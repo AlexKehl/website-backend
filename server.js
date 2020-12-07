@@ -23,9 +23,26 @@ MongoClient.connect(`mongodb://${process.env.DB_URL}`, {
     });
   });
 
-  app.post('/login', Auth.login);
+  app.post('/login', async (req, res) => {
+    const { accessToken, refreshToken } = await Auth.login({
+      email: req.body.email,
+      password: req.body.password,
+    });
 
-  app.post('/token', Auth.refreshToken);
+    res.json({ accessToken, refreshToken });
+  });
+
+  app.post('/token', async (req, res) => {
+    try {
+      const { accessToken } = await Auth.refreshToken({
+        email: req.body.email,
+        refreshToken: req.body.refreshToken,
+      });
+      res.json({ accessToken });
+    } catch (e) {
+      res.sendStatus(e.status || 403);
+    }
+  });
 
   const port = 3001;
 

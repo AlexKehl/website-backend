@@ -2,11 +2,12 @@
 
 const jwt = require('jsonwebtoken');
 
-const ModuleProvider = ({ itemsDb }) => {
+const ModuleProvider = ({ mainDb }) => {
   const env = process.env;
+  const Db = require('./db')({ mainDb });
   const Auth = require('./Auth')({
     env,
-    itemsDb,
+    Db,
     jwt,
   });
 

@@ -1,28 +1,29 @@
-const refreshTokens = [];
-
-const Auth = ({ env, itemsDb, jwt }) => {
+const Auth = ({ env, Db, jwt }) => {
   const generateAccessToken = user =>
     jwt.sign(user, env.ACCESS_TOKEN_SECRET, { expiresIn: '45s' });
 
-  const login = async (req, res) => {
+  const generateRefreshToken = user => jwt.sign(user, env.REFRESH_TOKEN_SECRET);
+
+  const login = async ({ email, password }) => {
     const user = {
-      email: 123,
+      email,
     };
-    const username = req.body.email;
     const accessToken = generateAccessToken(user);
-    const refreshToken = jwt.sign(user, env.REFRESH_TOKEN_SECRET);
-    refreshTokens.push(refreshToken);
-    res.json({ accessToken, refreshToken });
+    const refreshToken = generateRefreshToken(user);
+    await Db.updateUser({ email, refreshToken });
+    return { accessToken, refreshToken };
   };
 
-  const authenticateToken = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    const [, token] = authHeader && authHeader.split(' ');
+  const getAccessTokenFromHeader = ({ authorization }) =>
+    authorization && authorization.split(' ')[1];
+
+  const authenticateToken = (req, res, next) => {
+    const token = getAccessTokenFromHeader(req.headers);
     if (!token) {
       return res.sendStatus(401);
     }
     try {
-      const user = await jwt.verify(token, env.ACCESS_TOKEN_SECRET);
+      const user = jwt.verify(token, env.ACCESS_TOKEN_SECRET);
       req.user = user;
       next();
     } catch (e) {
@@ -30,20 +31,20 @@ const Auth = ({ env, itemsDb, jwt }) => {
     }
   };
 
-  const refreshToken = async (req, res) => {
-    const refreshToken = req.body.token;
+  const refreshToken = async ({ email, refreshToken }) => {
     if (!refreshToken) {
-      return res.sendStatus(401);
+      return { status: 401 };
     }
-    if (!refreshTokens.includes(refreshToken)) {
-      return res.sendStatus(403);
+    const userDoc = await Db.getUser(email);
+    if (!userDoc.refreshToken) {
+      return { status: 403 };
     }
     try {
-      const user = await jwt.verify(refreshToken, env.REFRESH_TOKEN_SECRET);
+      const user = jwt.verify(refreshToken, env.REFRESH_TOKEN_SECRET);
       const accessToken = generateAccessToken({ email: user.emal });
-      res.json({ accessToken });
+      return { accessToken };
     } catch (e) {
-      return res.sendStatus(403);
+      return { status: 403 };
     }
   };
 
@@ -51,6 +52,7 @@ const Auth = ({ env, itemsDb, jwt }) => {
     login,
     refreshToken,
     authenticateToken,
+    getAccessTokenFromHeader,
   };
 };
 
