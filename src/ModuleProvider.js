@@ -10,7 +10,8 @@ const ModuleProvider = ({ mainDb }) => {
     Db,
     jwt,
   });
+  const Routes = require('./routes')({ mainDb, Auth });
 
-  return { Auth };
+  return { Auth, Routes };
 };
 module.exports = ModuleProvider;
