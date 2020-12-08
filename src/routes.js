@@ -15,12 +15,16 @@ const Routes = ({ Auth }) => {
     });
 
     app.post('/login', async (req, res) => {
-      const { accessToken, refreshToken } = await Auth.login({
-        email: req.body.email,
-        password: req.body.password,
-      });
+      try {
+        const { accessToken, refreshToken } = await Auth.login({
+          email: req.body.email,
+          password: req.body.password,
+        });
 
-      res.json({ accessToken, refreshToken });
+        res.json({ accessToken, refreshToken });
+      } catch (e) {
+        res.sendStatus(e.status || 401);
+      }
     });
 
     app.post('/token', async (req, res) => {

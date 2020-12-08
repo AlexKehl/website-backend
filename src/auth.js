@@ -1,10 +1,25 @@
+const bcrypt = require('bcrypt');
+
 const Auth = ({ env, Db, jwt }) => {
   const generateAccessToken = user =>
     jwt.sign(user, env.ACCESS_TOKEN_SECRET, { expiresIn: '45s' });
 
   const generateRefreshToken = user => jwt.sign(user, env.REFRESH_TOKEN_SECRET);
 
+  const checkUser = async ({ email, password }) => {
+    try {
+      const { passwordHash } = await Db.getUser(email);
+      return await bcrypt.compare(password, passwordHash);
+    } catch (e) {
+      return false;
+    }
+  };
+
   const login = async ({ email, password }) => {
+    const hasValidCredentials = await checkUser({ email, password });
+    if (!hasValidCredentials) {
+      throw new Error({ status: 401 });
+    }
     const user = {
       email,
     };
@@ -49,6 +64,7 @@ const Auth = ({ env, Db, jwt }) => {
   };
 
   return {
+    checkUser,
     login,
     refreshToken,
     authenticateToken,

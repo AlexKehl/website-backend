@@ -14,7 +14,7 @@ const db = ({ mainDb }) => {
 
   const getUser = async email => {
     const collection = mainDb.collection('users');
-    return await collection.find({ _id: { $eq: email } });
+    return await collection.findOne({ _id: { $eq: email } });
   };
 
   return { updateUser, getUser };

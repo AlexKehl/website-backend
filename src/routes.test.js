@@ -1,4 +1,4 @@
-/* global describe, it, afterAll, beforeAll, process */
+/* global describe, test, afterAll, expect, beforeAll, process */
 
 require('dotenv').config();
 
@@ -26,14 +26,35 @@ describe('Server routes', () => {
     client.close();
   });
 
-  it('should create a new post', async () => {
+  test('It should return unauthorized (401) for invalid token', async () => {
     const res = await request(app).get('/');
-    console.log(res);
-    //   .send({
-    //     userId: 1,
-    //     title: 'test is cool',
-    //   });
-    // expect(res.statusCode).toEqual(201);
-    // expect(res.body).toHaveProperty('post');
+
+    expect(res.statusCode).toEqual(401);
+  });
+
+  test(`login route should return access and refreshToken
+  for valid credentials`, async () => {
+    const input = { email: 'test@test.com', password: '123' };
+
+    const res = await request(app)
+      .post('/login')
+      .send(input);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual({
+      accessToken: expect.any(String),
+      refreshToken: expect.any(String),
+    });
+  });
+
+  test('login route should return 401 if credentials are wrong', async () => {
+    const input = { email: 'foo@bar.com', password: '123' };
+
+    const res = await request(app)
+      .post('/login')
+      .send(input);
+
+    expect(res.statusCode).toEqual(401);
+    expect(res.body).toEqual({});
   });
 });

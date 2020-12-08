@@ -16,6 +16,7 @@ const Db = {
 };
 
 const {
+  checkUser,
   refreshToken,
   login,
   getAccessTokenFromHeader,
@@ -30,13 +31,36 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe('login', () => {
-  it('works', () => {
-    expect(true).toEqual(true);
+describe('checkUser', () => {
+  it('returns false if password doesnt match passwordHash', async () => {
+    Db.getUser.mockResolvedValue({ passwordHash: '1234' });
+    const input = { email: 'foo@bar.com', password: '123' };
+
+    const res = await checkUser(input);
+
+    expect(res).toBe(false);
   });
 
+  it('returns true if passwordhash matches', async () => {
+    Db.getUser.mockResolvedValue({
+      passwordHash:
+        '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
+    });
+    const input = { email: 'foo@bar.com', password: '123' };
+
+    const res = await checkUser(input);
+
+    expect(res).toBe(true);
+  });
+});
+
+describe('login', () => {
   it('returns an object with accessToken and refreshToken', async () => {
-    const input = { email: 'foo@bar.com' };
+    Db.getUser.mockResolvedValue({
+      passwordHash:
+        '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
+    });
+    const input = { email: 'foo@bar.com', password: '123' };
 
     const res = await login(input);
 
@@ -46,13 +70,28 @@ describe('login', () => {
     });
   });
 
-  it('It calls Db.updateUser with email and refreshToken', async () => {
-    const input = { email: 'foo@bar.com' };
+  it('calls Db.updateUser with email and refreshToken', async () => {
+    Db.getUser.mockResolvedValue({ passwordHash: '1234' });
+    const input = { email: 'foo@bar.com', password: '123' };
+
+    const res = await login(input);
+
+    expect(res).toEqual({
+      status: 401,
+    });
+  });
+
+  it('updates user doc with new refreshToken after successful login', async () => {
+    Db.getUser.mockResolvedValue({
+      passwordHash:
+        '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
+    });
+    const input = { email: 'foo@bar.com', password: '123' };
 
     await login(input);
 
     expect(Db.updateUser).toHaveBeenCalledWith({
-      ...input,
+      email: 'foo@bar.com',
       refreshToken: 'someToken',
     });
     expect(Db.updateUser).toHaveBeenCalledTimes(1);
