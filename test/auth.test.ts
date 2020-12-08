@@ -171,21 +171,21 @@ describe('authenticateToken', () => {
 
 describe('refreshToken', () => {
   it('throws with status 401 if no refreshtoken passed', async () => {
-    const input = { email: 123 };
+    const input = { email: 123, refreshToken: undefined };
 
-    expect(refreshToken(input)).rejects.toEqual({ status: 401 });
+    expect(refreshToken(input)).rejects.toEqual(new Error('http: 401'));
   });
 
   it('throws status 403 if db has no refreshtoken for this user', async () => {
     Db.getUser.mockResolvedValue({ email: 123 });
     const input = { email: 123, refreshToken: 'someRefreshToken' };
 
-    expect(refreshToken(input)).rejects.toEqual({ status: 403 });
+    expect(refreshToken(input)).rejects.toEqual(new Error('http: 403'));
     expect(Db.getUser).toHaveBeenCalledWith(123);
     expect(Db.getUser).toHaveBeenCalledTimes(1);
   });
 
-  it('throws status 403 if jwt.verify throws error', async () => {
+  it('throws error if jwt.verify throws error', async () => {
     Db.getUser.mockResolvedValue({
       email: 123,
       refreshToken: 'someRefreshToken',
@@ -195,7 +195,7 @@ describe('refreshToken', () => {
     });
     const input = { email: 123, refreshToken: 'someRefreshToken' };
 
-    expect(refreshToken(input)).rejects.toEqual({ status: 403 });
+    expect(refreshToken(input)).rejects.toEqual(new Error('someError'));
   });
 
   it('returns obj with new accessToken if jwt.verify was successful', async () => {

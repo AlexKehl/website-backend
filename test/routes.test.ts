@@ -3,24 +3,28 @@
   @group e2e
 */
 
-require('dotenv').config();
+import { config } from 'dotenv';
+config();
 
-const request = require('supertest');
-const MongoClient = require('mongodb').MongoClient;
+import * as request from 'supertest';
+import { MongoClient } from 'mongodb';
+import ModuleProviderFn from '../src/ModuleProvider';
+import { Express } from 'express-serve-static-core';
+import { Server } from 'http';
 
 console.log = jest.fn();
 
 describe('Server routes', () => {
-  let client;
-  let app;
-  let server;
+  let client: MongoClient;
+  let app: Express;
+  let server: Server;
   let Db;
   beforeAll(async () => {
     client = await MongoClient.connect(`mongodb://${process.env.DB_URL}`, {
       useUnifiedTopology: true,
     });
     const mainDb = client.db('test');
-    const ModuleProvider = require('../src/ModuleProvider')({ mainDb });
+    const ModuleProvider = ModuleProviderFn({ mainDb });
     const { Routes } = ModuleProvider;
     Db = ModuleProvider.Db;
     const routesObj = Routes.start(3002);
@@ -33,10 +37,10 @@ describe('Server routes', () => {
     client.close();
   });
 
-  test('It should return unauthorized (401) for invalid token', async () => {
+  test('It should return forbidden (403) for invalid token', async () => {
     const res = await request(app).get('/');
 
-    expect(res.statusCode).toEqual(401);
+    expect(res.status).toEqual(403);
   });
 
   test(`login route should return access and refreshToken
@@ -47,7 +51,7 @@ describe('Server routes', () => {
       .post('/login')
       .send(input);
 
-    expect(res.statusCode).toEqual(200);
+    expect(res.status).toEqual(200);
     expect(res.body).toEqual({
       accessToken: expect.any(String),
       refreshToken: expect.any(String),
@@ -61,7 +65,7 @@ describe('Server routes', () => {
       .post('/login')
       .send(input);
 
-    expect(res.statusCode).toEqual(401);
+    expect(res.status).toEqual(401);
     expect(res.body).toEqual({});
   });
 
@@ -72,7 +76,7 @@ describe('Server routes', () => {
       .post('/token')
       .send({ ...validUser });
 
-    expect(res.statusCode).toEqual(200);
+    expect(res.status).toEqual(200);
     expect(res.body.accessToken).toEqual(expect.any(String));
   });
 
@@ -83,7 +87,7 @@ describe('Server routes', () => {
       .post('/token')
       .send({ ...input });
 
-    expect(res.statusCode).toEqual(403);
+    expect(res.status).toEqual(403);
     expect(res.body).toEqual({});
   });
 });

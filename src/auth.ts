@@ -1,12 +1,8 @@
 import { compare } from 'bcrypt';
-import { Request, Response, NextFunction } from 'express';
 import { IncomingHttpHeaders } from 'http';
+import { User } from './types';
 
 const Auth = ({ env, Db, jwt }) => {
-  interface User {
-    email: string;
-    password: string;
-  }
   const generateAccessToken = (user: { email: string }) =>
     jwt.sign(user, env.ACCESS_TOKEN_SECRET, { expiresIn: '45s' });
 

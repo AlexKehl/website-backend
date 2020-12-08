@@ -1,5 +1,6 @@
-import express from 'express';
-import cors from 'cors';
+import * as express from 'express';
+import { Request, Response, NextFunction } from 'express';
+import * as cors from 'cors';
 
 const Routes = ({ Auth }) => {
   const start = (port: number) => {
@@ -8,12 +9,16 @@ const Routes = ({ Auth }) => {
     app.use(cors());
     app.use(express.json());
 
-    const tokenMiddleWare = (req, res, next) => {
+    const tokenMiddleWare = (
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ) => {
       try {
         Auth.authenticateToken(req.headers);
         next();
       } catch (e) {
-        res.sendStatus(e.status || 403);
+        res.sendStatus(403);
       }
     };
 

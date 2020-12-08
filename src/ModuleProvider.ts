@@ -4,8 +4,9 @@ import * as jwt from 'jsonwebtoken';
 import DbFn from './db';
 import AuthFn from './Auth';
 import RoutesFn from './routes';
+import * as mongodb from 'mongodb';
 
-const ModuleProvider = ({ mainDb }) => {
+const ModuleProvider = ({ mainDb }: { mainDb: mongodb.Db }) => {
   const env = process.env;
   const Db = DbFn({ mainDb });
   const Auth = AuthFn({

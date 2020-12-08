@@ -1,10 +1,11 @@
-const Db = ({ mainDb }) => {
-  const updateUser = async userObj => {
+import * as mongodb from 'mongodb';
+const Db = ({ mainDb }: { mainDb: mongodb.Db }) => {
+  const updateUser = async (user: { email: string }) => {
     try {
       const collection = mainDb.collection('users');
       await collection.updateOne(
-        { _id: userObj.email },
-        { $set: userObj },
+        { _id: user.email },
+        { $set: user },
         { upsert: true },
       );
     } catch (e) {
@@ -12,7 +13,7 @@ const Db = ({ mainDb }) => {
     }
   };
 
-  const getUser = async email => {
+  const getUser = async (email: string) => {
     const collection = mainDb.collection('users');
     return await collection.findOne({ _id: { $eq: email } });
   };
