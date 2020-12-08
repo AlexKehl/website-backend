@@ -1,4 +1,7 @@
 /* global describe, test, afterAll, expect, beforeAll, process, jest */
+/*
+  @group e2e
+*/
 
 require('dotenv').config();
 

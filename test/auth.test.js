@@ -1,4 +1,7 @@
 /* global describe, it, expect, jest, beforeEach */
+/*
+  @group unit
+*/
 
 const env = {
   ACCESS_TOKEN_SECRET: '444',
