@@ -1,13 +1,15 @@
 /* global process */
 
-require('dotenv').config();
+import { config } from 'dotenv';
+import ModuleProviderFn from './src/ModuleProvider';
+config();
 
-const MongoClient = require('mongodb').MongoClient;
+import { MongoClient } from 'mongodb';
 
 MongoClient.connect(`mongodb://${process.env.DB_URL}`, {
   useUnifiedTopology: true,
 }).then(client => {
   const mainDb = client.db('main');
-  const { Routes } = require('./src/ModuleProvider')({ mainDb });
+  const { Routes } = ModuleProviderFn({ mainDb });
   Routes.start(3001);
 });

@@ -1,14 +1,23 @@
-const Routes = ({ Auth }) => {
-  const express = require('express');
-  const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 
-  const start = port => {
+const Routes = ({ Auth }) => {
+  const start = (port: number) => {
     const app = express();
 
     app.use(cors());
     app.use(express.json());
 
-    app.get('/', Auth.authenticateToken, (req, res) => {
+    const tokenMiddleWare = (req, res, next) => {
+      try {
+        Auth.authenticateToken(req.headers);
+        next();
+      } catch (e) {
+        res.sendStatus(e.status || 403);
+      }
+    };
+
+    app.get('/', tokenMiddleWare, (req, res) => {
       res.json({
         message: 'Hello world!',
       });
@@ -49,4 +58,4 @@ const Routes = ({ Auth }) => {
   return { start };
 };
 
-module.exports = Routes;
+export default Routes;

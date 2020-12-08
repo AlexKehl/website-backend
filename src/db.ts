@@ -1,4 +1,4 @@
-const db = ({ mainDb }) => {
+const Db = ({ mainDb }) => {
   const updateUser = async userObj => {
     try {
       const collection = mainDb.collection('users');
@@ -20,4 +20,4 @@ const db = ({ mainDb }) => {
   return { updateUser, getUser };
 };
 
-module.exports = db;
+export default Db;
