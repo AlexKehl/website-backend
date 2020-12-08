@@ -1,21 +1,25 @@
-/* global describe, test, afterAll, expect, beforeAll, process */
+/* global describe, test, afterAll, expect, beforeAll, process, jest */
 
 require('dotenv').config();
 
 const request = require('supertest');
 const MongoClient = require('mongodb').MongoClient;
 
+console.log = jest.fn();
+
 describe('Server routes', () => {
-  let Routes;
   let client;
   let app;
   let server;
+  let Db;
   beforeAll(async () => {
     client = await MongoClient.connect(`mongodb://${process.env.DB_URL}`, {
       useUnifiedTopology: true,
     });
     const mainDb = client.db('test');
-    Routes = require('./ModuleProvider')({ mainDb }).Routes;
+    const ModuleProvider = require('../src/ModuleProvider')({ mainDb });
+    const { Routes } = ModuleProvider;
+    Db = ModuleProvider.Db;
     const routesObj = Routes.start(3002);
     app = routesObj.app;
     server = routesObj.server;
@@ -55,6 +59,28 @@ describe('Server routes', () => {
       .send(input);
 
     expect(res.statusCode).toEqual(401);
+    expect(res.body).toEqual({});
+  });
+
+  test('token route refreshes accessToken given valid refreshToken', async () => {
+    const validUser = await Db.getUser('test@test.com');
+
+    const res = await request(app)
+      .post('/token')
+      .send({ ...validUser });
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.accessToken).toEqual(expect.any(String));
+  });
+
+  test('token route does not refresh accessToken for invalid refreshToken', async () => {
+    const input = { email: 'test@test.com', refreshToken: 'someToken' };
+
+    const res = await request(app)
+      .post('/token')
+      .send({ ...input });
+
+    expect(res.statusCode).toEqual(403);
     expect(res.body).toEqual({});
   });
 });

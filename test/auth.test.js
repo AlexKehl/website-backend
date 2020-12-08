@@ -74,11 +74,11 @@ describe('login', () => {
     Db.getUser.mockResolvedValue({ passwordHash: '1234' });
     const input = { email: 'foo@bar.com', password: '123' };
 
-    const res = await login(input);
-
-    expect(res).toEqual({
-      status: 401,
-    });
+    expect(login(input)).rejects.toEqual(
+      new Error({
+        status: 401,
+      }),
+    );
   });
 
   it('updates user doc with new refreshToken after successful login', async () => {
@@ -187,26 +187,22 @@ describe('authenticateToken', () => {
 });
 
 describe('refreshToken', () => {
-  it('returns status 401 if no refreshtoken passed', async () => {
+  it('throws with status 401 if no refreshtoken passed', async () => {
     const input = { email: 123 };
 
-    const res = await refreshToken(input);
-
-    expect(res).toEqual({ status: 401 });
+    expect(refreshToken(input)).rejects.toEqual(new Error({ status: 401 }));
   });
 
-  it('returns status 403 if db has no refreshtoken for this user', async () => {
+  it('throws status 403 if db has no refreshtoken for this user', async () => {
     Db.getUser.mockResolvedValue({ email: 123 });
     const input = { email: 123, refreshToken: 'someRefreshToken' };
 
-    const res = await refreshToken(input);
-
-    expect(res).toEqual({ status: 403 });
+    expect(refreshToken(input)).rejects.toEqual(new Error({ status: 403 }));
     expect(Db.getUser).toHaveBeenCalledWith(123);
     expect(Db.getUser).toHaveBeenCalledTimes(1);
   });
 
-  it('returns status 403 if jwt.verify throws error', async () => {
+  it('throws status 403 if jwt.verify throws error', async () => {
     Db.getUser.mockResolvedValue({
       email: 123,
       refreshToken: 'someRefreshToken',
@@ -216,9 +212,7 @@ describe('refreshToken', () => {
     });
     const input = { email: 123, refreshToken: 'someRefreshToken' };
 
-    const res = await refreshToken(input);
-
-    expect(res).toEqual({ status: 403 });
+    expect(refreshToken(input)).rejects.toEqual(new Error({ status: 403 }));
   });
 
   it('returns obj with new accessToken if jwt.verify was successful', async () => {

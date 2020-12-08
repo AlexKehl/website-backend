@@ -48,18 +48,18 @@ const Auth = ({ env, Db, jwt }) => {
 
   const refreshToken = async ({ email, refreshToken }) => {
     if (!refreshToken) {
-      return { status: 401 };
+      throw new Error({ status: 401 });
     }
     const userDoc = await Db.getUser(email);
     if (!userDoc.refreshToken) {
-      return { status: 403 };
+      throw new Error({ status: 403 });
     }
     try {
       const user = jwt.verify(refreshToken, env.REFRESH_TOKEN_SECRET);
       const accessToken = generateAccessToken({ email: user.emal });
       return { accessToken };
     } catch (e) {
-      return { status: 403 };
+      throw new Error({ status: 403 });
     }
   };
 
