@@ -6,6 +6,7 @@ module.exports = {
       diagnostics: false,
     },
   },
+  runner: 'groups',
   roots: ['<rootDir>'],
   preset: 'ts-jest',
   testEnvironment: 'node',
