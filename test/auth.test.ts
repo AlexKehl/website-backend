@@ -3,34 +3,21 @@
   @group unit
 */
 
-import Auth from '../src/auth';
+import { config } from 'dotenv';
 
-const env = {
-  ACCESS_TOKEN_SECRET: '444',
-  REFRESH_TOKEN_SECRET: '123',
-};
+config();
 
-const jwt = {
-  sign: jest.fn(() => 'someToken'),
-  verify: jest.fn(() => 'someToken'),
-};
-
-const Db = {
-  updateUser: jest.fn(),
-  getUser: jest.fn(),
-};
-
-const {
+import {
   checkUser,
-  refreshToken,
   login,
-  getAccessTokenFromHeader,
+  refreshToken,
   authenticateToken,
-} = Auth({
-  env,
-  Db,
-  jwt,
-});
+  getAccessTokenFromHeader,
+} from '@/Auth';
+
+import UserModel from '@/model/User';
+
+jest.mock('@/model/User');
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -38,7 +25,10 @@ beforeEach(() => {
 
 describe('checkUser', () => {
   it('returns false if password doesnt match passwordHash', async () => {
-    Db.getUser.mockResolvedValue({ passwordHash: '1234' });
+    (UserModel.findOne as jest.Mock).mockResolvedValue({
+      email: 'foo',
+      passwordHash: '1234',
+    });
     const input = { email: 'foo@bar.com', password: '123' };
 
     const res = await checkUser(input);
@@ -47,7 +37,7 @@ describe('checkUser', () => {
   });
 
   it('returns true if passwordhash matches', async () => {
-    Db.getUser.mockResolvedValue({
+    (UserModel.findOne as jest.Mock).mockResolvedValue({
       passwordHash:
         '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
     });
@@ -61,7 +51,7 @@ describe('checkUser', () => {
 
 describe('login', () => {
   it('returns an object with accessToken and refreshToken', async () => {
-    Db.getUser.mockResolvedValue({
+    (UserModel.findOne as jest.Mock).mockResolvedValue({
       passwordHash:
         '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
     });
@@ -70,20 +60,22 @@ describe('login', () => {
     const res = await login(input);
 
     expect(res).toEqual({
-      accessToken: 'someToken',
-      refreshToken: 'someToken',
+      accessToken: expect.any(String),
+      refreshToken: expect.any(String),
     });
   });
 
-  it('calls Db.updateUser with email and refreshToken', async () => {
-    Db.getUser.mockResolvedValue({ passwordHash: '1234' });
+  it('throws an error if credentials are invalid', async () => {
+    (UserModel.findOne as jest.Mock).mockResolvedValue({
+      passwordHash: '1234',
+    });
     const input = { email: 'foo@bar.com', password: '123' };
 
-    expect(login(input)).rejects.toEqual({ status: 401 });
+    expect(login(input)).rejects.toEqual(new Error('http: 401'));
   });
 
   it('updates user doc with new refreshToken after successful login', async () => {
-    Db.getUser.mockResolvedValue({
+    (UserModel.findOne as jest.Mock).mockResolvedValue({
       passwordHash:
         '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
     });
@@ -91,11 +83,15 @@ describe('login', () => {
 
     await login(input);
 
-    expect(Db.updateUser).toHaveBeenCalledWith({
-      email: 'foo@bar.com',
-      refreshToken: 'someToken',
-    });
-    expect(Db.updateUser).toHaveBeenCalledTimes(1);
+    expect(UserModel.updateOne).toHaveBeenCalledWith(
+      {
+        email: 'foo@bar.com',
+      },
+      {
+        refreshToken: expect.any(String),
+      },
+    );
+    expect(UserModel.updateOne).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -129,85 +125,47 @@ describe('authenticateToken', () => {
   });
 
   it('throws if token is invalid (expired or smth.)', () => {
-    jwt.verify.mockImplementation(() => {
-      throw new Error('someError');
-    });
     const input = { authorization: 'Bearer someToken' };
 
     expect(() => {
       authenticateToken(input);
     }).toThrow();
   });
-
-  // it('adds user to req and calls next if token is valid', () => {
-  //   jwt.verify.mockReturnValue({
-  //     email: '123',
-  //     iat: 1607360812,
-  //     exp: 1607360857,
-  //   });
-  //   const req = {
-  //     headers: { authorization: 'Bearer someToken' },
-  //   };
-  //   const res = {
-  //     sendStatus: jest.fn(),
-  //   };
-  //
-  //   const next = jest.fn();
-  //
-  //   authenticateToken(req, res, next);
-  //
-  //   expect(res.sendStatus).not.toHaveBeenCalled();
-  //   expect(next).toHaveBeenCalledTimes(1);
-  //   expect(req).toEqual({
-  //     headers: { authorization: 'Bearer someToken' },
-  //     user: {
-  //       email: '123',
-  //       iat: 1607360812,
-  //       exp: 1607360857,
-  //     },
-  //   });
-  // });
 });
 
 describe('refreshToken', () => {
-  it('throws with status 401 if no refreshtoken passed', async () => {
-    const input = { email: 123, refreshToken: undefined };
-
-    expect(refreshToken(input)).rejects.toEqual(new Error('http: 401'));
-  });
-
   it('throws status 403 if db has no refreshtoken for this user', async () => {
-    Db.getUser.mockResolvedValue({ email: 123 });
-    const input = { email: 123, refreshToken: 'someRefreshToken' };
+    (UserModel.findOne as jest.Mock).mockResolvedValue({ email: 123 });
+    const input = { email: '123', refreshToken: 'someRefreshToken' };
 
     expect(refreshToken(input)).rejects.toEqual(new Error('http: 403'));
-    expect(Db.getUser).toHaveBeenCalledWith(123);
-    expect(Db.getUser).toHaveBeenCalledTimes(1);
+    expect(UserModel.findOne).toHaveBeenCalledWith({ email: '123' });
+    expect(UserModel.findOne).toHaveBeenCalledTimes(1);
   });
 
   it('throws error if jwt.verify throws error', async () => {
-    Db.getUser.mockResolvedValue({
-      email: 123,
+    (UserModel.findOne as jest.Mock)({
+      email: '123',
       refreshToken: 'someRefreshToken',
     });
-    jwt.verify.mockImplementation(() => {
-      throw new Error('someError');
-    });
-    const input = { email: 123, refreshToken: 'someRefreshToken' };
+    const input = { email: '123', refreshToken: 'someRefreshToken' };
 
-    expect(refreshToken(input)).rejects.toEqual(new Error('someError'));
+    expect(refreshToken(input)).rejects.toEqual(new Error('http: 403'));
   });
 
   it('returns obj with new accessToken if jwt.verify was successful', async () => {
-    Db.getUser.mockResolvedValue({
-      email: 123,
+    (UserModel.findOne as jest.Mock).mockResolvedValue({
+      email: '123',
       refreshToken: 'someRefreshToken',
     });
-    jwt.verify.mockReturnValue('someAccessToken');
-    const input = { email: 123, refreshToken: 'someRefreshToken' };
+    const input = {
+      email: '123',
+      refreshToken:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MDc4MDY2NDZ9.zZuoh9FrFjQiJk_3gtX0IJsafE9tz4-pP8LrgNF0OW8',
+    };
 
     const res = await refreshToken(input);
 
-    expect(res).toEqual({ accessToken: 'someToken' });
+    expect(res).toEqual({ accessToken: expect.any(String) });
   });
 });

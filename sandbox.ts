@@ -1,15 +1,34 @@
-const jwt = require('jsonwebtoken');
+import { config } from 'dotenv';
+import { connect } from 'mongoose';
+import UserModel from './src/model/User';
 
-const main = async () => {
-  try {
-    const res = jwt.verify(
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEyMyIsImlhdCI6MTYwNzM2MDgxMiwiZXhwIjoxNjA3MzYwODU3fQ.UO3xIjz2eecgg7urfN9R9EO5XbXykohsa-YJq78ld8A',
-      '9c1cbba397041f531da6616430c4cf3f40f3834c2c0ac4492b9373e7c6af15693b717796aa2241179d23c96b37c6c8ed4eaa376966b7f19551e5e6becf786008',
-    );
-    console.log(res);
-  } catch (e) {
-    console.log('jo', e);
-  }
+config();
+
+export const main = async () => {
+  // await connect(
+  //   `mongodb://${process.env.DB_URL}`,
+  //   { dbName: 'main' },
+  // );
+  // const newUser = new UserModel({
+  //   email: 'testUser3',
+  // });
+  // const email = 'testUser3';
+  //
+  // const foundUser = await UserModel.updateOne(
+  //   { email },
+  //   { refreshToken: '42' },
+  // );
+
+  //
+  // const foundUser = await UserModel.findOne({ email: 'testUser3' });
+
+  // const res = await newUser.updateOne(
+  //   { email: 'testUser3' },
+  //   { $set: R.omit(['_id'], itemToPut) },
+  // );
+
+  // console.log(foundUser);
+  console.log(process.env.ACCESS_TOKEN_SECRET);
 };
 
 main();
