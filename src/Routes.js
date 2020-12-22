@@ -17,7 +17,7 @@ const start = port => {
       exposedHeaders: '*',
       credentials: true,
       preflightContinue: true,
-    }),
+    })
   );
 
   const tokenMiddleWare = (req, res, next) => {
@@ -70,21 +70,22 @@ const start = port => {
   });
 
   app.post('/fileupload', async (req, res) => {
-    console.log(req.files.image);
+    console.log(req.body);
 
-    const file = req.files.image;
-
-    if (!('mv' in file)) {
-      res.sendStatus(500);
-    }
-
-    try {
-      const mvRes = await file.mv(`./${file.name}`);
-      res.send('OK');
-    } catch (e) {
-      res.sendStatus(500);
-      console.log(e);
-    }
+    res.send('ok');
+    // const file = req.files.image;
+    //
+    // if (!('mv' in file)) {
+    //   res.sendStatus(500);
+    // }
+    //
+    // try {
+    //   const mvRes = await file.mv(`./${file.name}`);
+    //   res.send('OK');
+    // } catch (e) {
+    //   res.sendStatus(500);
+    //   console.log(e);
+    // }
   });
 
   const server = app.listen(port, () => {
