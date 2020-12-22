@@ -1,25 +1,23 @@
-import { compare } from 'bcrypt';
-import { IncomingHttpHeaders } from 'http';
-import * as jwt from 'jsonwebtoken';
-import UserModel from './model/User';
-import { ICredentials } from './types';
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const UserModel = require('src/model/User.js');
 
-const generateAccessToken = ({ email }: { email: string }) =>
+const generateAccessToken = ({ email }) =>
   jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '45s' });
 
-const generateRefreshToken = ({ email }: { email: string }) =>
+const generateRefreshToken = ({ email }) =>
   jwt.sign({ email }, process.env.REFRESH_TOKEN_SECRET);
 
-const checkUser = async ({ email, password }: ICredentials) => {
+const checkUser = async ({ email, password }) => {
   try {
     const { passwordHash } = await UserModel.findOne({ email });
-    return await compare(password, passwordHash);
+    return await bcrypt.compare(password, passwordHash);
   } catch (e) {
     return false;
   }
 };
 
-const login = async ({ email, password }: ICredentials) => {
+const login = async ({ email, password }) => {
   const hasValidCredentials = await checkUser({ email, password });
   if (!hasValidCredentials) {
     throw new Error('http: 401');
@@ -31,10 +29,10 @@ const login = async ({ email, password }: ICredentials) => {
   return { accessToken, refreshToken };
 };
 
-const getAccessTokenFromHeader = ({ authorization }: IncomingHttpHeaders) =>
+const getAccessTokenFromHeader = ({ authorization }) =>
   authorization && authorization.split(' ')[1];
 
-const authenticateToken = (headers: IncomingHttpHeaders) => {
+const authenticateToken = headers => {
   const token = getAccessTokenFromHeader(headers);
   if (!token) {
     throw new Error('http: 401');
@@ -42,13 +40,7 @@ const authenticateToken = (headers: IncomingHttpHeaders) => {
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 };
 
-const refreshToken = async ({
-  email,
-  refreshToken,
-}: {
-  email: string;
-  refreshToken: string;
-}) => {
+const refreshToken = async ({ email, refreshToken }) => {
   if (!refreshToken) {
     throw new Error('http: 401');
   }
@@ -61,7 +53,7 @@ const refreshToken = async ({
   return { accessToken };
 };
 
-export {
+module.exports = {
   checkUser,
   login,
   refreshToken,

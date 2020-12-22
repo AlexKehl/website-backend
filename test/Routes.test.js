@@ -3,22 +3,21 @@
   @group e2e
 */
 
-import { config } from 'dotenv';
+const { config } = require('dotenv');
 config();
 
-import request from 'supertest';
-import mongoose, { connect } from 'mongoose';
-import { Express } from 'express-serve-static-core';
-import { Server } from 'http';
-import { start } from '@/Routes';
-import UserModel from '@/model/User';
+const request = require('supertest');
+const { connect } = require('mongoose');
+const { Server } = require('http');
+const { start } = require('src/Routes');
+const UserModel = require('src/model/User');
 
 console.log = jest.fn();
 
 describe('Server routes', () => {
-  let connection: typeof mongoose;
-  let server: Server;
-  let app: Express;
+  let connection;
+  let server;
+  let app;
   beforeAll(async () => {
     connection = await connect(
       `mongodb://${process.env.DB_URL}`,

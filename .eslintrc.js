@@ -1,27 +1,18 @@
 module.exports = {
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: 'module',
+  "env": {
+    "jest/globals": true,
+    "node": true,
+    "commonjs": true,
+    "es6": true
   },
-  extends: ['plugin:@typescript-eslint/recommended'],
-  overrides: [
-    {
-      files: ['*.ts'],
-      rules: {
-        'prefer-const': 'off',
-        '@typescript-eslint/explicit-module-boundary-types': 'off',
-      },
-    },
-  ],
-  env: {
-    browser: true,
-    commonjs: true,
-    es6: true,
+  "extends": "eslint:recommended",
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
   },
-  globals: {
-    Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly',
+  "parserOptions": {
+    "ecmaVersion": 2018
   },
-  rules: {},
+  "rules": {
+  }
 };

@@ -1,23 +1,22 @@
-/* global describe, it, expect, jest, beforeEach */
 /*
   @group unit
 */
 
-import { config } from 'dotenv';
+const { config } = require('dotenv');
 
 config();
 
-import {
+const {
   checkUser,
   login,
   refreshToken,
   authenticateToken,
   getAccessTokenFromHeader,
-} from '@/Auth';
+} = require('src/Auth');
 
-import UserModel from '@/model/User';
+const UserModel = require('src/model/User');
 
-jest.mock('@/model/User');
+jest.mock('src/model/User');
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -25,7 +24,7 @@ beforeEach(() => {
 
 describe('checkUser', () => {
   it('returns false if password doesnt match passwordHash', async () => {
-    (UserModel.findOne as jest.Mock).mockResolvedValue({
+    UserModel.findOne.mockResolvedValue({
       email: 'foo',
       passwordHash: '1234',
     });
@@ -37,7 +36,7 @@ describe('checkUser', () => {
   });
 
   it('returns true if passwordhash matches', async () => {
-    (UserModel.findOne as jest.Mock).mockResolvedValue({
+    UserModel.findOne.mockResolvedValue({
       passwordHash:
         '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
     });
@@ -51,7 +50,7 @@ describe('checkUser', () => {
 
 describe('login', () => {
   it('returns an object with accessToken and refreshToken', async () => {
-    (UserModel.findOne as jest.Mock).mockResolvedValue({
+    UserModel.findOne.mockResolvedValue({
       passwordHash:
         '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
     });
@@ -66,7 +65,7 @@ describe('login', () => {
   });
 
   it('throws an error if credentials are invalid', async () => {
-    (UserModel.findOne as jest.Mock).mockResolvedValue({
+    UserModel.findOne.mockResolvedValue({
       passwordHash: '1234',
     });
     const input = { email: 'foo@bar.com', password: '123' };
@@ -75,7 +74,7 @@ describe('login', () => {
   });
 
   it('updates user doc with new refreshToken after successful login', async () => {
-    (UserModel.findOne as jest.Mock).mockResolvedValue({
+    UserModel.findOne.mockResolvedValue({
       passwordHash:
         '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
     });
@@ -135,7 +134,7 @@ describe('authenticateToken', () => {
 
 describe('refreshToken', () => {
   it('throws status 403 if db has no refreshtoken for this user', async () => {
-    (UserModel.findOne as jest.Mock).mockResolvedValue({ email: 123 });
+    UserModel.findOne.mockResolvedValue({ email: 123 });
     const input = { email: '123', refreshToken: 'someRefreshToken' };
 
     expect(refreshToken(input)).rejects.toEqual(new Error('http: 403'));
@@ -144,7 +143,7 @@ describe('refreshToken', () => {
   });
 
   it('throws error if jwt.verify throws error', async () => {
-    (UserModel.findOne as jest.Mock)({
+    UserModel.findOne({
       email: '123',
       refreshToken: 'someRefreshToken',
     });
@@ -154,7 +153,7 @@ describe('refreshToken', () => {
   });
 
   it('returns obj with new accessToken if jwt.verify was successful', async () => {
-    (UserModel.findOne as jest.Mock).mockResolvedValue({
+    UserModel.findOne.mockResolvedValue({
       email: '123',
       refreshToken: 'someRefreshToken',
     });
