@@ -3,6 +3,8 @@ const cors = require('cors');
 const { login, refreshToken, authenticateToken } = require('src/Auth.js');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
+const { getFileListForCategory } = require('src/FileList');
+const { performFileUpload } = require('src/FileUpload');
 
 const start = port => {
   const app = express();
@@ -69,23 +71,30 @@ const start = port => {
     }
   });
 
-  app.post('/fileupload', async (req, res) => {
-    console.log(req.body);
+  app.get('/picturelist', async (req, res) => {
+    if (!req.query.category) {
+      res.sendStatus(500);
+    }
+    try {
+      const files = getFileListForCategory(req.query.category);
+      res.send(files);
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  });
 
-    res.send('ok');
-    // const file = req.files.image;
-    //
-    // if (!('mv' in file)) {
-    //   res.sendStatus(500);
-    // }
-    //
-    // try {
-    //   const mvRes = await file.mv(`./${file.name}`);
-    //   res.send('OK');
-    // } catch (e) {
-    //   res.sendStatus(500);
-    //   console.log(e);
-    // }
+  app.post('/fileupload', async (req, res) => {
+    try {
+      const res = await performFileUpload({
+        file: req.files.image,
+        fileMeta: req.body.fileMeta,
+      });
+      res.send('OK');
+    } catch (e) {
+      res.status(500).send(e.message);
+      console.log(e);
+    }
   });
 
   const server = app.listen(port, () => {
