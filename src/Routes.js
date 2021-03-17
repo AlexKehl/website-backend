@@ -5,6 +5,12 @@ const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const { getFileListForCategory } = require('src/FileList');
 const { performFileUpload } = require('src/FileUpload');
+const {
+  validateLoginReq,
+  validateTokenReq,
+  validateFileUploadReq,
+} = require('src/validators/middleware');
+const { adaptRequest } = require('src/utils/RequestAdapter');
 
 const start = port => {
   const app = express();
@@ -37,38 +43,34 @@ const start = port => {
     });
   });
 
-  app.post('/login', async (req, res) => {
-    try {
-      const { accessToken, refreshToken } = await login({
-        email: req.body.email,
-        password: req.body.password,
-      });
+  app.post('/login', validateLoginReq, async (req, res) => {
+    const httpRequest = adaptRequest(req);
+    const { headers, statusCode, data } = await login(httpRequest);
 
-      res.cookie('refreshToken', refreshToken, {
-        sameSite: true,
-        httpOnly: true,
-      });
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        sameSite: true,
-      });
-      res.cookie('hasActiveToken', true);
-      res.send({ accessToken, refreshToken });
-    } catch (e) {
-      res.sendStatus(e.status || 401);
-    }
+    res
+      .set(headers)
+      .status(statusCode)
+      .send(data);
+
+    // res.cookie('refreshToken', refreshToken, {
+    //   sameSite: true,
+    //   httpOnly: true,
+    // });
+    // res.cookie('accessToken', accessToken, {
+    //   httpOnly: true,
+    //   sameSite: true,
+    // });
+    // res.cookie('hasActiveToken', true);
   });
 
-  app.post('/token', async (req, res) => {
-    try {
-      const { accessToken } = await refreshToken({
-        email: req.body.email,
-        refreshToken: req.body.refreshToken,
-      });
-      res.status(200).json({ accessToken });
-    } catch (e) {
-      res.sendStatus(e.status || 403);
-    }
+  app.post('/token', validateTokenReq, async (req, res) => {
+    const httpRequest = adaptRequest(req);
+    const { headers, statusCode, data } = await refreshToken(httpRequest);
+
+    res
+      .set(headers)
+      .status(statusCode)
+      .send(data);
   });
 
   app.get('/picturelist', async (req, res) => {
@@ -85,6 +87,14 @@ const start = port => {
   });
 
   app.post('/fileupload', async (req, res) => {
+    const httpRequest = adaptRequest(req);
+    const { headers, statusCode, data } = await performFileUpload(httpRequest);
+
+    res
+      .set(headers)
+      .status(statusCode)
+      .send(data);
+
     try {
       const res = await performFileUpload({
         file: req.files.image,
@@ -98,7 +108,7 @@ const start = port => {
   });
 
   const server = app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`Server listening at http://localhost:${port}`);
   });
 
   return { app, server };

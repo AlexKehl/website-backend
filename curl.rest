@@ -1,0 +1,20 @@
+http://localhost:3002
+
+Content-Type: application/json
+
+POST /login
+{
+  "email": "test@test.com",
+  "password": "123"
+}
+
+http://localhost:3002
+
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MTU4NjQwNDZ9.hqbA_LWxQBq2jIGZ-tubleVbJKPulFWuYUaThto1C0Y
+GET /
+
+POST /token
+{
+  "email": "test@test.com",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MTU4NjQwNDZ9.hqbA_LWxQBq2jIGZ-tubleVbJKPulFWuYUaThto1C0Y"
+}

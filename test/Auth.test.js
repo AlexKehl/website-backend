@@ -1,10 +1,6 @@
-/*
-  @group unit
-*/
-
-const { config } = require('dotenv');
-
-config();
+const { setupModelTest } = require('test/utils');
+const { makeHttpResponse } = require('src/utils/HttpResponse');
+const { makeHttpError } = require('src/utils/HttpError');
 
 const {
   checkUser,
@@ -16,18 +12,15 @@ const {
 
 const UserModel = require('src/model/User');
 
-jest.mock('src/model/User');
-
-beforeEach(() => {
-  jest.clearAllMocks();
-});
+setupModelTest(UserModel, 'auth');
 
 describe('checkUser', () => {
   it('returns false if password doesnt match passwordHash', async () => {
-    UserModel.findOne.mockResolvedValue({
+    await UserModel.create({
       email: 'foo',
       passwordHash: '1234',
     });
+
     const input = { email: 'foo@bar.com', password: '123' };
 
     const res = await checkUser(input);
@@ -36,7 +29,8 @@ describe('checkUser', () => {
   });
 
   it('returns true if passwordhash matches', async () => {
-    UserModel.findOne.mockResolvedValue({
+    await UserModel.create({
+      email: 'foo@bar.com',
       passwordHash:
         '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
     });
@@ -50,47 +44,52 @@ describe('checkUser', () => {
 
 describe('login', () => {
   it('returns an object with accessToken and refreshToken', async () => {
-    UserModel.findOne.mockResolvedValue({
+    await UserModel.create({
+      email: 'foo@bar.com',
       passwordHash:
         '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
     });
-    const input = { email: 'foo@bar.com', password: '123' };
+    const input = { body: { email: 'foo@bar.com', password: '123' } };
 
     const res = await login(input);
 
-    expect(res).toEqual({
-      accessToken: expect.any(String),
-      refreshToken: expect.any(String),
+    const expected = makeHttpResponse({
+      statusCode: 200,
+      data: {
+        accessToken: expect.any(String),
+        refreshToken: expect.any(String),
+      },
     });
+
+    expect(res).toEqual(expected);
   });
 
-  it('throws an error if credentials are invalid', async () => {
-    UserModel.findOne.mockResolvedValue({
-      passwordHash: '1234',
-    });
-    const input = { email: 'foo@bar.com', password: '123' };
+  it('an http error if credentials are invalid', async () => {
+    const input = { body: { email: 'foo@bar.com', password: '123' } };
+    const res = await login(input);
 
-    expect(login(input)).rejects.toEqual(new Error('http: 401'));
+    const expected = makeHttpError({
+      statusCode: 401,
+      error: 'Invalid Credentials',
+    });
+    expect(res).toEqual(expected);
   });
 
   it('updates user doc with new refreshToken after successful login', async () => {
-    UserModel.findOne.mockResolvedValue({
+    await UserModel.create({
+      email: 'foo@bar.com',
       passwordHash:
         '$2b$10$oXWszZoSMWRJ.PpGVdKqw.xqZBbTpAoAWQnCBBPF2HqtEsTvdJ9K.',
     });
-    const input = { email: 'foo@bar.com', password: '123' };
+    const input = { body: { email: 'foo@bar.com', password: '123' } };
 
     await login(input);
 
-    expect(UserModel.updateOne).toHaveBeenCalledWith(
-      {
-        email: 'foo@bar.com',
-      },
-      {
-        refreshToken: expect.any(String),
-      },
-    );
-    expect(UserModel.updateOne).toHaveBeenCalledTimes(1);
+    const { refreshToken } = await UserModel.findOne({
+      email: 'foo@bar.com',
+    });
+
+    expect(typeof refreshToken).toEqual('string');
   });
 });
 
@@ -133,38 +132,106 @@ describe('authenticateToken', () => {
 });
 
 describe('refreshToken', () => {
-  it('throws status 403 if db has no refreshtoken for this user', async () => {
-    UserModel.findOne.mockResolvedValue({ email: 123 });
-    const input = { email: '123', refreshToken: 'someRefreshToken' };
-
-    expect(refreshToken(input)).rejects.toEqual(new Error('http: 403'));
-    expect(UserModel.findOne).toHaveBeenCalledWith({ email: '123' });
-    expect(UserModel.findOne).toHaveBeenCalledTimes(1);
-  });
-
-  it('throws error if jwt.verify throws error', async () => {
-    UserModel.findOne({
-      email: '123',
-      refreshToken: 'someRefreshToken',
-    });
-    const input = { email: '123', refreshToken: 'someRefreshToken' };
-
-    expect(refreshToken(input)).rejects.toEqual(new Error('http: 403'));
-  });
-
-  it('returns obj with new accessToken if jwt.verify was successful', async () => {
-    UserModel.findOne.mockResolvedValue({
-      email: '123',
-      refreshToken: 'someRefreshToken',
+  it('returns status 401 if db has no refreshtoken for this user', async () => {
+    await UserModel.create({
+      email: 'foo@bar.com',
     });
     const input = {
-      email: '123',
-      refreshToken:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MDc4MDY2NDZ9.zZuoh9FrFjQiJk_3gtX0IJsafE9tz4-pP8LrgNF0OW8',
+      body: { email: 'foo@bar.com', refreshToken: 'someRefreshToken' },
     };
 
     const res = await refreshToken(input);
 
-    expect(res).toEqual({ accessToken: expect.any(String) });
+    const expected = makeHttpError({
+      statusCode: 401,
+      error: 'No refreshToken stored',
+    });
+    expect(res).toEqual(expected);
+  });
+
+  it('returns status 403 if jwt.verify throws', async () => {
+    await UserModel.create({
+      email: 'foo@bar.com',
+      refreshToken: 'someRefreshToken',
+    });
+    const input = {
+      body: { email: 'foo@bar.com', refreshToken: 'someRefreshToken' },
+    };
+
+    const res = await refreshToken(input);
+
+    const expected = makeHttpError({
+      statusCode: 403,
+      error: 'Invalid refreshToken',
+    });
+    expect(res).toEqual(expected);
+  });
+
+  it('returns obj with new accessToken if jwt.verify was successful', async () => {
+    await UserModel.create({
+      email: '123',
+      refreshToken:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MDc4MDY2NDZ9.zZuoh9FrFjQiJk_3gtX0IJsafE9tz4-pP8LrgNF0OW8',
+    });
+    const input = {
+      body: {
+        email: '123',
+        refreshToken:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MDc4MDY2NDZ9.zZuoh9FrFjQiJk_3gtX0IJsafE9tz4-pP8LrgNF0OW8',
+      },
+    };
+
+    const res = await refreshToken(input);
+
+    const expected = makeHttpResponse({
+      statusCode: 200,
+      data: {
+        accessToken: expect.any(String),
+      },
+    });
+
+    expect(res).toEqual(expected);
+  });
+
+  it('returns 403 if token is valid but is not from this user', async () => {
+    await UserModel.create({
+      email: '123',
+      refreshToken: 'someOtherToken',
+    });
+    const input = {
+      body: {
+        email: '123',
+        refreshToken:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MDc4MDY2NDZ9.zZuoh9FrFjQiJk_3gtX0IJsafE9tz4-pP8LrgNF0OW8',
+      },
+    };
+
+    const res = await refreshToken(input);
+
+    const expected = makeHttpError({
+      statusCode: 403,
+      error: 'Invalid refreshToken',
+    });
+
+    expect(res).toEqual(expected);
+  });
+
+  it('returns 401 if email not found in db', async () => {
+    const input = {
+      body: {
+        email: '123',
+        refreshToken:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MDc4MDY2NDZ9.zZuoh9FrFjQiJk_3gtX0IJsafE9tz4-pP8LrgNF0OW8',
+      },
+    };
+
+    const res = await refreshToken(input);
+
+    const expected = makeHttpError({
+      statusCode: 401,
+      error: 'No refreshToken stored',
+    });
+
+    expect(res).toEqual(expected);
   });
 });
