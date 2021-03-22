@@ -1,5 +1,6 @@
 const adaptRequest = (req = {}) => {
   return Object.freeze({
+    headers: req.headers,
     path: req.path,
     method: req.method,
     pathParams: req.params,

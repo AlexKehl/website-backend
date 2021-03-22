@@ -1,38 +1,21 @@
-/* global describe, test, afterAll, expect, beforeAll, process, jest */
-/*
-  @group e2e
-*/
-
-const { config } = require('dotenv');
-config();
-
 const request = require('supertest');
-const { connect } = require('mongoose');
-const { Server } = require('http');
-const { start } = require('src/Routes');
+const { mockServer } = require('test/utils');
 const UserModel = require('src/model/User');
 
 console.log = jest.fn();
 
+const server = mockServer();
+
+let app;
+beforeAll(async () => {
+  app = await server.startServer();
+});
+
+afterAll(() => {
+  server.stopServer();
+});
+
 describe('Server routes', () => {
-  let connection;
-  let server;
-  let app;
-  beforeAll(async () => {
-    connection = await connect(
-      `mongodb://${process.env.DB_URL}`,
-      { dbName: 'main', useUnifiedTopology: true, useNewUrlParser: true },
-    );
-    const routesObj = start(3002);
-    app = routesObj.app;
-    server = routesObj.server;
-  });
-
-  afterAll(() => {
-    server.close();
-    connection.disconnect();
-  });
-
   test('It should return forbidden (403) for invalid token', async () => {
     const res = await request(app).get('/');
 
@@ -49,8 +32,11 @@ describe('Server routes', () => {
 
     expect(res.status).toEqual(200);
     expect(res.body).toEqual({
-      accessToken: expect.any(String),
-      refreshToken: expect.any(String),
+      data: {
+        accessToken: expect.any(String),
+        refreshToken: expect.any(String),
+      },
+      statusCode: 200,
     });
   });
 
@@ -62,7 +48,10 @@ describe('Server routes', () => {
       .send(input);
 
     expect(res.status).toEqual(401);
-    expect(res.body).toEqual({});
+    expect(res.body).toEqual({
+      error: 'Invalid Credentials',
+      success: false,
+    });
   });
 
   test('token route refreshes accessToken given valid refreshToken', async () => {
@@ -75,7 +64,12 @@ describe('Server routes', () => {
       .send({ email, refreshToken });
 
     expect(res.status).toEqual(200);
-    expect(res.body.accessToken).toEqual(expect.any(String));
+    expect(res.body).toEqual({
+      statusCode: 200,
+      data: {
+        accessToken: expect.any(String),
+      },
+    });
   });
 
   test('token route does not refresh accessToken for invalid refreshToken', async () => {
@@ -86,6 +80,9 @@ describe('Server routes', () => {
       .send({ ...input });
 
     expect(res.status).toEqual(403);
-    expect(res.body).toEqual({});
+    expect(res.body).toEqual({
+      error: 'Invalid refreshToken',
+      success: false,
+    });
   });
 });

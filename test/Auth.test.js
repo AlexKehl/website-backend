@@ -2,13 +2,7 @@ const { setupModelTest } = require('test/utils');
 const { makeHttpResponse } = require('src/utils/HttpResponse');
 const { makeHttpError } = require('src/utils/HttpError');
 
-const {
-  checkUser,
-  login,
-  refreshToken,
-  authenticateToken,
-  getAccessTokenFromHeader,
-} = require('src/Auth');
+const { checkUser, login, refreshToken } = require('src/Auth');
 
 const UserModel = require('src/model/User');
 
@@ -90,44 +84,6 @@ describe('login', () => {
     });
 
     expect(typeof refreshToken).toEqual('string');
-  });
-});
-
-describe('getAccessTokenFromHeader', () => {
-  it('returns the right token given format "Bearer <token>"', () => {
-    const input = {
-      authorization: 'Bearer someToken',
-    };
-
-    const res = getAccessTokenFromHeader(input);
-
-    expect(res).toEqual('someToken');
-  });
-
-  it('returns undefined if there is no authorization header', () => {
-    const input = {};
-
-    const res = getAccessTokenFromHeader(input);
-
-    expect(res).toBe(undefined);
-  });
-});
-
-describe('authenticateToken', () => {
-  it('throws if token is not present', () => {
-    const input = {};
-
-    expect(() => {
-      authenticateToken(input);
-    }).toThrow();
-  });
-
-  it('throws if token is invalid (expired or smth.)', () => {
-    const input = { authorization: 'Bearer someToken' };
-
-    expect(() => {
-      authenticateToken(input);
-    }).toThrow();
   });
 });
 

@@ -19,5 +19,5 @@ const applyValidator = schema => (req, res, next) => {
 module.exports = {
   validateLoginReq: applyValidator(loginRequest),
   validateTokenReq: applyValidator(tokenRequest),
-  fileUploadRequest: applyValidator(fileUploadRequest),
+  validateFileUploadReq: applyValidator(fileUploadRequest),
 };

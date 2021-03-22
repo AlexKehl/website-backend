@@ -1,6 +1,7 @@
+const { makeHttpResponse } = require('src/utils/HttpResponse');
 const express = require('express');
 const cors = require('cors');
-const { login, refreshToken, authenticateToken } = require('src/Auth.js');
+const { login, refreshToken } = require('src/Auth.js');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const { getFileListForCategory } = require('src/FileList');
@@ -11,6 +12,7 @@ const {
   validateFileUploadReq,
 } = require('src/validators/middleware');
 const { adaptRequest } = require('src/utils/RequestAdapter');
+const { withTokenAuth } = require('src/utils/TokenAuth');
 
 const start = port => {
   const app = express();
@@ -28,25 +30,36 @@ const start = port => {
     })
   );
 
-  const tokenMiddleWare = (req, res, next) => {
-    try {
-      authenticateToken(req.headers);
-      next();
-    } catch (e) {
-      res.sendStatus(403);
-    }
-  };
+  // const tokenMiddleWare = (req, res, next) => {
+  //   try {
+  //     authenticateToken(req.headers);
+  //     next();
+  //   } catch (e) {
+  //     res.sendStatus(403);
+  //   }
+  // };
 
-  app.get('/', tokenMiddleWare, (req, res) => {
-    res.json({
-      message: 'Hello world!',
-    });
+  app.get('/', async (req, res) => {
+    const httpRequest = adaptRequest(req);
+    const fn = () =>
+      makeHttpResponse({
+        statusCode: 200,
+        data: {
+          res: 'Hello!',
+        },
+      });
+
+    const { headers, statusCode, data } = await withTokenAuth(fn)(httpRequest);
+
+    res
+      .set(headers)
+      .status(statusCode)
+      .send(data);
   });
 
   app.post('/login', validateLoginReq, async (req, res) => {
     const httpRequest = adaptRequest(req);
     const { headers, statusCode, data } = await login(httpRequest);
-
     res
       .set(headers)
       .status(statusCode)
@@ -86,7 +99,7 @@ const start = port => {
     }
   });
 
-  app.post('/fileupload', async (req, res) => {
+  app.post('/fileupload', validateFileUploadReq, async (req, res) => {
     const httpRequest = adaptRequest(req);
     const { headers, statusCode, data } = await performFileUpload(httpRequest);
 

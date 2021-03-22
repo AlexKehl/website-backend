@@ -43,17 +43,6 @@ const login = async ({ body }) => {
   });
 };
 
-const getAccessTokenFromHeader = ({ authorization }) =>
-  authorization && authorization.split(' ')[1];
-
-const authenticateToken = headers => {
-  const token = getAccessTokenFromHeader(headers);
-  if (!token) {
-    throw new Error('http: 401');
-  }
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-};
-
 const refreshToken = async ({ body }) => {
   const { email, refreshToken } = body;
 
@@ -93,6 +82,4 @@ module.exports = {
   checkUser,
   login,
   refreshToken,
-  authenticateToken,
-  getAccessTokenFromHeader,
 };
