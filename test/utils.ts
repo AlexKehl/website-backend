@@ -1,10 +1,13 @@
-const { config } = require('dotenv');
-const { connect, disconnect } = require('mongoose');
-const { start } = require('src/Routes');
+import { config } from 'dotenv';
+import { connect, disconnect, Model } from 'mongoose';
+import { start } from 'src/Routes';
 
 config();
 
-const setupModelTest = (model, collection) => {
+const setupModelTest = <T extends typeof Model>(
+  model: T,
+  collection: string
+) => {
   beforeAll(async () => {
     await connect(
       `mongodb://${process.env.TEST_DB_URL}/${collection}`,
@@ -49,7 +52,4 @@ const mockServer = () => {
   };
 };
 
-module.exports = {
-  setupModelTest,
-  mockServer,
-};
+export { setupModelTest, mockServer };

@@ -1,4 +1,5 @@
-const { Schema, model } = require('mongoose');
+import { Schema, model } from 'mongoose';
+import { FileDoc } from 'src/types';
 
 const FileSchema = new Schema({
   path: { type: String, required: true },
@@ -9,4 +10,4 @@ const FileSchema = new Schema({
   description: { type: String },
 });
 
-module.exports = model('File', FileSchema);
+export default model<FileDoc>('File', FileSchema);

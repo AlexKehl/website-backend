@@ -1,16 +1,20 @@
-const FileModel = require('src/model/File.js');
-const { makeHttpError } = require('src/utils/HttpError');
-const { makeHttpResponse } = require('src/utils/HttpResponse');
+import { UploadedFile } from 'express-fileupload';
+import FileModel from 'src/model/File';
+import { makeHttpError } from 'src/utils/HttpError';
+import { makeHttpResponse } from 'src/utils/HttpResponse';
+import { FileUpload } from './types';
 
 const getFilePath = ({ category, name }) =>
   `${process.env.FILE_PATH}/${category}/${name}`;
 
-const getFileFromNestedObj = nestedObj => {
-  const objectValues = Object.values(nestedObj);
+const getFileFromNestedObj = (uploadedFile: {
+  [x: string]: UploadedFile;
+}): UploadedFile => {
+  const objectValues = Object.values(uploadedFile);
   return objectValues[0];
 };
 
-const performFileUpload = async ({ body, file }) => {
+const performFileUpload = async ({ body, file }: Partial<FileUpload>) => {
   const { fileMeta } = body;
   const { category, name } = fileMeta;
   const rawFile = getFileFromNestedObj(file);
@@ -33,7 +37,4 @@ const performFileUpload = async ({ body, file }) => {
   });
 };
 
-module.exports = {
-  performFileUpload,
-  getFileFromNestedObj,
-};
+export { performFileUpload, getFileFromNestedObj };

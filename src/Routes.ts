@@ -1,20 +1,21 @@
-const { makeHttpResponse } = require('src/utils/HttpResponse');
-const express = require('express');
-const cors = require('cors');
-const { login, refreshToken } = require('src/Auth.js');
-const cookieParser = require('cookie-parser');
-const fileUpload = require('express-fileupload');
-const { getFileListForCategory } = require('src/FileList');
-const { performFileUpload } = require('src/FileUpload');
-const {
+import { makeHttpResponse } from 'src/utils/HttpResponse';
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import { login, refreshToken } from 'src/Auth';
+import cookieParser from 'cookie-parser';
+import fileUpload from 'express-fileupload';
+import { getFileListForCategory } from 'src/FileList';
+import { performFileUpload } from 'src/FileUpload';
+import {
   validateLoginReq,
   validateTokenReq,
   validateFileUploadReq,
-} = require('src/validators/middleware');
-const { adaptRequest } = require('src/utils/RequestAdapter');
-const { withTokenAuth } = require('src/utils/TokenAuth');
+} from 'src/validators/middleware';
+import { adaptRequest } from 'src/utils/RequestAdapter';
+import { withTokenAuth } from 'src/utils/TokenAuth';
+import { FileUpload, Login } from './types';
 
-const start = port => {
+const start = (port: number) => {
   const app = express();
 
   app.use(express.json());
@@ -30,18 +31,9 @@ const start = port => {
     })
   );
 
-  // const tokenMiddleWare = (req, res, next) => {
-  //   try {
-  //     authenticateToken(req.headers);
-  //     next();
-  //   } catch (e) {
-  //     res.sendStatus(403);
-  //   }
-  // };
-
-  app.get('/', async (req, res) => {
+  app.get('/', async (req: Request, res: Response) => {
     const httpRequest = adaptRequest(req);
-    const fn = () =>
+    const fn = async () =>
       makeHttpResponse({
         statusCode: 200,
         data: {
@@ -57,8 +49,8 @@ const start = port => {
       .send(data);
   });
 
-  app.post('/login', validateLoginReq, async (req, res) => {
-    const httpRequest = adaptRequest(req);
+  app.post('/login', validateLoginReq, async (req: Login, res: Response) => {
+    const httpRequest = adaptRequest<Login>(req);
     const { headers, statusCode, data } = await login(httpRequest);
     res
       .set(headers)
@@ -99,26 +91,32 @@ const start = port => {
     }
   });
 
-  app.post('/fileupload', validateFileUploadReq, async (req, res) => {
-    const httpRequest = adaptRequest(req);
-    const { headers, statusCode, data } = await performFileUpload(httpRequest);
+  app.post(
+    '/fileupload',
+    validateFileUploadReq,
+    async (req: FileUpload, res: Response) => {
+      const httpRequest = adaptRequest<FileUpload>(req);
+      const { headers, statusCode, data } = await performFileUpload(
+        httpRequest
+      );
 
-    res
-      .set(headers)
-      .status(statusCode)
-      .send(data);
+      res
+        .set(headers)
+        .status(statusCode)
+        .send(data);
 
-    try {
-      const res = await performFileUpload({
-        file: req.files.image,
-        fileMeta: req.body.fileMeta,
-      });
-      res.send('OK');
-    } catch (e) {
-      res.status(500).send(e.message);
-      console.log(e);
+      // try {
+      //   const res = await performFileUpload({
+      //     file: req.files.image,
+      //     fileMeta: req.body.fileMeta,
+      //   });
+      //   res.send('OK');
+      // } catch (e) {
+      //   res.status(500).send(e.message);
+      //   console.log(e);
+      // }
     }
-  });
+  );
 
   const server = app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
@@ -127,4 +125,4 @@ const start = port => {
   return { app, server };
 };
 
-module.exports = { start };
+export { start };

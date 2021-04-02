@@ -1,4 +1,5 @@
-const { Schema, model } = require('mongoose');
+import { Schema, model } from 'mongoose';
+import { UserDoc } from 'src/types';
 
 const UserSchema = new Schema({
   email: { type: String, required: true },
@@ -6,4 +7,4 @@ const UserSchema = new Schema({
   passwordHash: { type: String },
 });
 
-module.exports = model('User', UserSchema);
+export default model<UserDoc>('User', UserSchema);

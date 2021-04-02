@@ -1,7 +1,14 @@
 module.exports = {
-  "moduleNameMapper": {
-    "^@/(.*)$": "./src/$1"
+  moduleNameMapper: {
+    '^@/(.*)$': './src/$1',
   },
-  "verbose": false,
-  "testEnvironment": "node"
-}
+  watchPlugins: [
+    'jest-watch-typeahead/filename',
+    'jest-watch-typeahead/testname',
+  ],
+  verbose: false,
+  testEnvironment: 'node',
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+  },
+};

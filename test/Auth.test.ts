@@ -1,10 +1,11 @@
-const { setupModelTest } = require('test/utils');
-const { makeHttpResponse } = require('src/utils/HttpResponse');
-const { makeHttpError } = require('src/utils/HttpError');
+import { setupModelTest } from 'test/utils';
+import { makeHttpResponse } from 'src/utils/HttpResponse';
+import { makeHttpError } from 'src/utils/HttpError';
 
-const { checkUser, login, refreshToken } = require('src/Auth');
+import { checkUser, login, refreshToken } from 'src/Auth';
 
-const UserModel = require('src/model/User');
+import UserModel from 'src/model/User';
+import { User } from './testdata/User';
 
 setupModelTest(UserModel, 'auth');
 
@@ -89,9 +90,7 @@ describe('login', () => {
 
 describe('refreshToken', () => {
   it('returns status 401 if db has no refreshtoken for this user', async () => {
-    await UserModel.create({
-      email: 'foo@bar.com',
-    });
+    await UserModel.create(User);
     const input = {
       body: { email: 'foo@bar.com', refreshToken: 'someRefreshToken' },
     };
@@ -106,10 +105,7 @@ describe('refreshToken', () => {
   });
 
   it('returns status 403 if jwt.verify throws', async () => {
-    await UserModel.create({
-      email: 'foo@bar.com',
-      refreshToken: 'someRefreshToken',
-    });
+    await UserModel.create(User);
     const input = {
       body: { email: 'foo@bar.com', refreshToken: 'someRefreshToken' },
     };
@@ -125,7 +121,7 @@ describe('refreshToken', () => {
 
   it('returns obj with new accessToken if jwt.verify was successful', async () => {
     await UserModel.create({
-      email: '123',
+      ...User,
       refreshToken:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MDc4MDY2NDZ9.zZuoh9FrFjQiJk_3gtX0IJsafE9tz4-pP8LrgNF0OW8',
     });
@@ -149,9 +145,9 @@ describe('refreshToken', () => {
     expect(res).toEqual(expected);
   });
 
-  it('returns 403 if token is valid but is not from this user', async () => {
+  it.only('returns 403 if token is valid but is not from this user', async () => {
     await UserModel.create({
-      email: '123',
+      ...User,
       refreshToken: 'someOtherToken',
     });
     const input = {

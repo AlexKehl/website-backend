@@ -1,16 +1,17 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const UserModel = require('src/model/User.js');
-const { makeHttpError } = require('src/utils/HttpError');
-const { makeHttpResponse } = require('src/utils/HttpResponse');
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import UserModel from 'src/model/User';
+import {makeHttpError} from 'src/utils/HttpError';
+import {makeHttpResponse} from 'src/utils/HttpResponse';
+import {Credentials, Login} from './types';
 
-const generateAccessToken = ({ email }) =>
+const generateAccessToken = ({ email }: {email: string}) =>
   jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '45s' });
 
-const generateRefreshToken = ({ email }) =>
+const generateRefreshToken = ({ email }: {email: string}) =>
   jwt.sign({ email }, process.env.REFRESH_TOKEN_SECRET);
 
-const checkUser = async ({ email, password }) => {
+const checkUser = async ({ email, password }: Credentials) => {
   try {
     const { passwordHash } = await UserModel.findOne({ email });
     return await bcrypt.compare(password, passwordHash);
@@ -19,7 +20,7 @@ const checkUser = async ({ email, password }) => {
   }
 };
 
-const login = async ({ body }) => {
+const login = async ({ body }: Partial<Login>) => {
   const { email, password } = body;
   const hasValidCredentials = await checkUser({ email, password });
 
@@ -43,10 +44,11 @@ const login = async ({ body }) => {
   });
 };
 
-const refreshToken = async ({ body }) => {
+const refreshToken = async ({ body }: Partial<Login>) => {
   const { email, refreshToken } = body;
 
   const user = await UserModel.findOne({ email });
+  console.log(user)
 
   if (!user?.refreshToken) {
     return makeHttpError({
@@ -78,7 +80,7 @@ const refreshToken = async ({ body }) => {
   });
 };
 
-module.exports = {
+export{
   checkUser,
   login,
   refreshToken,

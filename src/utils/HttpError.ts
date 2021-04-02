@@ -1,4 +1,6 @@
-const makeHttpError = ({ statusCode, error }) => ({
+import { HttpError } from 'src/types';
+
+export const makeHttpError = ({ statusCode, error }): HttpError => ({
   headers: {
     'Content-Type': 'application/json',
   },
@@ -8,5 +10,3 @@ const makeHttpError = ({ statusCode, error }) => ({
     error,
   },
 });
-
-module.exports = { makeHttpError };

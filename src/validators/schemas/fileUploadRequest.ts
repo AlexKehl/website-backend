@@ -1,7 +1,7 @@
-const Joi = require('joi');
-const Categories = require('src/configuration/Categories');
+import * as Joi from 'joi';
+import Categories from 'src/configuration/Categories';
 
-const fileUploadRequest = Joi.object({
+export default Joi.object({
   image: Joi.object({
     mv: Joi.function(),
   }),
@@ -15,5 +15,3 @@ const fileUploadRequest = Joi.object({
     description: Joi.string(),
   }),
 });
-
-module.exports = fileUploadRequest;

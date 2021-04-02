@@ -1,7 +1,7 @@
-const { getFileFromNestedObj, performFileUpload } = require('src/FileUpload');
-const { setupModelTest } = require('test/utils');
+import { getFileFromNestedObj, performFileUpload } from 'src/FileUpload';
+import { setupModelTest } from 'test/utils';
 
-const FileModel = require('src/model/File.js');
+import FileModel from 'src/model/File.js';
 
 setupModelTest(FileModel, 'file');
 
