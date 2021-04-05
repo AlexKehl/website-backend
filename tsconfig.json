@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "src/*": ["src/*"],
-      "test/*": ["test/*"]
-    }
+    "allowSyntheticDefaultImports": true,
+    "strict": true
   }
 }

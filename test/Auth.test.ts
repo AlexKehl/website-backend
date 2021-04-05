@@ -1,11 +1,9 @@
-import { setupModelTest } from 'test/utils';
-import { makeHttpResponse } from 'src/utils/HttpResponse';
-import { makeHttpError } from 'src/utils/HttpError';
-
-import { checkUser, login, refreshToken } from 'src/Auth';
-
-import UserModel from 'src/model/User';
+import UserModel from '../src/model/User';
+import { checkUser, login, refreshToken } from '../src/Auth';
+import { makeHttpError } from '../src/utils/HttpError';
+import { makeHttpResponse } from '../src/utils/HttpResponse';
 import { User } from './testdata/User';
+import { setupModelTest } from './utils';
 
 setupModelTest(UserModel, 'auth');
 
@@ -80,9 +78,10 @@ describe('login', () => {
 
     await login(input);
 
-    const { refreshToken } = await UserModel.findOne({
-      email: 'foo@bar.com',
-    });
+    const { refreshToken } =
+      (await UserModel.findOne({
+        email: 'foo@bar.com',
+      })) || {};
 
     expect(typeof refreshToken).toEqual('string');
   });

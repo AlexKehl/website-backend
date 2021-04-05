@@ -1,7 +1,6 @@
-import { getFileFromNestedObj, performFileUpload } from 'src/FileUpload';
-import { setupModelTest } from 'test/utils';
-
-import FileModel from 'src/model/File.js';
+import FileModel from '../src/model/File.js';
+import { getFileFromNestedObj, performFileUpload } from '../src/FileUpload';
+import { setupModelTest } from './utils';
 
 setupModelTest(FileModel, 'file');
 

@@ -1,6 +1,6 @@
-const fileUploadRequest = require('src/validators/schemas/fileUploadRequest');
-const [someCategory] = require('src/configuration/Categories');
-const Joi = require('joi');
+import fileUploadRequest from '../../../src/validators/schemas/fileUploadRequest';
+import Categories from '../../../src/configuration/Categories';
+import Joi from 'joi';
 
 describe('fileUploadRequest', () => {
   it('checks valid input', () => {
@@ -8,7 +8,7 @@ describe('fileUploadRequest', () => {
       image: { mv: () => true },
       fileMeta: {
         name: 'image1',
-        category: someCategory,
+        category: Categories[0],
         height: 1024,
         width: 768,
       },

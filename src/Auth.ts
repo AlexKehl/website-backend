@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import UserModel from 'src/model/User';
-import {makeHttpError} from 'src/utils/HttpError';
-import {makeHttpResponse} from 'src/utils/HttpResponse';
-import {Credentials, Login} from './types';
+import UserModel from './model/User';
+import {Credentials, Login } from './types';
+import {makeHttpError} from './utils/HttpError';
+import {makeHttpResponse} from './utils/HttpResponse';
 
 const generateAccessToken = ({ email }: {email: string}) =>
   jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '45s' });
@@ -13,14 +13,14 @@ const generateRefreshToken = ({ email }: {email: string}) =>
 
 const checkUser = async ({ email, password }: Credentials) => {
   try {
-    const { passwordHash } = await UserModel.findOne({ email });
+    const { passwordHash = '' } = await UserModel.findOne({ email }) || {};
     return await bcrypt.compare(password, passwordHash);
   } catch (e) {
     return false;
   }
 };
 
-const login = async ({ body }: Partial<Login>) => {
+const login = async ({ body }: Pick<Login, 'body'>) => {
   const { email, password } = body;
   const hasValidCredentials = await checkUser({ email, password });
 
@@ -44,7 +44,7 @@ const login = async ({ body }: Partial<Login>) => {
   });
 };
 
-const refreshToken = async ({ body }: Partial<Login>) => {
+const refreshToken = async ({ body }: Pick<Login, 'body'>) => {
   const { email, refreshToken } = body;
 
   const user = await UserModel.findOne({ email });

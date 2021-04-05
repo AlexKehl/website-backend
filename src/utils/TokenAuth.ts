@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { AdaptedRequest, BLFunction } from 'src/types';
-import { makeHttpError } from 'src/utils/HttpError';
+import { BLFunction, AdaptedRequest } from '../types';
+import { makeHttpError } from './HttpError';
 
 const getAccessTokenFromHeader = ({
   authorization,
@@ -12,7 +12,7 @@ const withTokenAuth = (fn: BLFunction) => (
 ) => {
   const token = getAccessTokenFromHeader(requestData.headers);
   try {
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    jwt.verify(token || '', process.env.ACCESS_TOKEN_SECRET);
     return fn(requestData);
   } catch (e) {
     return makeHttpError({

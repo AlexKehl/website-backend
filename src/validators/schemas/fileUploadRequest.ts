@@ -1,5 +1,5 @@
-import * as Joi from 'joi';
-import Categories from 'src/configuration/Categories';
+import Joi from 'joi';
+import Categories from '../../configuration/Categories';
 
 export default Joi.object({
   image: Joi.object({

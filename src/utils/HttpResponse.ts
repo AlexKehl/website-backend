@@ -1,4 +1,4 @@
-import { HttpResponse } from 'src/types';
+import { HttpResponse } from '../types';
 
 export const makeHttpResponse = ({
   statusCode,
@@ -13,6 +13,6 @@ export const makeHttpResponse = ({
   statusCode,
   data: {
     statusCode,
-    data: data,
+    data: data || {},
   },
 });

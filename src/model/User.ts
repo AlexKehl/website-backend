@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { UserDoc } from 'src/types';
+import { UserDoc } from '../types';
 
 const UserSchema = new Schema({
   email: { type: String, required: true },

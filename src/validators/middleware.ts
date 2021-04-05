@@ -1,26 +1,25 @@
-import * as Joi from 'joi';
-import loginRequest from 'src/validators/schemas/loginRequest';
-import tokenRequest from 'src/validators/schemas/tokenRequest';
-import fileUploadRequest from 'src/validators/schemas/fileUploadRequest';
-import { Request, Response, NextFunction } from 'express';
+import Joi from 'joi';
+import { AdaptedRequest, BLFunction } from '../types';
+import { makeHttpError } from '../utils/HttpError';
 
 const attemptSchema = (schema: Joi.ObjectSchema) => (value: object) => {
   return Joi.attempt(value, schema);
 };
 
-const applyValidator = (schema: Joi.ObjectSchema) => (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const withReqValidator = ({
+  fn,
+  schema,
+}: {
+  fn: BLFunction;
+  schema: Joi.ObjectSchema;
+}) => (requestData: AdaptedRequest<any>) => {
   try {
-    attemptSchema(schema)(req.body);
-    next();
+    attemptSchema(schema)(requestData);
+    return fn(requestData);
   } catch (e) {
-    res.sendStatus(400);
+    return makeHttpError({
+      statusCode: 400,
+      error: 'Wrong Request',
+    });
   }
 };
-
-export const validateLoginReq = applyValidator(loginRequest);
-export const validateTokenReq = applyValidator(tokenRequest);
-export const validateFileUploadReq = applyValidator(fileUploadRequest);

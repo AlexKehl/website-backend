@@ -1,5 +1,5 @@
 import { Request} from 'express';
-import {AdaptedRequest } from 'src/types';
+import {AdaptedRequest} from '../types';
 
 export const adaptRequest = <T extends Request>(req: T): AdaptedRequest<T> => {
   return Object.freeze({

@@ -1,12 +1,10 @@
-const { config } = require('dotenv');
-const {
+import { config } from 'dotenv';
+import jwt from 'jsonwebtoken';
+import { makeHttpError } from '../../src/utils/HttpError';
+import {
   getAccessTokenFromHeader,
-  authenticateToken,
   withTokenAuth,
-} = require('src/utils/TokenAuth');
-const jwt = require('jsonwebtoken');
-const { makeHttpError } = require('src/utils/HttpError');
-const { makeHttpResponse } = require('src/utils/HttpResponse');
+} from '../../src/utils/TokenAuth';
 
 config();
 
@@ -30,43 +28,43 @@ describe('getAccessTokenFromHeader', () => {
   });
 });
 
-describe('authenticateToken', () => {
-  it('returns an http error if token is invalid', () => {
-    const input = {
-      headers: {
-        authorization: `Bearer someToken`,
-      },
-    };
-
-    const res = authenticateToken(input);
-
-    expect(res).toEqual(
-      makeHttpError({
-        statusCode: 403,
-        error: 'Invalid accessToken ',
-      })
-    );
-  });
-
-  it('returns identity if token is valid', () => {
-    const email = 'foo@bar.com';
-    const validAccessToken = jwt.sign(
-      { email },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '45s' }
-    );
-
-    const input = {
-      headers: {
-        authorization: `Bearer ${validAccessToken}`,
-      },
-    };
-
-    const res = authenticateToken(input);
-
-    expect(res).toEqual(input);
-  });
-});
+// describe('authenticateToken', () => {
+//   it('returns an http error if token is invalid', () => {
+//     const input = {
+//       headers: {
+//         authorization: `Bearer someToken`,
+//       },
+//     };
+//
+//     const res = authenticateToken(input);
+//
+//     expect(res).toEqual(
+//       makeHttpError({
+//         statusCode: 403,
+//         error: 'Invalid accessToken ',
+//       })
+//     );
+//   });
+//
+//   it('returns identity if token is valid', () => {
+//     const email = 'foo@bar.com';
+//     const validAccessToken = jwt.sign(
+//       { email },
+//       process.env.ACCESS_TOKEN_SECRET,
+//       { expiresIn: '45s' }
+//     );
+//
+//     const input = {
+//       headers: {
+//         authorization: `Bearer ${validAccessToken}`,
+//       },
+//     };
+//
+//     const res = authenticateToken(input);
+//
+//     expect(res).toEqual(input);
+//   });
+// });
 
 describe('withTokenAuth', () => {
   it('does not call passed fn if token is invalid', () => {

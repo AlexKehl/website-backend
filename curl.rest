@@ -18,5 +18,9 @@ POST /login
 
 
 http://localhost:3002
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MTYzNzQyODcsImV4cCI6MTYxNjM3NDMzMn0._1fiRxTqj24HWQHGh95rF3d5WAzkcSdpds8OW4bfZDU
+
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MTY0NDc3NjYsImV4cCI6MTYxNjQ0NzgxMX0.IY2p88ZMGjjIKgpKJKgi9Ap1e9Ktc-u-JDJiM9fHwLQ
+GET /
+
+https://www.google.com
 GET /

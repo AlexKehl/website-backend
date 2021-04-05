@@ -1,6 +1,7 @@
 import { config } from 'dotenv';
 import { connect, disconnect, Model } from 'mongoose';
-import { start } from 'src/Routes';
+import { Server } from 'node:http';
+import { start } from '../src/Routes';
 
 config();
 
@@ -28,7 +29,7 @@ const setupModelTest = <T extends typeof Model>(
 };
 
 const mockServer = () => {
-  let serverRef;
+  let serverRef: Server;
   const startServer = async () => {
     await connect(
       `mongodb://${process.env.DB_URL}`,

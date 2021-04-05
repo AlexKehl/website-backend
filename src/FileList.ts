@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import fs from 'fs';
 
 const getFileListForCategory = (category: string) =>
   fs.readdirSync(`${process.env.FILE_PATH}/${category}`);

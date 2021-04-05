@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { FileDoc } from 'src/types';
+import { FileDoc } from '../types';
 
 const FileSchema = new Schema({
   path: { type: String, required: true },

@@ -9,7 +9,7 @@ export interface AdaptedRequest<T extends Request> {
   readonly pathParams: ParamsDictionary;
   readonly queryParams: Record<string, any>;
   readonly body: T['body'];
-  readonly file?: any;
+  readonly file: any;
 }
 
 export interface Credentials {
@@ -30,11 +30,13 @@ export interface FileMeta {
   description?: string;
 }
 
+export interface FileObj {
+  [x: string]: UploadedFile;
+}
+
 export interface FileUpload extends Request {
   body: {
     fileMeta: FileMeta;
   };
-  file: {
-    [x: string]: UploadedFile;
-  };
+  file?: FileObj;
 }

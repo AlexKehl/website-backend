@@ -1,12 +1,13 @@
-const request = require('supertest');
-const { mockServer } = require('test/utils');
-const UserModel = require('src/model/User');
+import { Express } from 'express';
+import request from 'supertest';
+import UserModel from '../src/model/User';
+import { mockServer } from './utils';
 
 console.log = jest.fn();
 
 const server = mockServer();
 
-let app;
+let app: Express;
 beforeAll(async () => {
   app = await server.startServer();
 });
@@ -55,9 +56,10 @@ describe('Server routes', () => {
   });
 
   test('token route refreshes accessToken given valid refreshToken', async () => {
-    const { email, refreshToken } = await UserModel.findOne({
-      email: 'test@test.com',
-    });
+    const { email, refreshToken } =
+      (await UserModel.findOne({
+        email: 'test@test.com',
+      })) || {};
 
     const res = await request(app)
       .post('/token')
