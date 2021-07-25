@@ -20,7 +20,9 @@ const hasValidToken = async (expressObj: ExpressObj) => {
       message: 'Invalid token',
       payload: makeHttpError({
         statusCode: 403,
-        error: 'Invalid accessToken ',
+        data: {
+          error: 'Invalid accessToken ',
+        },
       }),
     });
   }

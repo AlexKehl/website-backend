@@ -4,7 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import { makeHttpResponse } from './utils/HttpResponse';
 import { ExpressObj } from './types';
 import routeHandler from './utils/RouteHandler';
-import { loginController } from './controllers/Auth';
+import { loginController, registerController } from './controllers/Auth';
 import { hasValidToken } from './guards/HasValidToken';
 import { body, validationResult } from 'express-validator';
 import { hasValidatedData } from './guards/HasValidatedData';
@@ -40,11 +40,17 @@ const start = (port: number) => {
     routeHandler({ controller: testHandler, guards: [hasValidToken] })
   );
 
-  // app.post('/register', routeHandler({ controller: registerHandler }));
+  app.post(
+    '/register',
+    body('email').isEmail(),
+    body('password').isLength({ min: 8 }),
+    routeHandler({ controller: registerController, guards: [hasValidatedData] })
+  );
 
   app.post(
     '/login',
     body('email').isEmail(),
+    body('password').isLength({ min: 8 }),
     routeHandler({ controller: loginController, guards: [hasValidatedData] })
   );
 

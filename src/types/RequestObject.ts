@@ -8,7 +8,10 @@ export interface MakeHttpResponseData {
 
 export interface MakeHttpErrorData {
   statusCode: number;
-  data?: Record<string, any>;
+  data: {
+    error: string;
+    [x: string]: any;
+  };
 }
 
 export interface AdaptedRequest<T extends Request> {

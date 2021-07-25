@@ -2,13 +2,15 @@ import { HttpError, MakeHttpErrorData } from '../types';
 
 export const makeHttpError = ({
   statusCode,
-  data = {},
+  data,
 }: MakeHttpErrorData): HttpError => ({
   headers: {
     'Content-Type': 'application/json',
   },
   statusCode,
-  success: false,
-  data,
+  data: {
+    success: false,
+    ...data,
+  },
   isHttpError: true,
 });

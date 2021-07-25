@@ -12,12 +12,11 @@ const hasValidatedData = async (expressObj: ExpressObj) => {
       payload: makeHttpError({
         statusCode: HttpStatus.BAD_REQUEST,
         data: {
-          message: 'Has wrong fields',
+          error: 'Has wrong fields',
           errors: errors.array(),
         },
       }),
     });
-    // return res.status(400).json({ errors: errors.array() });
   }
   return expressObj;
 };

@@ -8,6 +8,8 @@ export const makeHttpResponse = ({
     'Content-Type': 'application/json',
   },
   statusCode,
-  success: true,
-  data,
+  data: {
+    success: true,
+    ...data,
+  },
 });

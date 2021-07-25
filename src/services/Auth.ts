@@ -31,7 +31,9 @@ const login = async ({ email, password }: LoginDto) => {
   if (!(await hasValidCredentials({ email, password }))) {
     return makeHttpError({
       statusCode: HttpStatus.UNAUTHORIZED,
-      error: 'Invalid Credentials',
+      data: {
+        error: 'Invalid Credentials',
+      },
     });
   }
   const accessToken = generateAccessToken({ email });
@@ -51,7 +53,9 @@ const register = async ({ email, password }: RegisterDto) => {
   if (await isUserExisting(email)) {
     return makeHttpError({
       statusCode: HttpStatus.CONFLICT,
-      error: 'User exists',
+      data: {
+        error: 'User exists',
+      },
     });
   }
   const passwordHash = await hash(password, SALT_ROUNDS);
@@ -64,15 +68,30 @@ const refreshAccessToken = async ({ body }: Pick<Login, 'body'>) => {
   const { email, refreshToken } = body;
   const user = await UserModel.findOne({ email });
   if (!user?.refreshToken) {
-    return makeHttpError({ statusCode: 401, error: 'No refreshToken stored' });
+    return makeHttpError({
+      statusCode: 401,
+      data: {
+        error: 'No refreshToken stored',
+      },
+    });
   }
   if (refreshToken !== user.refreshToken) {
-    return makeHttpError({ statusCode: 403, error: 'Invalid refreshToken' });
+    return makeHttpError({
+      statusCode: 403,
+      data: {
+        error: 'Invalid refreshToken',
+      },
+    });
   }
   try {
     verify(refreshToken, REFRESH_TOKEN_SECRET);
   } catch (e) {
-    return makeHttpError({ statusCode: 403, error: 'Invalid refreshToken' });
+    return makeHttpError({
+      statusCode: 403,
+      data: {
+        error: 'Invalid refreshToken',
+      },
+    });
   }
   return makeHttpResponse({
     statusCode: 200,
