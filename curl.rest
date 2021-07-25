@@ -2,25 +2,24 @@ http://localhost:3002
 
 Content-Type: application/json
 
+POST /register
+{
+  "email": "test@test.com",
+  "password": "123"
+}
+
+http://localhost:3002
+
+Content-Type: application/json
+
 POST /login
 {
   "email": "test@test.com",
   "password": "123"
 }
-#
-# http://localhost:3002
-#
-# POST /token
-# {
-#   "email": "test@test.com",
-#   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MTU4NjQwNDZ9.hqbA_LWxQBq2jIGZ-tubleVbJKPulFWuYUaThto1C0Y"
-# }
-
 
 http://localhost:3002
 
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MTY0NDc3NjYsImV4cCI6MTYxNjQ0NzgxMX0.IY2p88ZMGjjIKgpKJKgi9Ap1e9Ktc-u-JDJiM9fHwLQ
-GET /
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MjcyNDE2NjgsImV4cCI6MTYyNzI0MTcxM30.iAxme7oAnK6KXzgDDXmS5zgvCZpn9DhkKt75iFYcJBU
 
-https://www.google.com
 GET /

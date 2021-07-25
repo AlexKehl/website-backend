@@ -1,5 +1,5 @@
 import UserModel from '../src/model/User';
-import { checkUser, login, refreshToken } from '../src/Auth';
+import { checkUser, login, refreshToken } from '../src/services/Auth';
 import { makeHttpError } from '../src/utils/HttpError';
 import { makeHttpResponse } from '../src/utils/HttpResponse';
 import { User } from './testdata/User';

@@ -1,6 +1,15 @@
-import { Request } from 'express';
-import { UploadedFile } from 'express-fileupload';
+import { Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
+
+export interface MakeHttpResponseData {
+  statusCode: number;
+  data?: Record<string, any>;
+}
+
+export interface MakeHttpErrorData {
+  statusCode: number;
+  data?: Record<string, any>;
+}
 
 export interface AdaptedRequest<T extends Request> {
   readonly headers: T['headers'];
@@ -9,7 +18,6 @@ export interface AdaptedRequest<T extends Request> {
   readonly pathParams: ParamsDictionary;
   readonly queryParams: Record<string, any>;
   readonly body: T['body'];
-  readonly file: any;
 }
 
 export interface Credentials {
@@ -22,21 +30,24 @@ export interface Login extends Request {
   body: Credentials;
 }
 
+export interface LoginDto {
+  email: string;
+  password: string;
+}
+
+export interface WithBody<T> extends Request {
+  body: T;
+}
+
+export interface RegisterDto {
+  email: string;
+  password: string;
+}
+
 export interface FileMeta {
   category: string;
   name: string;
   height: number;
   width: number;
   description?: string;
-}
-
-export interface FileObj {
-  [x: string]: UploadedFile;
-}
-
-export interface FileUpload extends Request {
-  body: {
-    fileMeta: FileMeta;
-  };
-  file?: FileObj;
 }

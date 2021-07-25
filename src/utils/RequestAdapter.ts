@@ -1,7 +1,10 @@
-import { Request} from 'express';
-import {AdaptedRequest} from '../types';
+import { AdaptedRequest, ToExpressObj, ExpressRequest } from '../types';
 
-export const adaptRequest = <T extends Request>(req: T): AdaptedRequest<T> => {
+export const toExpressObj: ToExpressObj = (req, res) => ({ req, res });
+
+export const adaptRequest = <T extends ExpressRequest>(
+  req: T
+): AdaptedRequest<T> => {
   return Object.freeze({
     headers: req.headers,
     path: req.path,
@@ -9,7 +12,5 @@ export const adaptRequest = <T extends Request>(req: T): AdaptedRequest<T> => {
     pathParams: req.params,
     queryParams: req.query,
     body: req.body,
-    file: req?.files?.image,
   });
 };
-

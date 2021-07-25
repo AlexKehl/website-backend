@@ -1,22 +1,16 @@
-import { config } from 'dotenv';
 import { connect, disconnect, Model } from 'mongoose';
 import { Server } from 'node:http';
 import { start } from '../src/Routes';
-
-config();
 
 const setupModelTest = <T extends typeof Model>(
   model: T,
   collection: string
 ) => {
   beforeAll(async () => {
-    await connect(
-      `mongodb://${process.env.TEST_DB_URL}/${collection}`,
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
+    await connect(`mongodb://${process.env.TEST_DB_URL}/${collection}`, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
   });
 
   afterEach(async () => {
@@ -31,10 +25,11 @@ const setupModelTest = <T extends typeof Model>(
 const mockServer = () => {
   let serverRef: Server;
   const startServer = async () => {
-    await connect(
-      `mongodb://${process.env.DB_URL}`,
-      { dbName: 'main', useUnifiedTopology: true, useNewUrlParser: true }
-    );
+    await connect(`mongodb://${process.env.DB_URL}`, {
+      dbName: 'main',
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    });
 
     const { app, server } = start(3006);
 

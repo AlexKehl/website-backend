@@ -1,18 +1,13 @@
-import { HttpResponse } from '../types';
+import { HttpResponse, MakeHttpResponseData } from '../types';
 
 export const makeHttpResponse = ({
   statusCode,
-  data,
-}: {
-  statusCode: number;
-  data?: Record<string, any>;
-}): HttpResponse => ({
+  data = {},
+}: MakeHttpResponseData): HttpResponse => ({
   headers: {
     'Content-Type': 'application/json',
   },
   statusCode,
-  data: {
-    statusCode,
-    data: data || {},
-  },
+  success: true,
+  data,
 });

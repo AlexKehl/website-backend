@@ -1,8 +1,8 @@
 {
   "src/*.js": {
-    "alternate": "test/{}.test.js"
+    "alternate": "test/{}.test.ts"
   },
   "test/*.test.js": {
-    "alternate": "src/{}.js"
+    "alternate": "src/{}.ts"
   }
 }
