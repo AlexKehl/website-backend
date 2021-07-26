@@ -1,6 +1,7 @@
 import { connect, connection } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { start } from '../src/Routes';
+import { ServerStartOptions } from '../src/types';
 
 let mongod: MongoMemoryServer;
 
@@ -37,8 +38,8 @@ export const setupDb = () => {
   afterAll(async () => await closeDatabase());
 };
 
-export const setupServer = () => {
-  const { app, server } = start({ port: 3005 });
+export const setupServer = (options: ServerStartOptions) => {
+  const { app, server } = start(options);
   beforeAll(async () => {
     await connectToDb();
   });

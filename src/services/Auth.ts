@@ -34,6 +34,14 @@ const isUserExisting = async (email: string): Promise<boolean> => {
 };
 
 const login = async ({ email, password }: LoginDto) => {
+  if (!(await isUserExisting(email))) {
+    return makeHttpError({
+      statusCode: HttpStatus.NOT_FOUND,
+      data: {
+        error: 'User not found',
+      },
+    });
+  }
   if (!(await hasValidCredentials({ email, password }))) {
     return makeHttpError({
       statusCode: HttpStatus.UNAUTHORIZED,

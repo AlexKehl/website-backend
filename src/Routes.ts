@@ -1,9 +1,9 @@
 import * as cors from 'cors';
 import * as express from 'express';
 import * as cookieParser from 'cookie-parser';
+import { body } from 'express-validator';
 import routeHandler from './utils/RouteHandler';
 import { loginController, registerController } from './controllers/Auth';
-import { body } from 'express-validator';
 import { hasValidatedData } from './guards/HasValidatedData';
 import { getNewAccessTokenController } from './controllers/Token';
 import { hasValidRefreshToken } from './guards/HasValidRefreshToken';
