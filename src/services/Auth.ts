@@ -1,15 +1,16 @@
 import { compare, hash } from 'bcrypt';
-import { sign, verify } from 'jsonwebtoken';
+import { sign } from 'jsonwebtoken';
 import {
   ACCESS_TOKEN_SECRET,
   REFRESH_TOKEN_SECRET,
   SALT_ROUNDS,
 } from '../../config';
-import { Credentials, Login, LoginDto, RegisterDto } from '../types';
+import { User } from '../model/User';
+import { Credentials, LoginDto, RegisterDto } from '../types';
 import { makeHttpError } from '../utils/HttpError';
 import { makeHttpResponse } from '../utils/HttpResponse';
-import UserModel from '../model/User';
 import HttpStatus from '../utils/HttpStatus';
+import { logger } from '../utils/Logger';
 
 const generateAccessToken = ({ email }: { email: string }) =>
   sign({ email }, ACCESS_TOKEN_SECRET, { expiresIn: '45s' });
@@ -19,16 +20,17 @@ const generateRefreshToken = ({ email }: { email: string }) =>
 
 const hasValidCredentials = async ({ email, password }: Credentials) => {
   try {
-    const { passwordHash = '' } = (await UserModel.findOne({ email })) || {};
+    const { passwordHash = '' } = (await User.findOne({ email })) || {};
+
     return await compare(password, passwordHash);
   } catch (e) {
-    console.log(e);
+    logger.log({ level: 'info', message: e.message });
     return false;
   }
 };
 
 const isUserExisting = async (email: string): Promise<boolean> => {
-  return Boolean(await UserModel.findOne({ email }));
+  return Boolean(await User.findOne({ email }));
 };
 
 const login = async ({ email, password }: LoginDto) => {
@@ -42,7 +44,7 @@ const login = async ({ email, password }: LoginDto) => {
   }
   const accessToken = generateAccessToken({ email });
   const refreshToken = generateRefreshToken({ email });
-  await UserModel.updateOne(
+  await User.updateOne(
     { email },
     { refreshTokenHash: await hash(refreshToken, SALT_ROUNDS) }
   );
@@ -62,7 +64,7 @@ const register = async ({ email, password }: RegisterDto) => {
     });
   }
   const passwordHash = await hash(password, SALT_ROUNDS);
-  const createdUser = new UserModel({ email, passwordHash });
+  const createdUser = new User({ email, passwordHash });
   await createdUser.save();
   return makeHttpResponse({ statusCode: HttpStatus.CREATED });
 };

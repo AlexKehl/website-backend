@@ -1,7 +1,7 @@
-import { UserData } from '../../src/types';
+import { UserDoc } from '../../src/model/User';
 
-export const User: UserData = {
+export const User: UserDoc = {
   email: 'test@test.com',
   passwordHash: 'someHash',
-  refreshToken: 'someToken',
+  refreshTokenHash: 'someToken',
 };

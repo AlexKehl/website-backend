@@ -4,14 +4,14 @@ import {
   ACCESS_TOKEN_EXPIRATION_TIME,
   ACCESS_TOKEN_SECRET,
 } from '../../config';
-import UserModel from '../model/User';
+import { User } from '../model/User';
 import { RefreshTokenDto } from '../types';
 import { makeHttpError } from '../utils/HttpError';
 import { makeHttpResponse } from '../utils/HttpResponse';
 import HttpStatus from '../utils/HttpStatus';
 
 const getNewAccessToken = async ({ email, refreshToken }: RefreshTokenDto) => {
-  const { refreshTokenHash } = (await UserModel.findOne({ email })) || {};
+  const { refreshTokenHash } = (await User.findOne({ email })) || {};
   if (!refreshTokenHash) {
     return makeHttpError({
       statusCode: HttpStatus.NOT_FOUND,
@@ -20,8 +20,6 @@ const getNewAccessToken = async ({ email, refreshToken }: RefreshTokenDto) => {
       },
     });
   }
-  console.log(refreshToken);
-  console.log(refreshTokenHash);
 
   if (!(await compare(refreshToken, refreshTokenHash))) {
     return makeHttpError({

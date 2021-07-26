@@ -1,5 +1,15 @@
 import { Schema, model } from 'mongoose';
-import { FileDoc } from '../types';
+import { Document } from 'mongoose';
+
+export interface FileDoc {
+  _id?: string;
+  path: string;
+  name: string;
+  category: string;
+  height: number;
+  width: number;
+  description?: string;
+}
 
 const FileSchema = new Schema({
   path: { type: String, required: true },
@@ -10,4 +20,4 @@ const FileSchema = new Schema({
   description: { type: String },
 });
 
-export default model<FileDoc>('File', FileSchema);
+export const File = model<FileDoc & Document>('File', FileSchema);

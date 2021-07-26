@@ -1,10 +1,16 @@
 import { Schema, model } from 'mongoose';
-import { UserDoc } from '../types';
+import { Document } from 'mongoose';
 
-const UserSchema = new Schema({
+export interface UserDoc {
+  email: string;
+  refreshTokenHash: string;
+  passwordHash: string;
+}
+
+const UserSchema: Schema = new Schema({
   email: { type: String, required: true },
   refreshTokenHash: { type: String },
   passwordHash: { type: String },
 });
 
-export default model<UserDoc>('User', UserSchema);
+export const User = model<UserDoc & Document>('User', UserSchema);

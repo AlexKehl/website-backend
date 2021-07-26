@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AdaptedRequest, WithBody } from './RequestObject';
+import { WithBody } from './RequestObject';
 
 export type ExpressResponse = Response;
 export type ExpressRequest = Request;
@@ -45,5 +45,4 @@ export interface HttpResponse {
 }
 
 export * from './RequestObject';
-export * from './Model';
 export * from './Dto';
