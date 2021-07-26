@@ -28,14 +28,8 @@ http://localhost:3002
 
 Content-Type: application/json
 
-POST /refresh
+POST /refreshtoken
 {
   "email": "test@test.com",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MjcyNTkzMzR9.8TtpFNkiK54Mcfd_pg2QK0Hx_9WXeD1eyn3SM_Ba0Dw"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MjcyNTk2Mjh9.SdL0JW5j1uWwoN1Sz38fucH4eBKfwC19SPpg6hXs67w"
 }
-
-# {
-#     "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MjcyNTkzMzQsImV4cCI6MTYyNzI1OTM3OX0.lufoRp0lweC5kIZ2R3sqHJbB4bFRFE4CEeYs8MM3sHQ",
-#     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MjcyNTkzMzR9.8TtpFNkiK54Mcfd_pg2QK0Hx_9WXeD1eyn3SM_Ba0Dw",
-#     "success": true
-# }

@@ -39,9 +39,11 @@ const start = (port: number) => {
 
   app.post(
     '/refreshtoken',
+    body('email').isEmail(),
+    body('refreshToken').isString(),
     routeHandler({
       controller: getNewAccessTokenController,
-      guards: [hasValidRefreshToken],
+      guards: [hasValidatedData, hasValidRefreshToken],
     })
   );
 

@@ -12,7 +12,6 @@ const routeHandler: RouteHandler = ({ controller, guards }) => async (
       return controller(expressObj);
     }
     for (const guard of guards) {
-      console.log(guard);
       await guard(expressObj);
     }
     return controller(expressObj);

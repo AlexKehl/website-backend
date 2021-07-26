@@ -25,5 +25,4 @@ if (process.env.NODE_ENV !== 'production') {
   );
 }
 
-logger.log({ message: 'foo', level: 'warn' });
-// logger.error('hi');
+export { logger };
