@@ -44,5 +44,10 @@ export interface HttpResponse {
   };
 }
 
+export interface ServerStartOptions {
+  port: number;
+  startupMessage?: string;
+}
+
 export * from './RequestObject';
 export * from './Dto';

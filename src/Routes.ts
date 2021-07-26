@@ -7,8 +7,9 @@ import { body } from 'express-validator';
 import { hasValidatedData } from './guards/HasValidatedData';
 import { getNewAccessTokenController } from './controllers/Token';
 import { hasValidRefreshToken } from './guards/HasValidRefreshToken';
+import { ServerStartOptions } from './types';
 
-const start = (port: number) => {
+const start = ({ port, startupMessage }: ServerStartOptions) => {
   const app = express();
 
   app.use(express.json());
@@ -48,7 +49,9 @@ const start = (port: number) => {
   );
 
   const server = app.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
+    if (startupMessage) {
+      console.log(startupMessage);
+    }
   });
 
   return { app, server };

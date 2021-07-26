@@ -8,7 +8,10 @@ const main = async () => {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
-  start(3002);
+  start({
+    port: 3002,
+    startupMessage: `Server listening at http://localhost:${3002}`,
+  });
 };
 
 main();

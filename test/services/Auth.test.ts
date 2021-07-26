@@ -3,7 +3,7 @@ import { login, register } from '../../src/services/Auth';
 import { makeHttpError } from '../../src/utils/HttpError';
 import { makeHttpResponse } from '../../src/utils/HttpResponse';
 import HttpStatus from '../../src/utils/HttpStatus';
-import { setupDb } from '../DbSetup';
+import { setupDb } from '../TestSetupUtils';
 import { RegisteredUser, UserWithPassword } from '../fixtures/User';
 
 setupDb();
