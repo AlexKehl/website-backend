@@ -8,17 +8,15 @@ const registerController = async ({ req, res }: ExpressObj<LoginDto>) => {
 
 const loginController = async ({ req, res }: ExpressObj<LoginDto>) => {
   const { headers, statusCode, data } = await login(req.body);
+  res.cookie('refreshToken', data?.refreshToken, {
+    sameSite: true,
+    httpOnly: true,
+  });
+  res.cookie('accessToken', data?.accessToken, {
+    httpOnly: true,
+    sameSite: true,
+  });
   res.set(headers).status(statusCode).send(data);
-
-  // res.cookie('refreshToken', refreshToken, {
-  //   sameSite: true,
-  //   httpOnly: true,
-  // });
-  // res.cookie('accessToken', accessToken, {
-  //   httpOnly: true,
-  //   sameSite: true,
-  // });
-  // res.cookie('hasActiveToken', true);
 };
 
 export { registerController, loginController };

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
 export interface MakeHttpResponseData {
@@ -33,18 +33,8 @@ export interface Login extends Request {
   body: Credentials;
 }
 
-export interface LoginDto {
-  email: string;
-  password: string;
-}
-
 export interface WithBody<T> extends Request {
   body: T;
-}
-
-export interface RegisterDto {
-  email: string;
-  password: string;
 }
 
 export interface FileMeta {

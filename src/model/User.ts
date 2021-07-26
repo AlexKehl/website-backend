@@ -3,7 +3,7 @@ import { UserDoc } from '../types';
 
 const UserSchema = new Schema({
   email: { type: String, required: true },
-  refreshToken: { type: String },
+  refreshTokenHash: { type: String },
   passwordHash: { type: String },
 });
 

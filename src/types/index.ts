@@ -46,3 +46,4 @@ export interface HttpResponse {
 
 export * from './RequestObject';
 export * from './Model';
+export * from './Dto';

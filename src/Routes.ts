@@ -1,13 +1,12 @@
 import * as cors from 'cors';
 import * as express from 'express';
 import * as cookieParser from 'cookie-parser';
-import { makeHttpResponse } from './utils/HttpResponse';
-import { ExpressObj } from './types';
 import routeHandler from './utils/RouteHandler';
 import { loginController, registerController } from './controllers/Auth';
-import { hasValidToken } from './guards/HasValidToken';
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
 import { hasValidatedData } from './guards/HasValidatedData';
+import { getNewAccessTokenController } from './controllers/Token';
+import { hasValidRefreshToken } from './guards/HasValidRefreshToken';
 
 const start = (port: number) => {
   const app = express();
@@ -24,22 +23,6 @@ const start = (port: number) => {
     })
   );
 
-  const testHandler = async ({ res }: ExpressObj) => {
-    const { data, headers, statusCode } = makeHttpResponse({
-      statusCode: 200,
-      data: {
-        res: 'Hello!',
-      },
-    });
-
-    res.set(headers).status(statusCode).send(data);
-  };
-
-  app.get(
-    '/',
-    routeHandler({ controller: testHandler, guards: [hasValidToken] })
-  );
-
   app.post(
     '/register',
     body('email').isEmail(),
@@ -54,12 +37,13 @@ const start = (port: number) => {
     routeHandler({ controller: loginController, guards: [hasValidatedData] })
   );
 
-  // app.post('/refreshtoken', async (req, res) => {
-  //   const httpRequest = adaptRequest(req);
-  //   const { headers, statusCode, data } = await refreshAccessToken(httpRequest);
-  //
-  //   res.set(headers).status(statusCode).send(data);
-  // });
+  app.post(
+    '/refreshtoken',
+    routeHandler({
+      controller: getNewAccessTokenController,
+      guards: [hasValidRefreshToken],
+    })
+  );
 
   const server = app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);

@@ -3,13 +3,13 @@ import { Document } from 'mongoose';
 
 export interface UserDoc extends Document {
   email: UserData['email'];
-  refreshToken?: UserData['refreshToken'];
+  refreshTokenHash?: UserData['refreshTokenHash'];
   passwordHash: UserData['passwordHash'];
 }
 
 export interface UserData {
   email: string;
-  refreshToken?: string;
+  refreshTokenHash?: string;
   passwordHash: string;
 }
 

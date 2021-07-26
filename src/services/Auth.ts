@@ -27,6 +27,10 @@ const hasValidCredentials = async ({ email, password }: Credentials) => {
   }
 };
 
+const isUserExisting = async (email: string): Promise<boolean> => {
+  return Boolean(await UserModel.findOne({ email }));
+};
+
 const login = async ({ email, password }: LoginDto) => {
   if (!(await hasValidCredentials({ email, password }))) {
     return makeHttpError({
@@ -38,15 +42,14 @@ const login = async ({ email, password }: LoginDto) => {
   }
   const accessToken = generateAccessToken({ email });
   const refreshToken = generateRefreshToken({ email });
-  await UserModel.updateOne({ email }, { refreshToken });
+  await UserModel.updateOne(
+    { email },
+    { refreshTokenHash: await hash(refreshToken, SALT_ROUNDS) }
+  );
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
     data: { accessToken, refreshToken },
   });
-};
-
-const isUserExisting = async (email: string): Promise<boolean> => {
-  return Boolean(await UserModel.findOne({ email }));
 };
 
 const register = async ({ email, password }: RegisterDto) => {
@@ -64,39 +67,4 @@ const register = async ({ email, password }: RegisterDto) => {
   return makeHttpResponse({ statusCode: HttpStatus.CREATED });
 };
 
-const refreshAccessToken = async ({ body }: Pick<Login, 'body'>) => {
-  const { email, refreshToken } = body;
-  const user = await UserModel.findOne({ email });
-  if (!user?.refreshToken) {
-    return makeHttpError({
-      statusCode: 401,
-      data: {
-        error: 'No refreshToken stored',
-      },
-    });
-  }
-  if (refreshToken !== user.refreshToken) {
-    return makeHttpError({
-      statusCode: 403,
-      data: {
-        error: 'Invalid refreshToken',
-      },
-    });
-  }
-  try {
-    verify(refreshToken, REFRESH_TOKEN_SECRET);
-  } catch (e) {
-    return makeHttpError({
-      statusCode: 403,
-      data: {
-        error: 'Invalid refreshToken',
-      },
-    });
-  }
-  return makeHttpResponse({
-    statusCode: 200,
-    data: { accessToken: generateAccessToken({ email }) },
-  });
-};
-
-export { hasValidCredentials, login, refreshAccessToken, register };
+export { hasValidCredentials, login, register };

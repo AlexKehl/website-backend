@@ -3,13 +3,14 @@ import { ACCESS_TOKEN_SECRET } from '../../config';
 import { ExpressObj } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 import { makeHttpError } from '../utils/HttpError';
+import HttpStatus from '../utils/HttpStatus';
 
 const getAccessTokenFromHeader = ({
   authorization,
 }: { authorization?: string } = {}) =>
   authorization && authorization.split(' ')[1];
 
-const hasValidToken = async (expressObj: ExpressObj) => {
+const hasValidAccessToken = async (expressObj: ExpressObj) => {
   const token = getAccessTokenFromHeader(expressObj.req.headers);
 
   try {
@@ -19,13 +20,13 @@ const hasValidToken = async (expressObj: ExpressObj) => {
     throw new WithPayloadError({
       message: 'Invalid token',
       payload: makeHttpError({
-        statusCode: 403,
+        statusCode: HttpStatus.UNAUTHORIZED,
         data: {
-          error: 'Invalid accessToken ',
+          error: 'Invalid accessToken',
         },
       }),
     });
   }
 };
 
-export { getAccessTokenFromHeader, hasValidToken };
+export { getAccessTokenFromHeader, hasValidAccessToken };
