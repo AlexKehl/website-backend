@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 
 export interface UserDoc {
   email: string;
-  refreshTokenHash: string;
+  refreshTokenHash?: string;
   passwordHash: string;
 }
 

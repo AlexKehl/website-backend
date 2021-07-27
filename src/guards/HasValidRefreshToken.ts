@@ -17,7 +17,6 @@ const hasValidRefreshToken = async (
       payload: makeHttpError({
         statusCode: HttpStatus.UNAUTHORIZED,
         data: {
-          fromGuard: true,
           error: 'Invalid refreshToken',
         },
       }),

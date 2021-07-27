@@ -10,8 +10,20 @@ import { makeHttpError } from '../utils/HttpError';
 import { makeHttpResponse } from '../utils/HttpResponse';
 import HttpStatus from '../utils/HttpStatus';
 
+interface EvaluateRefreshTokenInput extends RefreshTokenDto {
+  refreshTokenHash?: string;
+}
+
 const getNewAccessToken = async ({ email, refreshToken }: RefreshTokenDto) => {
   const { refreshTokenHash } = (await User.findOne({ email })) || {};
+  return evaluateRefreshToken({ email, refreshToken, refreshTokenHash });
+};
+
+const evaluateRefreshToken = async ({
+  email,
+  refreshToken,
+  refreshTokenHash,
+}: EvaluateRefreshTokenInput) => {
   if (!refreshTokenHash) {
     return makeHttpError({
       statusCode: HttpStatus.NOT_FOUND,
@@ -39,4 +51,4 @@ const getNewAccessToken = async ({ email, refreshToken }: RefreshTokenDto) => {
   });
 };
 
-export { getNewAccessToken };
+export { getNewAccessToken, evaluateRefreshToken };
