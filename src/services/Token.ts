@@ -6,8 +6,8 @@ import {
 } from '../../config';
 import { User } from '../model/User';
 import { RefreshTokenDto } from '../types';
-import { makeHttpError } from '../utils/HttpError';
-import { makeHttpResponse } from '../utils/HttpResponse';
+import { makeHttpError } from '../utils/HttpErrors';
+import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
 
 interface EvaluateRefreshTokenInput extends RefreshTokenDto {
@@ -42,7 +42,7 @@ const evaluateRefreshToken = async ({
     });
   }
   return makeHttpResponse({
-    statusCode: 200,
+    statusCode: HttpStatus.OK,
     data: {
       accessToken: sign({ email }, ACCESS_TOKEN_SECRET, {
         expiresIn: ACCESS_TOKEN_EXPIRATION_TIME,

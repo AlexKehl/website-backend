@@ -1,5 +1,5 @@
 import { RouteHandler } from '../types';
-import { HttpErrorHandler } from './HttpErrorHandler';
+import { HttpErrorRouteHandler } from './HttpErrorHandler';
 import { toExpressObj } from './RequestAdapter';
 
 const routeHandler: RouteHandler = ({ controller, guards }) => async (
@@ -16,7 +16,7 @@ const routeHandler: RouteHandler = ({ controller, guards }) => async (
     }
     return controller(expressObj);
   } catch (e) {
-    HttpErrorHandler(res)(e);
+    HttpErrorRouteHandler(res)(e);
   }
 };
 

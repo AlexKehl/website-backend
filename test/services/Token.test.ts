@@ -1,6 +1,6 @@
 import { evaluateRefreshToken } from '../../src/services/Token';
-import { makeHttpError } from '../../src/utils/HttpError';
-import { makeHttpResponse } from '../../src/utils/HttpResponse';
+import { makeHttpError } from '../../src/utils/HttpErrors';
+import { makeHttpResponse } from '../../src/utils/HttpResponses';
 import HttpStatus from '../../src/utils/HttpStatus';
 import { RegisteredUser, UserWithRefreshToken } from '../fixtures/User';
 

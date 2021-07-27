@@ -2,7 +2,6 @@ import { verify } from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET } from '../../config';
 import { ExpressObj } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
-import { makeHttpError } from '../utils/HttpError';
 import HttpStatus from '../utils/HttpStatus';
 
 const getAccessTokenFromHeader = ({
@@ -18,13 +17,10 @@ const hasValidAccessToken = async (expressObj: ExpressObj) => {
     return expressObj;
   } catch (e) {
     throw new WithPayloadError({
-      message: 'Invalid token',
-      payload: makeHttpError({
-        statusCode: HttpStatus.UNAUTHORIZED,
-        data: {
-          error: 'Invalid accessToken',
-        },
-      }),
+      statusCode: HttpStatus.UNAUTHORIZED,
+      data: {
+        error: 'Invalid accessToken',
+      },
     });
   }
 };

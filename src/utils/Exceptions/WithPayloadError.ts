@@ -1,11 +1,12 @@
-import { HttpError } from '../../types';
+import { HttpError, MakeHttpErrorData } from '../../types';
+import { makeHttpError } from '../HttpErrors';
 
 export default class WithPayloadError extends Error {
   private payload: HttpError;
-  constructor({ message, payload }: { message: string; payload: HttpError }) {
-    super(message);
+  constructor(payload: MakeHttpErrorData) {
+    super(payload.data.error);
     Error.captureStackTrace(this, this.constructor);
-    this.payload = payload;
+    this.payload = makeHttpError(payload);
   }
 
   getPayload() {

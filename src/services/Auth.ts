@@ -7,12 +7,12 @@ import {
   REFRESH_TOKEN_SECRET,
   SALT_ROUNDS,
 } from '../../config';
-import { User } from '../model/User';
-import { Credentials, LoginDto, RegisterDto } from '../types';
-import { makeHttpError } from '../utils/HttpError';
-import { makeHttpResponse } from '../utils/HttpResponse';
+import { User, UserDoc } from '../model/User';
+import { LoginDto, RegisterDto } from '../types';
+import { tryToExecute } from '../utils/HttpErrors';
+import { handleHttpErrors } from '../utils/HttpErrorHandler';
+import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
-import { logger } from '../utils/Logger';
 
 const generateAccessToken = ({ email }: { email: string }) =>
   sign({ email }, ACCESS_TOKEN_SECRET, {
@@ -24,63 +24,70 @@ const generateRefreshToken = ({ email }: { email: string }) =>
     expiresIn: REFRESH_TOKEN_EXPIRATION_TIME,
   });
 
-const hasValidCredentials = async ({ email, password }: Credentials) => {
-  try {
-    const { passwordHash = '' } = (await User.findOne({ email })) || {};
+const isUserNotExisting = async ({ email, password }: RegisterDto) =>
+  tryToExecute<RegisterDto>({
+    fnToTry: async () => !(await User.findOne({ email }).exec()),
+    httpErrorData: {
+      statusCode: HttpStatus.CONFLICT,
+      data: {
+        error: 'User exists',
+      },
+    },
+    passThrough: { email, password },
+  });
 
-    return await compare(password, passwordHash);
-  } catch (e) {
-    logger.log({ level: 'info', message: e.message });
-    return false;
-  }
-};
-
-const isUserExisting = async (email: string): Promise<boolean> => {
-  return Boolean(await User.findOne({ email }));
-};
-
-const login = async ({ email, password }: LoginDto) => {
-  if (!(await isUserExisting(email))) {
-    return makeHttpError({
+const getUserByMail = async (email: string): Promise<UserDoc> =>
+  tryToExecute<UserDoc>({
+    fnToTry: () => User.findOne({ email }).exec(),
+    httpErrorData: {
       statusCode: HttpStatus.NOT_FOUND,
       data: {
         error: 'User not found',
       },
-    });
-  }
-  if (!(await hasValidCredentials({ email, password }))) {
-    return makeHttpError({
+    },
+  });
+
+const hasValidCredentials = (loginDto: LoginDto) => async (user: UserDoc) =>
+  tryToExecute<LoginDto>({
+    fnToTry: () => compare(loginDto.password, user.passwordHash),
+    passThrough: loginDto,
+    httpErrorData: {
       statusCode: HttpStatus.UNAUTHORIZED,
-      data: {
-        error: 'Invalid Credentials',
-      },
-    });
-  }
+      data: { error: 'Invalid Credentials' },
+    },
+  });
+
+const createLoginSuccessResponse = ({ email }: LoginDto) => {
   const accessToken = generateAccessToken({ email });
   const refreshToken = generateRefreshToken({ email });
-  await User.updateOne(
-    { email },
-    { refreshTokenHash: await hash(refreshToken, SALT_ROUNDS) }
-  );
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
     data: { accessToken, refreshToken },
   });
 };
 
-const register = async ({ email, password }: RegisterDto) => {
-  if (await isUserExisting(email)) {
-    return makeHttpError({
-      statusCode: HttpStatus.CONFLICT,
-      data: {
-        error: 'User exists',
-      },
-    });
-  }
+const login = async (loginDto: LoginDto) =>
+  getUserByMail(loginDto.email)
+    .then(hasValidCredentials(loginDto))
+    .then(createLoginSuccessResponse)
+    .catch(handleHttpErrors);
+
+const createNewUser = async ({ email, password }: RegisterDto) => {
   const passwordHash = await hash(password, SALT_ROUNDS);
-  const createdUser = new User({ email, passwordHash });
-  await createdUser.save();
-  return makeHttpResponse({ statusCode: HttpStatus.CREATED });
+  return new User({ email, passwordHash });
 };
 
-export { hasValidCredentials, login, register };
+const register = async ({ email, password }: RegisterDto) =>
+  isUserNotExisting({ email, password })
+    .then(createNewUser)
+    .then((user) => user.save())
+    .then(() => makeHttpResponse({ statusCode: HttpStatus.CREATED }))
+    .catch(handleHttpErrors);
+
+export {
+  hasValidCredentials,
+  login,
+  register,
+  createLoginSuccessResponse,
+  createNewUser,
+};
