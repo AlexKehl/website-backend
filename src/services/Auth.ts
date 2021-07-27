@@ -1,7 +1,9 @@
 import { compare, hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import {
+  ACCESS_TOKEN_EXPIRATION_TIME,
   ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_EXPIRATION_TIME,
   REFRESH_TOKEN_SECRET,
   SALT_ROUNDS,
 } from '../../config';
@@ -13,10 +15,14 @@ import HttpStatus from '../utils/HttpStatus';
 import { logger } from '../utils/Logger';
 
 const generateAccessToken = ({ email }: { email: string }) =>
-  sign({ email }, ACCESS_TOKEN_SECRET, { expiresIn: '45s' });
+  sign({ email }, ACCESS_TOKEN_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRATION_TIME,
+  });
 
 const generateRefreshToken = ({ email }: { email: string }) =>
-  sign({ email }, REFRESH_TOKEN_SECRET);
+  sign({ email }, REFRESH_TOKEN_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRATION_TIME,
+  });
 
 const hasValidCredentials = async ({ email, password }: Credentials) => {
   try {
