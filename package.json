@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch",
+    "test": "jest --watch --config ./jest-unit.json",
     "e2e": "jest --watch --runInBand --config ./jest-e2e.json",
     "start": "node server.js"
   },

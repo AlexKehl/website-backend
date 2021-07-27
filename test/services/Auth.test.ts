@@ -55,9 +55,9 @@ describe('login', () => {
     const res = await login({ email, password });
 
     const expected = makeHttpError({
-      statusCode: HttpStatus.UNAUTHORIZED,
+      statusCode: HttpStatus.NOT_FOUND,
       data: {
-        error: 'Invalid Credentials',
+        error: 'User not found',
       },
     });
 
