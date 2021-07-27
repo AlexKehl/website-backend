@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch --config ./jest-unit.json",
-    "e2e": "jest --watch --runInBand --config ./jest-e2e.json",
+    "test": "jest --config ./jest-unit.json",
+    "test:watch": "jest --watch --config ./jest-unit.json",
+    "e2e": "jest --runInBand --config ./jest-e2e.json",
+    "e2e:watch": "jest --watch --runInBand --config ./jest-e2e.json",
+    "testrun": "npm run test && npm run e2e",
     "start": "node server.js"
   },
   "module": "node",
