@@ -8,6 +8,8 @@ import { hasValidatedData } from './guards/HasValidatedData';
 import { getNewAccessTokenController } from './controllers/Token';
 import { hasValidRefreshToken } from './guards/HasValidRefreshToken';
 import { ServerStartOptions } from './types';
+import upload from './utils/MulterConfig';
+import { fileUploadController } from './controllers/Files';
 
 const start = ({ port, startupMessage }: ServerStartOptions) => {
   const app = express();
@@ -47,6 +49,14 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
       guards: [hasValidatedData, hasValidRefreshToken],
     })
   );
+
+  app.post(
+    '/file/upload',
+    upload.single('file'),
+    routeHandler({ controller: fileUploadController })
+  );
+
+  app.use('/files', express.static('pictures'));
 
   const server = app.listen(port, () => {
     if (startupMessage) {

@@ -51,3 +51,4 @@ export interface ServerStartOptions {
 
 export * from './RequestObject';
 export * from './Dto';
+export * from './Files';

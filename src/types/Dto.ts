@@ -12,3 +12,7 @@ export interface RefreshTokenDto {
   email: string;
   refreshToken: string;
 }
+
+export interface FileDto {
+  category: string;
+}
