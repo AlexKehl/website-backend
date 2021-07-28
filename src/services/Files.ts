@@ -1,64 +1,111 @@
-import { FileDto, SerializedFileObj, WithBody } from '../types';
-import { File } from '../model/File';
-import { tryToExecute } from '../utils/HttpErrors';
-
-// const uploadFile = (req: WithBody<FileDto>) => isFileNotExistingInDb(req);
+import {
+  FileDeleteDto,
+  FileDto,
+  HttpResponse,
+  ImageForConsumer,
+  SerializedFileObj,
+  WithBody,
+} from '../types';
+import { File, FileDoc } from '../model/File';
+import {
+  handleHttpErrors,
+  makeHttpError,
+  tryToExecute,
+} from '../utils/HttpErrors';
+import HttpStatus from '../utils/HttpStatus';
+import { intersection } from 'lodash';
+import { mkdir, unlink, writeFile } from 'fs/promises';
+import { join } from 'path';
+import { BASE_URL, IMAGE_PATH } from '../../config';
+import { makeHttpResponse } from '../utils/HttpResponses';
 
 const serializeFileObj = (req: WithBody<FileDto>): SerializedFileObj => {
   const { originalname, buffer, size, mimetype } = req.file!;
   return { ...req.body, originalname, buffer, size, mimetype };
 };
 
-// {
-//   fieldname: 'file',
-//   originalname: 'i-201.jpg',
-//   encoding: '7bit',
-//   mimetype: 'image/jpeg',
-//   buffer: <Buffer 89 50 4e 47 0d 0a 1a 0a 00 00 00 0d 49 48 44 52 00 00 02 d0 00 00 01 95 08 06 00 00 00 d7 2a c6 de 00 00 20 00 49 44 41 54 78 9c 54 bd 51 96 24 4b 8e ... 473051 more bytes>,
-//   size: 473101
-// }
+const hasFile = (fileObj: SerializedFileObj): Promise<SerializedFileObj> => {
+  const requiredFileKeys = ['originalname', 'mimetype', 'buffer', 'size'];
 
-// const isFileNotExistingInDb = async (req: WithBody<FileDto>) => {
-//   // return Boolean(await File.findOne({ name, category }));
-//
-//   tryToExecute<WithBody<FileDto>>({
-//     fnToTry: async () => !(await File.findOne({ name: req.file?.originalname, category: req.file. })),
-//     httpErrorData: {
-//       statusCode: HttpStatus.CONFLICT,
-//       data: {
-//         error: 'User exists',
-//       },
-//     },
-//     passThrough: ,
-//   });
-// };
-//
-// async upload(file: Express.Multer.File, fileUploadDto: FileUploadDto) {
-//   if (
-//     await isFileExistingInDb(file.originalname, fileUploadDto.category)
-//   ) {
-//     throw new EntityExistsException("File exists");
-//   }
-//
-//   await this.writeFileToDisk(file, fileUploadDto);
-//
-//   const createdFile = new this.fileModel({
-//     name: file.originalname,
-//     category: fileUploadDto.category,
-//   });
-//   return createdFile.save();
-// }
-//
-// async delete(category: string, name: string) {
-//   if (!(await this.isFileExistingInDb(name, category))) {
-//     throw new NotFoundException();
-//   }
-//   return Promise.all([
-//     unlink(join(IMAGE_PATH, category, name)),
-//     this.fileModel.deleteOne({ category, name }),
-//   ]);
-// }
-//
+  const areAllFileKeysPresent =
+    intersection(requiredFileKeys, Object.keys(fileObj)).length ===
+    requiredFileKeys.length;
+
+  return areAllFileKeysPresent
+    ? Promise.resolve(fileObj)
+    : Promise.reject(
+        makeHttpError({
+          statusCode: HttpStatus.BAD_REQUEST,
+          data: { error: 'Corrupt File' },
+        })
+      );
+};
+
+const hasNoFileConflict = async (fileObj: SerializedFileObj) =>
+  tryToExecute<SerializedFileObj>({
+    fnToTry: async () =>
+      !(await File.findOne({
+        name: fileObj.originalname,
+        category: fileObj.category,
+      })),
+    httpErrorData: {
+      statusCode: HttpStatus.CONFLICT,
+      data: { error: 'File with this name and category exists' },
+    },
+    passThrough: fileObj,
+  });
+
+const isFileNotExistingInDb = async ({ category, name }: FileDeleteDto) =>
+  tryToExecute<FileDeleteDto>({
+    fnToTry: async () => await File.findOne({ name, category }),
+    httpErrorData: {
+      statusCode: HttpStatus.NOT_FOUND,
+      data: { error: 'File is not existing.' },
+    },
+    passThrough: { category, name },
+  });
+
+const writeFileToDisk = async (
+  fileObj: SerializedFileObj
+): Promise<SerializedFileObj> => {
+  const { category, originalname, buffer } = fileObj;
+  return tryToExecute<SerializedFileObj>({
+    fnToTry: async () => {
+      await mkdir(join(IMAGE_PATH, category), { recursive: true });
+      await writeFile(join(IMAGE_PATH, category, originalname), buffer);
+      return true;
+    },
+    httpErrorData: {
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      data: { error: 'Server has problems with saving the file.' },
+    },
+    passThrough: fileObj,
+  });
+};
+
+const saveFileMetaToDb = async (file: SerializedFileObj) => {
+  return File.create({
+    name: file.originalname,
+    category: file.category,
+  });
+};
+
+const uploadFile = (req: WithBody<FileDto>) =>
+  Promise.resolve(serializeFileObj(req))
+    .then(hasFile)
+    .then(hasNoFileConflict)
+    .then(writeFileToDisk)
+    .then(saveFileMetaToDb)
+    .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
+    .catch(handleHttpErrors);
+
+const deleteFile = ({ category, name }: FileDeleteDto) =>
+  isFileNotExistingInDb({ category, name })
+    .then(() => unlink(join(IMAGE_PATH, category, name)))
+    .then(() => File.deleteOne({ category, name }))
+    .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
+    .catch(handleHttpErrors);
+
 // async getImagePath(category: string, imageName: string) {
 //   if (!this.isImageExistingOnDisk(category, imageName)) {
 //     throw new NotFoundException();
@@ -66,15 +113,44 @@ const serializeFileObj = (req: WithBody<FileDto>): SerializedFileObj => {
 //   return join(category, imageName);
 // }
 //
-// async getImagePathsForCategory(
-//   category: string
-// ): Promise<ImageForConsumer[]> {
-//   const imagesForCategory = await this.fileModel.find({ category }).lean();
-//   return imagesForCategory.map(({ name, category }) => ({
-//     name,
-//     category,
-//     url: join(BASE_URL, "files/image", category, name),
-//   }));
-// }
+const imageForConsumerMap = (fileDocs: FileDoc[]): ImageForConsumer[] => {
+  return fileDocs.map(({ category, name }) => ({
+    category,
+    name,
+    url: `${BASE_URL}/files/image/${category}/${name}`,
+  }));
+};
 
-export { serializeFileObj };
+const createImagesForConsumerHttpResponse = (
+  images: ImageForConsumer[]
+): HttpResponse =>
+  makeHttpResponse({
+    statusCode: HttpStatus.OK,
+    data: { images },
+  });
+
+const getImagesDocsForCategory = (category: string) =>
+  tryToExecute({
+    fnToTry: async () => File.find({ category }).lean(),
+    httpErrorData: {
+      statusCode: HttpStatus.NOT_FOUND,
+      data: { error: 'No images stored for this category' },
+    },
+  });
+
+const getImagePathsForCategory = async (
+  category: string
+): Promise<HttpResponse> => {
+  const imagesForCategoryDocs = await File.find({ category }).lean();
+  const imagesForConsumer = imageForConsumerMap(imagesForCategoryDocs);
+  return createImagesForConsumerHttpResponse(imagesForConsumer);
+};
+
+export {
+  serializeFileObj,
+  hasFile,
+  uploadFile,
+  deleteFile,
+  imageForConsumerMap,
+  getImagePathsForCategory,
+};

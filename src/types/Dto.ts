@@ -16,3 +16,8 @@ export interface RefreshTokenDto {
 export interface FileDto {
   category: string;
 }
+
+export interface FileDeleteDto {
+  category: string;
+  name: string;
+}

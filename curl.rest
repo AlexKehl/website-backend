@@ -1,35 +1,47 @@
+# http://localhost:3002
+#
+# Content-Type: application/json
+#
+# POST /register
+# {
+#   "email": "test@test.com",
+#   "password": "12345678"
+# }
+#
+# http://localhost:3002
+#
+# Content-Type: application/json
+#
+# POST /login
+# {
+#   "email": "test@test.com",
+#   "password": "12345678"
+# }
+#
+# http://localhost:3002
+#
+# GET /files
+#
+# http://localhost:3002
+#
+# Content-Type: application/json
+#
+# POST /refreshtoken
+# {
+#   "email": "test@test.com",
+#   "refreshToken": "eyJhbGciOiJIUzI2NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MjcyNTk2Mjh9.SdL0JW5j1uWwoN1Sz38fucH4eBKfwC19SPpg6hXs67w"
+# }
+
 http://localhost:3002
 
 Content-Type: application/json
 
-POST /register
+POST /file/delete
 {
-  "email": "test@test.com",
-  "password": "12345678"
+  "name": "i-201.jpg",
+  "category": "acryl"
 }
 
 http://localhost:3002
 
-Content-Type: application/json
-
-POST /login
-{
-  "email": "test@test.com",
-  "password": "12345678"
-}
-
-http://localhost:3002
-
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MjcyNDk0NTYsImV4cCI6MTYyNzI0OTUwMX0.TtWRHFxELxA6SByESMlgn6NHUbPUBBZd3Xu2P4N7KjQ
-
-GET /
-
-http://localhost:3002
-
-Content-Type: application/json
-
-POST /refreshtoken
-{
-  "email": "test@test.com",
-  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2MjcyNTk2Mjh9.SdL0JW5j1uWwoN1Sz38fucH4eBKfwC19SPpg6hXs67w"
-}
+GET /files/acryl

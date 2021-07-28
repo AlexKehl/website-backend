@@ -1,4 +1,6 @@
-import { SerializedFileObj } from '../../src/types';
+import { BASE_URL } from '../../config';
+import { FileDoc } from '../../src/model/File';
+import { ImageForConsumer, SerializedFileObj } from '../../src/types';
 
 export const serializedFileObj: SerializedFileObj = {
   originalname: 'i-201.jpg',
@@ -7,3 +9,27 @@ export const serializedFileObj: SerializedFileObj = {
   size: 473101,
   category: 'Acryl',
 };
+
+export const fileDocs: FileDoc[] = [
+  {
+    category: 'Acryl',
+    name: 'foo.jpg',
+  },
+  {
+    category: 'Oil',
+    name: 'bar.jpg',
+  },
+];
+
+export const imagesForConsumer: ImageForConsumer[] = [
+  {
+    name: 'foo.jpg',
+    category: 'Acryl',
+    url: `${BASE_URL}/files/image/Acryl/foo.jpg`,
+  },
+  {
+    name: 'bar.jpg',
+    category: 'Oil',
+    url: `${BASE_URL}/files/image/Oil/bar.jpg`,
+  },
+];
