@@ -31,7 +31,6 @@ export const tryToExecute = async <T>({
   passThrough,
 }: TryToExecuteInput): Promise<T> => {
   const res = await fnToTry();
-  console.log(res);
   return res
     ? Promise.resolve(passThrough || res)
     : Promise.reject(new WithPayloadError(httpErrorData));

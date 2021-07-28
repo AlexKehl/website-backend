@@ -12,11 +12,11 @@ export const serializedFileObj: SerializedFileObj = {
 
 export const fileDocs: FileDoc[] = [
   {
-    category: 'Acryl',
+    category: 'acryl',
     name: 'foo.jpg',
   },
   {
-    category: 'Oil',
+    category: 'oil',
     name: 'bar.jpg',
   },
 ];
@@ -24,12 +24,12 @@ export const fileDocs: FileDoc[] = [
 export const imagesForConsumer: ImageForConsumer[] = [
   {
     name: 'foo.jpg',
-    category: 'Acryl',
-    url: `${BASE_URL}/files/image/Acryl/foo.jpg`,
+    category: 'acryl',
+    url: `${BASE_URL}/files/acryl/foo.jpg`,
   },
   {
     name: 'bar.jpg',
-    category: 'Oil',
-    url: `${BASE_URL}/files/image/Oil/bar.jpg`,
+    category: 'oil',
+    url: `${BASE_URL}/files/oil/bar.jpg`,
   },
 ];

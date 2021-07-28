@@ -17,7 +17,7 @@ export interface FileDto {
   category: string;
 }
 
-export interface FileDeleteDto {
+export interface FileWithCategoryDto {
   category: string;
   name: string;
 }

@@ -1,23 +1,20 @@
+import { mkdir, unlink, writeFile } from 'fs/promises';
+import { intersection } from 'lodash';
+import { join } from 'path';
+import { BASE_URL, IMAGE_PATH } from '../../config';
+import { File, FileDoc } from '../model/File';
 import {
-  FileDeleteDto,
+  FileWithCategoryDto,
   FileDto,
   HttpResponse,
   ImageForConsumer,
   SerializedFileObj,
   WithBody,
 } from '../types';
-import { File, FileDoc } from '../model/File';
-import {
-  handleHttpErrors,
-  makeHttpError,
-  tryToExecute,
-} from '../utils/HttpErrors';
-import HttpStatus from '../utils/HttpStatus';
-import { intersection } from 'lodash';
-import { mkdir, unlink, writeFile } from 'fs/promises';
-import { join } from 'path';
-import { BASE_URL, IMAGE_PATH } from '../../config';
+import WithPayloadError from '../utils/Exceptions/WithPayloadError';
+import { handleHttpErrors, tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
+import HttpStatus from '../utils/HttpStatus';
 
 const serializeFileObj = (req: WithBody<FileDto>): SerializedFileObj => {
   const { originalname, buffer, size, mimetype } = req.file!;
@@ -31,10 +28,10 @@ const hasFile = (fileObj: SerializedFileObj): Promise<SerializedFileObj> => {
     intersection(requiredFileKeys, Object.keys(fileObj)).length ===
     requiredFileKeys.length;
 
-  return areAllFileKeysPresent
+  return areAllFileKeysPresent && fileObj.size > 0
     ? Promise.resolve(fileObj)
     : Promise.reject(
-        makeHttpError({
+        new WithPayloadError({
           statusCode: HttpStatus.BAD_REQUEST,
           data: { error: 'Corrupt File' },
         })
@@ -55,8 +52,8 @@ const hasNoFileConflict = async (fileObj: SerializedFileObj) =>
     passThrough: fileObj,
   });
 
-const isFileNotExistingInDb = async ({ category, name }: FileDeleteDto) =>
-  tryToExecute<FileDeleteDto>({
+const isFileNotExistingInDb = async ({ category, name }: FileWithCategoryDto) =>
+  tryToExecute<FileWithCategoryDto>({
     fnToTry: async () => await File.findOne({ name, category }),
     httpErrorData: {
       statusCode: HttpStatus.NOT_FOUND,
@@ -99,25 +96,32 @@ const uploadFile = (req: WithBody<FileDto>) =>
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
     .catch(handleHttpErrors);
 
-const deleteFile = ({ category, name }: FileDeleteDto) =>
+const deleteFile = ({ category, name }: FileWithCategoryDto) =>
   isFileNotExistingInDb({ category, name })
     .then(() => unlink(join(IMAGE_PATH, category, name)))
     .then(() => File.deleteOne({ category, name }))
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
     .catch(handleHttpErrors);
 
-// async getImagePath(category: string, imageName: string) {
-//   if (!this.isImageExistingOnDisk(category, imageName)) {
-//     throw new NotFoundException();
-//   }
-//   return join(category, imageName);
-// }
-//
+const generateImagePathHttpResponse = ({
+  category,
+  name,
+}: FileWithCategoryDto) =>
+  makeHttpResponse({
+    statusCode: HttpStatus.OK,
+    data: { imagePath: join(category, name) },
+  });
+
+const getImagePath = (category: string, name: string) =>
+  isFileNotExistingInDb({ category, name })
+    .then(generateImagePathHttpResponse)
+    .catch(handleHttpErrors);
+
 const imageForConsumerMap = (fileDocs: FileDoc[]): ImageForConsumer[] => {
   return fileDocs.map(({ category, name }) => ({
     category,
     name,
-    url: `${BASE_URL}/files/image/${category}/${name}`,
+    url: `${BASE_URL}/files/${category}/${name}`,
   }));
 };
 
@@ -130,7 +134,7 @@ const createImagesForConsumerHttpResponse = (
   });
 
 const getImagesDocsForCategory = (category: string) =>
-  tryToExecute({
+  tryToExecute<FileDoc[]>({
     fnToTry: async () => File.find({ category }).lean(),
     httpErrorData: {
       statusCode: HttpStatus.NOT_FOUND,
@@ -138,13 +142,11 @@ const getImagesDocsForCategory = (category: string) =>
     },
   });
 
-const getImagePathsForCategory = async (
-  category: string
-): Promise<HttpResponse> => {
-  const imagesForCategoryDocs = await File.find({ category }).lean();
-  const imagesForConsumer = imageForConsumerMap(imagesForCategoryDocs);
-  return createImagesForConsumerHttpResponse(imagesForConsumer);
-};
+const getImagePathsForCategory = async (category: string) =>
+  getImagesDocsForCategory(category)
+    .then(imageForConsumerMap)
+    .then(createImagesForConsumerHttpResponse)
+    .catch(handleHttpErrors);
 
 export {
   serializeFileObj,
@@ -153,4 +155,5 @@ export {
   deleteFile,
   imageForConsumerMap,
   getImagePathsForCategory,
+  getImagePath,
 };

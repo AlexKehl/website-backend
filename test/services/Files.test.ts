@@ -1,9 +1,13 @@
+import { join } from 'path';
+import { BASE_URL } from '../../config';
 import {
+  getImagePath,
   hasFile,
   imageForConsumerMap,
   serializeFileObj,
 } from '../../src/services/Files';
 import { FileDto, SerializedFileObj, WithBody } from '../../src/types';
+import WithPayloadError from '../../src/utils/Exceptions/WithPayloadError';
 import { makeHttpError } from '../../src/utils/HttpErrors';
 import HttpStatus from '../../src/utils/HttpStatus';
 import {
@@ -38,7 +42,7 @@ describe('hasFile', () => {
   it('rejects if input misses some key from SerializedFileObj', async () => {
     const { buffer, ...rest } = serializedFileObj;
 
-    const expected = makeHttpError({
+    const expected = new WithPayloadError({
       statusCode: HttpStatus.BAD_REQUEST,
       data: { error: 'Corrupt File' },
     });
@@ -53,6 +57,7 @@ describe('imageForConsumerMap', () => {
 
     expect(res).toEqual(imagesForConsumer);
   });
+
   it('returns an empty array if input is empty array', () => {
     const res = imageForConsumerMap([]);
 
