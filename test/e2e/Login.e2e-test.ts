@@ -162,4 +162,23 @@ describe('/logout', () => {
     expect(res.status).toEqual(HttpStatus.OK);
     expect(res.body.success).toBe(true);
   });
+
+  it('deletes refreshTokenHash on successful logout', async () => {
+    const { email, passwordHash } = RegisteredUser;
+    const {
+      refreshToken,
+      refreshTokenHash,
+    } = await generateRefreshTokenAndHash(email);
+    const createdUser = new User({ email, passwordHash, refreshTokenHash });
+    await createdUser.save();
+
+    await request(app)
+      .post('/logout')
+      .set('Cookie', [`refreshToken=${refreshToken}`])
+      .send({ email: RegisteredUser.email });
+
+    const loggedOutUserDoc = await User.findOne({ email }).exec();
+
+    expect(loggedOutUserDoc?.refreshTokenHash).not.toBeDefined();
+  });
 });

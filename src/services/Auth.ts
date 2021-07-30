@@ -60,8 +60,9 @@ const hasValidCredentials = (loginDto: LoginDto) => async (user: UserDoc) =>
   });
 
 const hasValidRefreshToken = (refreshToken: string) => async (user: UserDoc) =>
-  tryToExecute<LoginDto>({
+  tryToExecute<UserDoc>({
     fnToTry: () => compare(refreshToken, user.refreshTokenHash || ''),
+    passThrough: user,
     httpErrorData: {
       statusCode: HttpStatus.FORBIDDEN,
       data: { error: 'Invalid refresh token' },
@@ -96,6 +97,16 @@ const updateRefreshToken = async ({
   }
 };
 
+const deleteRefreshToken = ({ email }: UserDoc) =>
+  tryToExecute({
+    fnToTry: async () =>
+      await User.updateOne({ email }, { $unset: { refreshTokenHash: '' } }),
+    httpErrorData: {
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      data: { error: 'Error when deleting refresh token' },
+    },
+  });
+
 const login = async (loginDto: LoginDto) =>
   getUserByMail(loginDto.email)
     .then(hasValidCredentials(loginDto))
@@ -118,6 +129,7 @@ const register = async ({ email, password }: RegisterDto) =>
 const logout = async (email: string, refreshToken: string) => {
   return getUserByMail(email)
     .then(hasValidRefreshToken(refreshToken))
+    .then(deleteRefreshToken)
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
     .catch(handleHttpErrors);
 };
