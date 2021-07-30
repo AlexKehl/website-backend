@@ -13,6 +13,10 @@ export interface RefreshTokenDto {
   refreshToken: string;
 }
 
+export interface LogoutDto {
+  email: string;
+}
+
 export interface FileDto {
   category: string;
 }

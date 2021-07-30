@@ -8,13 +8,13 @@ const hasValidRefreshToken = async (
   expressObj: ExpressObj<RefreshTokenDto>
 ) => {
   try {
-    verify(expressObj.req.body.refreshToken || '', REFRESH_TOKEN_SECRET);
+    verify(expressObj.req.cookies.refreshToken || '', REFRESH_TOKEN_SECRET);
     return expressObj;
   } catch (e) {
     throw new WithPayloadError({
       statusCode: HttpStatus.UNAUTHORIZED,
       data: {
-        error: 'Invalid refreshToken',
+        error: 'Invalid refresh token',
       },
     });
   }

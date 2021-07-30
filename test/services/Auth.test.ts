@@ -5,7 +5,12 @@ import {
 } from '../../src/services/Auth';
 import { makeHttpResponse } from '../../src/utils/HttpResponses';
 import HttpStatus from '../../src/utils/HttpStatus';
-import { RegisteredUser, UserWithPassword } from '../fixtures/User';
+import {
+  getUserWithRefreshToken,
+  RegisteredUser,
+  userResponse,
+  UserWithPassword,
+} from '../fixtures/User';
 import WithPayloadError from '../../src/utils/Exceptions/WithPayloadError';
 import { verify } from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../config';
@@ -21,7 +26,7 @@ describe('createNewUser', () => {
 describe('hasValidCredentials', () => {
   it('resolves with loginDto if credentials are valid', async () => {
     const res = await hasValidCredentials(UserWithPassword)(RegisteredUser);
-    expect(res).toEqual(UserWithPassword);
+    expect(res).toEqual(RegisteredUser);
   });
 
   it('rejects for invalid credentials', async () => {
@@ -42,14 +47,16 @@ describe('hasValidCredentials', () => {
 });
 
 describe('createLoginSuccessResponse', () => {
-  it('returns http res with access and refresh tokens', () => {
-    const res = createLoginSuccessResponse(UserWithPassword);
+  it('returns http res with tokens and userResponse', async () => {
+    const userWithRefreshToken = await getUserWithRefreshToken();
+    const res = createLoginSuccessResponse(userWithRefreshToken);
 
     const expected = makeHttpResponse({
       statusCode: HttpStatus.OK,
       data: {
         accessToken: expect.any(String),
         refreshToken: expect.any(String),
+        user: userResponse,
       },
     });
 

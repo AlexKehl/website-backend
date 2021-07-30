@@ -1,6 +1,10 @@
-import { body } from 'express-validator';
+import { body, cookie } from 'express-validator';
 import { Express } from 'express';
-import { registerController, loginController } from '../controllers/Auth';
+import {
+  registerController,
+  loginController,
+  logoutController,
+} from '../controllers/Auth';
 import { getNewAccessTokenController } from '../controllers/Token';
 import { hasValidatedData } from '../guards/HasValidatedData';
 import { hasValidRefreshToken } from '../guards/HasValidRefreshToken';
@@ -24,9 +28,19 @@ export const startAuthRoutes = (app: Express) => {
   app.post(
     '/refreshtoken',
     body('email').isEmail(),
-    body('refreshToken').isString(),
+    cookie('refreshToken').isString(),
     routeHandler({
       controller: getNewAccessTokenController,
+      guards: [hasValidatedData, hasValidRefreshToken],
+    })
+  );
+
+  app.post(
+    '/logout',
+    body('email').isEmail(),
+    cookie('refreshToken').isString(),
+    routeHandler({
+      controller: logoutController,
       guards: [hasValidatedData, hasValidRefreshToken],
     })
   );

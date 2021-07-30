@@ -8,11 +8,13 @@ import {
   SALT_ROUNDS,
 } from '../../config';
 import { User, UserDoc } from '../model/User';
-import { LoginDto, RegisterDto } from '../types';
+import { LoginDto, RefreshTokenDto, RegisterDto } from '../types';
 import { tryToExecute } from '../utils/HttpErrors';
 import { handleHttpErrors } from '../utils/HttpErrorHandler';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
+import { logger } from '../utils/Logger';
+import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 
 const generateAccessToken = ({ email }: { email: string }) =>
   sign({ email }, ACCESS_TOKEN_SECRET, {
@@ -48,27 +50,56 @@ const getUserByMail = async (email: string): Promise<UserDoc> =>
   });
 
 const hasValidCredentials = (loginDto: LoginDto) => async (user: UserDoc) =>
-  tryToExecute<LoginDto>({
+  tryToExecute<UserDoc>({
     fnToTry: () => compare(loginDto.password, user.passwordHash),
-    passThrough: loginDto,
+    passThrough: user,
     httpErrorData: {
       statusCode: HttpStatus.UNAUTHORIZED,
       data: { error: 'Invalid Credentials' },
     },
   });
 
-const createLoginSuccessResponse = ({ email }: LoginDto) => {
+const hasValidRefreshToken = (refreshToken: string) => async (user: UserDoc) =>
+  tryToExecute<LoginDto>({
+    fnToTry: () => compare(refreshToken, user.refreshTokenHash || ''),
+    httpErrorData: {
+      statusCode: HttpStatus.FORBIDDEN,
+      data: { error: 'Invalid refresh token' },
+    },
+  });
+
+const createLoginSuccessResponse = ({
+  email,
+  refreshToken,
+}: RefreshTokenDto) => {
   const accessToken = generateAccessToken({ email });
-  const refreshToken = generateRefreshToken({ email });
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
-    data: { accessToken, refreshToken },
+    data: { accessToken, refreshToken, user: { email } },
   });
+};
+
+const updateRefreshToken = async ({
+  email,
+}: UserDoc): Promise<RefreshTokenDto> => {
+  try {
+    const refreshToken = generateRefreshToken({ email });
+    const refreshTokenHash = await hash(refreshToken, SALT_ROUNDS);
+    await User.updateOne({ email }, { refreshTokenHash });
+    return { email, refreshToken };
+  } catch (e) {
+    logger.log({ level: 'error', message: e.message });
+    throw new WithPayloadError({
+      data: { error: 'Error updating Refresh token' },
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+    });
+  }
 };
 
 const login = async (loginDto: LoginDto) =>
   getUserByMail(loginDto.email)
     .then(hasValidCredentials(loginDto))
+    .then(updateRefreshToken)
     .then(createLoginSuccessResponse)
     .catch(handleHttpErrors);
 
@@ -84,10 +115,18 @@ const register = async ({ email, password }: RegisterDto) =>
     .then(() => makeHttpResponse({ statusCode: HttpStatus.CREATED }))
     .catch(handleHttpErrors);
 
+const logout = async (email: string, refreshToken: string) => {
+  return getUserByMail(email)
+    .then(hasValidRefreshToken(refreshToken))
+    .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
+    .catch(handleHttpErrors);
+};
+
 export {
   hasValidCredentials,
   login,
   register,
   createLoginSuccessResponse,
   createNewUser,
+  logout,
 };

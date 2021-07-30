@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { WithBody } from './RequestObject';
+import { HttpResponse } from './Responses';
 
 export type ExpressResponse = Response;
 export type ExpressRequest = Request;
@@ -35,20 +36,22 @@ export interface HttpError {
   };
 }
 
-export interface HttpResponse {
-  headers: Record<string, string>;
-  statusCode: number;
-  data: {
-    success: boolean;
-    [x: string]: any;
-  };
-}
-
 export interface ServerStartOptions {
   port: number;
   startupMessage?: string;
 }
 
+export interface UserResponse {
+  email: string;
+}
+
+export interface EmailWithTokens {
+  email: string;
+  refreshToken: string;
+  refreshTokenHash: string;
+}
+
 export * from './RequestObject';
 export * from './Dto';
 export * from './Files';
+export * from './Responses';

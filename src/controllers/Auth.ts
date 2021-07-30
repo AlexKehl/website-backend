@@ -1,5 +1,5 @@
-import { login, register } from '../services/Auth';
-import { LoginDto, ExpressObj } from '../types';
+import { login, logout, register } from '../services/Auth';
+import { LoginDto, ExpressObj, LogoutDto } from '../types';
 
 const registerController = async ({ req, res }: ExpressObj<LoginDto>) => {
   const { headers, statusCode, data } = await register(req.body);
@@ -9,14 +9,21 @@ const registerController = async ({ req, res }: ExpressObj<LoginDto>) => {
 const loginController = async ({ req, res }: ExpressObj<LoginDto>) => {
   const { headers, statusCode, data } = await login(req.body);
   res.cookie('refreshToken', data?.refreshToken, {
-    sameSite: true,
     httpOnly: true,
+    secure: true,
   });
   res.cookie('accessToken', data?.accessToken, {
-    httpOnly: true,
     sameSite: true,
+    secure: true,
   });
   res.set(headers).status(statusCode).send(data);
 };
 
-export { registerController, loginController };
+const logoutController = async ({ req, res }: ExpressObj<LogoutDto>) => {
+  const { refreshToken } = req.cookies;
+  const { email } = req.body;
+  const { headers, statusCode, data } = await logout(email, refreshToken);
+  res.set(headers).status(statusCode).send(data);
+};
+
+export { registerController, loginController, logoutController };

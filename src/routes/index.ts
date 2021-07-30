@@ -4,6 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import { ServerStartOptions } from '../types';
 import { startAuthRoutes } from './Auth';
 import { startFilesRoutes } from './Files';
+import { CLIENT_URL } from '../../config';
 
 const start = ({ port, startupMessage }: ServerStartOptions) => {
   const app = express();
@@ -12,7 +13,7 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
   app.use(cookieParser());
   app.use(
     cors({
-      origin: 'http://127.0.0.1:3000',
+      origin: CLIENT_URL,
       allowedHeaders: 'content-type',
       exposedHeaders: '*',
       credentials: true,
