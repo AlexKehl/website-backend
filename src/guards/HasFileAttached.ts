@@ -2,10 +2,10 @@ import { ExpressObj } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 import HttpStatus from '../utils/HttpStatus';
 
-const hasFileAttached = async (expressObj: ExpressObj) => {
-  if (!expressObj.req.file) {
+const hasFilesAttached = async (expressObj: ExpressObj) => {
+  if (!expressObj.req.files?.length) {
     throw new WithPayloadError({
-      data: { error: 'File is missing' },
+      data: { error: 'Files are missing' },
       statusCode: HttpStatus.BAD_REQUEST,
     });
   }
@@ -13,4 +13,4 @@ const hasFileAttached = async (expressObj: ExpressObj) => {
   return expressObj;
 };
 
-export { hasFileAttached };
+export { hasFilesAttached };

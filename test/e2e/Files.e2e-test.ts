@@ -6,21 +6,21 @@ import { fileDocs, imagesForConsumer } from '../fixtures/File';
 
 const { app } = setupServer({ port: 3005 });
 
-describe('/file/upload', () => {
-  it('returns HttpStatus.BAD_REQUEST if file is missing', async () => {
+describe('/file/sync/gallery', () => {
+  it('returns HttpStatus.BAD_REQUEST if files are missing', async () => {
     const res = await request(app)
-      .post('/file/upload')
-      .field('category', 'Acryl');
+      .post('/file/sync/gallery')
+      .field('category', 'acryl');
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
     expect(res.body.success).toBe(false);
   });
 
-  it('returns HttpStatus.BAD_REQUEST if file is corrupt', async () => {
+  it('returns HttpStatus.BAD_REQUEST if some file is corrupt', async () => {
     const res = await request(app)
-      .post('/file/upload')
-      .attach('file', './test/fixtures/CorruptImage.jpg')
-      .field('category', 'Acryl');
+      .post('/file/sync/gallery')
+      .attach('files', './test/fixtures/CorruptImage.jpg')
+      .field('category', 'acryl');
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
     expect(res.body.success).toBe(false);
@@ -28,8 +28,8 @@ describe('/file/upload', () => {
 
   it('returns HttpStatus.BAD_REQUEST if category is missing', async () => {
     const res = await request(app)
-      .post('/file/upload')
-      .attach('file', './test/fixtures/TestImage.jpg');
+      .post('/file/sync/gallery')
+      .attach('files', './test/fixtures/TestImage.jpg');
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
     expect(res.body.success).toBe(false);
@@ -37,10 +37,16 @@ describe('/file/upload', () => {
 
   it('returns HttpStatus.OK upload was successfull', async () => {
     const res = await request(app)
-      .post('/file/upload')
-      .attach('file', './test/fixtures/TestImage.jpg')
-      .field('category', 'Acryl');
+      .post('/file/sync/gallery')
+      .attach('files', './test/fixtures/TestImage.jpg')
+      .field('category', 'acryl');
 
+    const uploadedFile = await File.findOne({
+      name: 'TestImage.jpg',
+      category: 'acryl',
+    }).exec();
+
+    expect(uploadedFile).toBeDefined();
     expect(res.status).toEqual(HttpStatus.OK);
     expect(res.body.success).toBe(true);
   });

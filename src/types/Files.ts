@@ -1,3 +1,4 @@
+import { FileDoc } from '../model/File';
 import { FileDto } from './Dto';
 
 export type SerializedFileObj = FileDto &
@@ -7,4 +8,9 @@ export interface ImageForConsumer {
   name: string;
   url: string;
   category: string;
+}
+
+export interface FilesToSync {
+  toUpload: SerializedFileObj[];
+  toDelete: FileDoc[];
 }

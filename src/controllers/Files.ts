@@ -1,22 +1,13 @@
 import { IMAGE_PATH } from '../../config';
 import {
-  deleteFile,
   getImagePath,
   getImagePathsForCategory,
-  uploadFile,
+  syncFiles,
 } from '../services/Files';
-import { ExpressObj, FileWithCategoryDto, FileDto } from '../types';
+import { ExpressObj, FileDto } from '../types';
 
-const fileUploadController = async ({ req, res }: ExpressObj<FileDto>) => {
-  const { headers, statusCode, data } = await uploadFile(req);
-  res.set(headers).status(statusCode).send(data);
-};
-
-const fileDeleteController = async ({
-  req,
-  res,
-}: ExpressObj<FileWithCategoryDto>) => {
-  const { headers, statusCode, data } = await deleteFile(req.body);
+const fileSyncController = async ({ req, res }: ExpressObj<FileDto>) => {
+  const { headers, statusCode, data } = await syncFiles(req);
   res.set(headers).status(statusCode).send(data);
 };
 
@@ -41,8 +32,7 @@ const getImageByCategoryController = async ({ req, res }: ExpressObj) => {
 };
 
 export {
-  fileUploadController,
-  fileDeleteController,
+  fileSyncController,
   getImagePathsForCategoryController,
   getImageByCategoryController,
 };

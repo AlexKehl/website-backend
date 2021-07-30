@@ -1,53 +1,109 @@
-import { join } from 'path';
-import { BASE_URL } from '../../config';
+import { FileDoc } from '../../src/model/File';
 import {
-  getImagePath,
-  hasFile,
+  createFilesToSyncObj,
+  isFileValid,
   imageForConsumerMap,
-  serializeFileObj,
+  serializeFileObjects,
 } from '../../src/services/Files';
-import { FileDto, SerializedFileObj, WithBody } from '../../src/types';
-import WithPayloadError from '../../src/utils/Exceptions/WithPayloadError';
-import { makeHttpError } from '../../src/utils/HttpErrors';
-import HttpStatus from '../../src/utils/HttpStatus';
 import {
+  FileDto,
+  FilesToSync,
+  SerializedFileObj,
+  WithBody,
+} from '../../src/types';
+import {
+  fileDoc,
   fileDocs,
   imagesForConsumer,
   serializedFileObj,
 } from '../fixtures/File';
 
-describe('serializeFileObj', () => {
-  it('returns an obj of type SerializedFileObj', () => {
+describe('serializeFileObjects', () => {
+  it('returns SerializedFileObj[]', () => {
     const { category, ...serializedFileObjRest } = serializedFileObj;
     const input: Partial<WithBody<FileDto>> = {
-      file: serializedFileObjRest as Express.Multer.File,
-      body: { category: 'Acryl' },
+      files: [serializedFileObjRest] as Express.Multer.File[],
+      body: { category: 'acryl' },
     };
 
-    const res = serializeFileObj(input as WithBody<FileDto>);
+    const res = serializeFileObjects(input as WithBody<FileDto>);
 
-    const expected: SerializedFileObj = serializedFileObj;
+    const expected: SerializedFileObj[] = [serializedFileObj];
 
     expect(res).toEqual(expected);
   });
 });
 
-describe('hasFile', () => {
-  it('resolves with SerializedFileObj if input has file', async () => {
-    const res = await hasFile(serializedFileObj);
+describe('createFilesToSyncObj', () => {
+  it('adds toDelete if serializeFileObjects is empty', async () => {
+    const res = await createFilesToSyncObj([fileDoc])([]);
 
-    expect(res).toEqual(serializedFileObj);
+    const expected: FilesToSync = {
+      toDelete: [fileDoc],
+      toUpload: [],
+    };
+
+    expect(res).toEqual(expected);
   });
 
-  it('rejects if input misses some key from SerializedFileObj', async () => {
+  it('adds toDelete if fileDocs.length > serializeFileObjects.length', async () => {
+    const res = await createFilesToSyncObj([fileDoc, ...fileDocs])([
+      serializedFileObj,
+    ]);
+
+    const expected: FilesToSync = {
+      toDelete: fileDocs,
+      toUpload: [],
+    };
+
+    expect(res).toEqual(expected);
+  });
+
+  it('can delete and upload simultaneously', async () => {
+    const res = await createFilesToSyncObj([fileDocs[0]])([serializedFileObj]);
+
+    const expected: FilesToSync = {
+      toDelete: [fileDocs[0]],
+      toUpload: [serializedFileObj],
+    };
+
+    expect(res).toEqual(expected);
+  });
+
+  it('adds toUpload if fileDocs is empty', async () => {
+    const res = await createFilesToSyncObj([])([serializedFileObj]);
+
+    const expected: FilesToSync = {
+      toDelete: [],
+      toUpload: [serializedFileObj],
+    };
+
+    expect(res).toEqual(expected);
+  });
+
+  it('returns empty output for empty input', async () => {
+    const res = await createFilesToSyncObj([])([]);
+
+    const expected: FilesToSync = {
+      toDelete: [],
+      toUpload: [],
+    };
+
+    expect(res).toEqual(expected);
+  });
+});
+
+describe('isFileValid', () => {
+  it('returns true if input has file', async () => {
+    const res = isFileValid(serializedFileObj);
+
+    expect(res).toBe(true);
+  });
+
+  it('returns false if input misses some key from SerializedFileObj', async () => {
     const { buffer, ...rest } = serializedFileObj;
 
-    const expected = new WithPayloadError({
-      statusCode: HttpStatus.BAD_REQUEST,
-      data: { error: 'Corrupt File' },
-    });
-
-    await expect(hasFile(rest as SerializedFileObj)).rejects.toEqual(expected);
+    expect(isFileValid(rest as SerializedFileObj)).toBe(false);
   });
 });
 

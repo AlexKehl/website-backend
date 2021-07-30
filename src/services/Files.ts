@@ -1,5 +1,5 @@
 import { mkdir, unlink, writeFile } from 'fs/promises';
-import { intersection } from 'lodash';
+import { differenceWith, intersection } from 'lodash';
 import { join } from 'path';
 import { BASE_URL, IMAGE_PATH } from '../../config';
 import { File, FileDoc } from '../model/File';
@@ -10,47 +10,63 @@ import {
   ImageForConsumer,
   SerializedFileObj,
   WithBody,
+  FilesToSync,
 } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 import { handleHttpErrors, tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
 
-const serializeFileObj = (req: WithBody<FileDto>): SerializedFileObj => {
-  const { originalname, buffer, size, mimetype } = req.file!;
-  return { ...req.body, originalname, buffer, size, mimetype };
+const serializeFileObjects = (req: WithBody<FileDto>): SerializedFileObj[] => {
+  return (req.files as Express.Multer.File[]).map((file) => {
+    const { originalname, buffer, size, mimetype } = file;
+    return { ...req.body, originalname, buffer, size, mimetype };
+  });
 };
 
-const hasFile = (fileObj: SerializedFileObj): Promise<SerializedFileObj> => {
+const isFileValid = (fileObj: SerializedFileObj): boolean => {
   const requiredFileKeys = ['originalname', 'mimetype', 'buffer', 'size'];
 
   const areAllFileKeysPresent =
     intersection(requiredFileKeys, Object.keys(fileObj)).length ===
     requiredFileKeys.length;
 
-  return areAllFileKeysPresent && fileObj.size > 0
-    ? Promise.resolve(fileObj)
+  return areAllFileKeysPresent && fileObj.size > 0;
+};
+
+const validateFiles = (
+  fileObjects: SerializedFileObj[]
+): Promise<SerializedFileObj[]> => {
+  const areAllFilesValid = fileObjects.every(isFileValid);
+  return areAllFilesValid
+    ? Promise.resolve(fileObjects)
     : Promise.reject(
         new WithPayloadError({
           statusCode: HttpStatus.BAD_REQUEST,
-          data: { error: 'Corrupt File' },
+          data: { error: 'Corrupt Files' },
         })
       );
 };
 
-const hasNoFileConflict = async (fileObj: SerializedFileObj) =>
-  tryToExecute<SerializedFileObj>({
-    fnToTry: async () =>
-      !(await File.findOne({
-        name: fileObj.originalname,
-        category: fileObj.category,
-      })),
-    httpErrorData: {
-      statusCode: HttpStatus.CONFLICT,
-      data: { error: 'File with this name and category exists' },
-    },
-    passThrough: fileObj,
-  });
+const createFilesToSyncObj = (fileDocs: FileDoc[]) => async (
+  serializedFileObjects: SerializedFileObj[]
+): Promise<FilesToSync> => {
+  const toDelete = differenceWith(
+    fileDocs,
+    serializedFileObjects,
+    (fileDoc, obj) =>
+      fileDoc.category === obj.category && fileDoc.name === obj.originalname
+  );
+
+  const toUpload = differenceWith(
+    serializedFileObjects,
+    fileDocs,
+    (obj, fileDoc) =>
+      fileDoc.category === obj.category && fileDoc.name === obj.originalname
+  );
+
+  return { toUpload, toDelete };
+};
 
 const isFileNotExistingInDb = async ({ category, name }: FileWithCategoryDto) =>
   tryToExecute<FileWithCategoryDto>({
@@ -87,21 +103,14 @@ const saveFileMetaToDb = async (file: SerializedFileObj) => {
   });
 };
 
-const uploadFile = (req: WithBody<FileDto>) =>
-  Promise.resolve(serializeFileObj(req))
-    .then(hasFile)
-    .then(hasNoFileConflict)
-    .then(writeFileToDisk)
-    .then(saveFileMetaToDb)
-    .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
-    .catch(handleHttpErrors);
+const uploadFile = (fileObj: SerializedFileObj): Promise<any> =>
+  Promise.all([writeFileToDisk(fileObj), saveFileMetaToDb(fileObj)]);
 
-const deleteFile = ({ category, name }: FileWithCategoryDto) =>
-  isFileNotExistingInDb({ category, name })
-    .then(() => unlink(join(IMAGE_PATH, category, name)))
-    .then(() => File.deleteOne({ category, name }))
-    .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
-    .catch(handleHttpErrors);
+const deleteFile = ({ category, name }: FileDoc): Promise<any> =>
+  Promise.all([
+    unlink(join(IMAGE_PATH, category, name)),
+    File.deleteOne({ category, name }),
+  ]);
 
 const generateImagePathHttpResponse = ({
   category,
@@ -111,11 +120,6 @@ const generateImagePathHttpResponse = ({
     statusCode: HttpStatus.OK,
     data: { imagePath: join(category, name) },
   });
-
-const getImagePath = (category: string, name: string) =>
-  isFileNotExistingInDb({ category, name })
-    .then(generateImagePathHttpResponse)
-    .catch(handleHttpErrors);
 
 const imageForConsumerMap = (fileDocs: FileDoc[]): ImageForConsumer[] => {
   return fileDocs.map(({ category, name }) => ({
@@ -142,6 +146,32 @@ const getImagesDocsForCategory = (category: string) =>
     },
   });
 
+const getInputsForFilesToSyncObj = (category: string) => async (
+  serializeFileObjects: SerializedFileObj[]
+) => {
+  const imagesForCategory = await getImagesDocsForCategory(category);
+  return createFilesToSyncObj(imagesForCategory)(serializeFileObjects);
+};
+
+const processFilesToSync = async ({ toDelete, toUpload }: FilesToSync) => {
+  const uploadPromises = toUpload.map(uploadFile);
+  const deletePromises = toDelete.map(deleteFile);
+  return Promise.all([...uploadPromises, ...deletePromises]);
+};
+
+const getImagePath = (category: string, name: string) =>
+  isFileNotExistingInDb({ category, name })
+    .then(generateImagePathHttpResponse)
+    .catch(handleHttpErrors);
+
+const syncFiles = (req: WithBody<FileDto>) =>
+  Promise.resolve(serializeFileObjects(req))
+    .then(validateFiles)
+    .then(getInputsForFilesToSyncObj(req.body.category))
+    .then(processFilesToSync)
+    .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
+    .catch(handleHttpErrors);
+
 const getImagePathsForCategory = async (category: string) =>
   getImagesDocsForCategory(category)
     .then(imageForConsumerMap)
@@ -149,11 +179,13 @@ const getImagePathsForCategory = async (category: string) =>
     .catch(handleHttpErrors);
 
 export {
-  serializeFileObj,
-  hasFile,
+  createFilesToSyncObj,
+  serializeFileObjects,
+  isFileValid,
   uploadFile,
   deleteFile,
   imageForConsumerMap,
   getImagePathsForCategory,
   getImagePath,
+  syncFiles,
 };

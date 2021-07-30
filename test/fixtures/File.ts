@@ -7,7 +7,12 @@ export const serializedFileObj: SerializedFileObj = {
   mimetype: 'image/jpeg',
   buffer: Buffer.from([8, 6, 7, 5, 3, 0, 9]),
   size: 473101,
-  category: 'Acryl',
+  category: 'acryl',
+};
+
+export const fileDoc: FileDoc = {
+  category: 'acryl',
+  name: 'i-201.jpg',
 };
 
 export const fileDocs: FileDoc[] = [
