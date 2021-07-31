@@ -59,16 +59,6 @@ const hasValidCredentials = (loginDto: LoginDto) => async (user: UserDoc) =>
     },
   });
 
-const hasValidRefreshToken = (refreshToken: string) => async (user: UserDoc) =>
-  tryToExecute<UserDoc>({
-    fnToTry: () => compare(refreshToken, user.refreshTokenHash || ''),
-    passThrough: user,
-    httpErrorData: {
-      statusCode: HttpStatus.FORBIDDEN,
-      data: { error: 'Invalid refresh token' },
-    },
-  });
-
 const createLoginSuccessResponse = ({
   email,
   refreshToken,
@@ -126,9 +116,8 @@ const register = async ({ email, password }: RegisterDto) =>
     .then(() => makeHttpResponse({ statusCode: HttpStatus.CREATED }))
     .catch(handleHttpErrors);
 
-const logout = async (email: string, refreshToken: string) => {
+const logout = async (email: string) => {
   return getUserByMail(email)
-    .then(hasValidRefreshToken(refreshToken)) // TODO move to guard
     .then(deleteRefreshToken)
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
     .catch(handleHttpErrors);
