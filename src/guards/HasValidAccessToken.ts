@@ -15,7 +15,6 @@ const hasValidAccessToken = async (expressObj: ExpressObj) => {
     verify(expressObj.req.cookies.accessToken || '', ACCESS_TOKEN_SECRET);
     return expressObj;
   } catch (e) {
-    console.log(e);
     throw new WithPayloadError({
       statusCode: HttpStatus.UNAUTHORIZED,
       data: {

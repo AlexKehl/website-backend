@@ -66,7 +66,25 @@ const createLoginSuccessResponse = ({
   const accessToken = generateAccessToken({ email });
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
-    data: { accessToken, refreshToken, user: { email } },
+    cookies: [
+      {
+        name: 'accessToken',
+        val: accessToken,
+        options: {
+          sameSite: true,
+          secure: true,
+        },
+      },
+      {
+        name: 'refreshToken',
+        val: refreshToken,
+        options: {
+          sameSite: true,
+          secure: true,
+        },
+      },
+    ],
+    data: { user: { email } },
   });
 };
 

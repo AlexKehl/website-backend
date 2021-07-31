@@ -28,7 +28,7 @@ export type ToExpressObj = (
 export interface HttpError {
   headers: Record<string, string>;
   statusCode: number;
-  isHttpError: boolean;
+  isHttpError: true;
   data?: {
     success: boolean;
     error?: string;

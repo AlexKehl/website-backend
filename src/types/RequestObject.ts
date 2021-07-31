@@ -1,8 +1,16 @@
-import { Request } from 'express';
+import { CookieOptions, Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
+
+export interface Cookie {
+  name: string;
+  val: string;
+  options?: CookieOptions;
+}
 
 export interface MakeHttpResponseData {
   statusCode: number;
+  cookies?: Cookie[];
+  headers?: Record<string, any>;
   data?: Record<string, any>;
 }
 

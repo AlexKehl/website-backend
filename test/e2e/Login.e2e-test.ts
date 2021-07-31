@@ -39,8 +39,6 @@ describe('/login', () => {
 
     const expectedBody = {
       success: true,
-      accessToken: expect.any(String),
-      refreshToken: expect.any(String),
       user: {
         email,
       },
@@ -103,35 +101,12 @@ describe('/login', () => {
 });
 
 describe('/logout', () => {
-  it('validates email', async () => {
-    const res = await request(app).post('/logout').send({ email: 'foo' });
-
-    expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-    expect(res.body.success).toBe(false);
-  });
-
   it('validates refreshToken', async () => {
     const res = await request(app)
       .post('/logout')
       .send({ email: RegisteredUser.email });
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-    expect(res.body.success).toBe(false);
-  });
-
-  it('returns HttpStatus.FORBIDDEN if token is missing in DB', async () => {
-    const { email, passwordHash } = RegisteredUser;
-    const createdUser = new User({ email, passwordHash });
-    await createdUser.save();
-
-    const res = await request(app)
-      .post('/logout')
-      .set('Cookie', [
-        'refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE2Mjc2MDAxNDUsImV4cCI6MTYyNzg1OTM0NX0.pGbRCl6SElk8AGYywk760mNQcczWkmZzp44VBEb0KFY',
-      ])
-      .send({ email: RegisteredUser.email });
-
-    expect(res.status).toEqual(HttpStatus.FORBIDDEN);
     expect(res.body.success).toBe(false);
   });
 

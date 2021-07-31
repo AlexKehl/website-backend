@@ -5,17 +5,14 @@ import {
   syncFiles,
 } from '../services/Files';
 import { ExpressObj, FileDto } from '../types';
+import { evaluateHttpObject } from '../utils/HttpResponses';
 
 const fileSyncController = async ({ req, res }: ExpressObj<FileDto>) => {
-  const { headers, statusCode, data } = await syncFiles(req);
-  res.set(headers).status(statusCode).send(data);
+  evaluateHttpObject(res, await syncFiles(req));
 };
 
 const getImagePathsForCategoryController = async ({ req, res }: ExpressObj) => {
-  const { headers, statusCode, data } = await getImagePathsForCategory(
-    req.params.category
-  );
-  res.set(headers).status(statusCode).send(data);
+  evaluateHttpObject(res, await getImagePathsForCategory(req.params.category));
 };
 
 const getImageByCategoryController = async ({ req, res }: ExpressObj) => {

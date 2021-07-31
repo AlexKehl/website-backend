@@ -53,15 +53,31 @@ describe('createLoginSuccessResponse', () => {
 
     const expected = makeHttpResponse({
       statusCode: HttpStatus.OK,
+      cookies: [
+        {
+          name: 'accessToken',
+          val: expect.any(String),
+          options: {
+            sameSite: true,
+            secure: true,
+          },
+        },
+        {
+          name: 'refreshToken',
+          val: expect.any(String),
+          options: {
+            sameSite: true,
+            secure: true,
+          },
+        },
+      ],
       data: {
-        accessToken: expect.any(String),
-        refreshToken: expect.any(String),
         user: userResponse,
       },
     });
 
     expect(res).toEqual(expected);
-    expect(verify(res.data.accessToken, ACCESS_TOKEN_SECRET)).toBeDefined();
-    expect(verify(res.data.refreshToken, REFRESH_TOKEN_SECRET)).toBeDefined();
+    expect(verify(res.cookies[0].val, ACCESS_TOKEN_SECRET)).toBeDefined();
+    expect(verify(res.cookies[1].val, REFRESH_TOKEN_SECRET)).toBeDefined();
   });
 });
