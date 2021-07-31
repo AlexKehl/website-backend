@@ -36,12 +36,10 @@ export const startAuthRoutes = (app: Express) => {
 
   app.post(
     '/logout',
-    //TODO remove email from body
-    body('email').isEmail(),
     cookie('refreshToken').isString(),
     routeHandler({
       controller: logoutController,
-      guards: [hasValidatedData, hasValidRefreshToken],
+      guards: [hasValidatedData],
     })
   );
 };

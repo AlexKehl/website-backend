@@ -1,14 +1,15 @@
 import { compare } from 'bcrypt';
-import { decode, sign } from 'jsonwebtoken';
+import { sign } from 'jsonwebtoken';
 import {
   ACCESS_TOKEN_EXPIRATION_TIME,
   ACCESS_TOKEN_SECRET,
 } from '../../config';
 import { User } from '../model/User';
-import { DecodedRefreshToken, EmailDto } from '../types';
+import { EmailDto } from '../types';
 import { makeHttpError } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
+import { getEmailFromToken } from '../utils/Tokens';
 
 interface EvaluateRefreshTokenInput extends EmailDto {
   refreshToken: string;
@@ -16,7 +17,7 @@ interface EvaluateRefreshTokenInput extends EmailDto {
 }
 
 const getNewAccessToken = async (refreshToken: string) => {
-  const { email } = decode(refreshToken) as DecodedRefreshToken;
+  const email = getEmailFromToken(refreshToken);
   const { refreshTokenHash } = (await User.findOne({ email })) || {};
   return evaluateRefreshToken({ email, refreshToken, refreshTokenHash });
 };

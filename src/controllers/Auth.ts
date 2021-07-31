@@ -1,5 +1,6 @@
 import { login, logout, register } from '../services/Auth';
 import { LoginDto, ExpressObj, EmailDto } from '../types';
+import { getEmailFromToken } from '../utils/Tokens';
 
 const registerController = async ({ req, res }: ExpressObj<LoginDto>) => {
   const { headers, statusCode, data } = await register(req.body);
@@ -19,9 +20,9 @@ const loginController = async ({ req, res }: ExpressObj<LoginDto>) => {
   res.set(headers).status(statusCode).send(data);
 };
 
-const logoutController = async ({ req, res }: ExpressObj<EmailDto>) => {
+const logoutController = async ({ req, res }: ExpressObj) => {
   const { refreshToken } = req.cookies;
-  const { email } = req.body;
+  const email = getEmailFromToken(refreshToken);
   const { headers, statusCode, data } = await logout(email, refreshToken);
   res.set(headers).status(statusCode).send(data);
 };

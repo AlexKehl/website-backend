@@ -128,7 +128,7 @@ const register = async ({ email, password }: RegisterDto) =>
 
 const logout = async (email: string, refreshToken: string) => {
   return getUserByMail(email)
-    .then(hasValidRefreshToken(refreshToken))
+    .then(hasValidRefreshToken(refreshToken)) // TODO move to guard
     .then(deleteRefreshToken)
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
     .catch(handleHttpErrors);

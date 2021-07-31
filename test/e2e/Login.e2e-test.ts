@@ -119,16 +119,6 @@ describe('/logout', () => {
     expect(res.body.success).toBe(false);
   });
 
-  it('returns HttpStatus.UNAUTHORIZED if jwt is invalid', async () => {
-    const res = await request(app)
-      .post('/logout')
-      .set('Cookie', ['refreshToken=someInvalidRefreshToken'])
-      .send({ email: RegisteredUser.email });
-
-    expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
-    expect(res.body.success).toBe(false);
-  });
-
   it('returns HttpStatus.FORBIDDEN if token is missing in DB', async () => {
     const { email, passwordHash } = RegisteredUser;
     const createdUser = new User({ email, passwordHash });

@@ -4,11 +4,20 @@ import {
   REFRESH_TOKEN_SECRET,
   REFRESH_TOKEN_EXPIRATION_TIME,
   SALT_ROUNDS,
+  ACCESS_TOKEN_EXPIRATION_TIME,
+  ACCESS_TOKEN_SECRET,
 } from '../../config';
 import { UserDoc } from '../../src/model/User';
 import { LoginDto, RefreshTokenDto, UserResponse } from '../../src/types';
 
 const USER_EMAIL = 'test@test.com';
+
+export const generateAccessToken = async (email: string) => {
+  const accessToken = sign({ email }, ACCESS_TOKEN_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRATION_TIME,
+  });
+  return accessToken;
+};
 
 export const generateRefreshTokenAndHash = async (email: string) => {
   const refreshToken = sign({ email }, REFRESH_TOKEN_SECRET, {

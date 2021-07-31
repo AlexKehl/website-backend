@@ -3,13 +3,21 @@ import * as request from 'supertest';
 import HttpStatus from '../../src/utils/HttpStatus';
 import { File } from '../../src/model/File';
 import { fileDocs, imagesForConsumer } from '../fixtures/File';
+import {
+  generateAccessToken,
+  generateRefreshTokenAndHash,
+  RegisteredUser,
+} from '../fixtures/User';
 
 const { app } = setupServer({ port: 3005 });
 
 describe('/file/sync/gallery', () => {
   it('returns HttpStatus.BAD_REQUEST if files are missing', async () => {
+    const accessToken = await generateAccessToken(RegisteredUser.email);
+
     const res = await request(app)
       .post('/file/sync/gallery')
+      .set('Cookie', [`accessToken=${accessToken}`])
       .field('category', 'acryl');
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -17,8 +25,11 @@ describe('/file/sync/gallery', () => {
   });
 
   it('returns HttpStatus.BAD_REQUEST if some file is corrupt', async () => {
+    const accessToken = await generateAccessToken(RegisteredUser.email);
+
     const res = await request(app)
       .post('/file/sync/gallery')
+      .set('Cookie', [`accessToken=${accessToken}`])
       .attach('files', './test/fixtures/CorruptImage.jpg')
       .field('category', 'acryl');
 
@@ -35,9 +46,12 @@ describe('/file/sync/gallery', () => {
     expect(res.body.success).toBe(false);
   });
 
-  it('returns HttpStatus.OK upload was successfull', async () => {
+  it('returns HttpStatus.OK on successfull upload', async () => {
+    const accessToken = await generateAccessToken(RegisteredUser.email);
+
     const res = await request(app)
       .post('/file/sync/gallery')
+      .set('Cookie', [`accessToken=${accessToken}`])
       .attach('files', './test/fixtures/TestImage.jpg')
       .field('category', 'acryl');
 
