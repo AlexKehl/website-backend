@@ -8,12 +8,7 @@ export interface RegisterDto {
   password: string;
 }
 
-export interface RefreshTokenDto {
-  email: string;
-  refreshToken: string;
-}
-
-export interface LogoutDto {
+export interface EmailDto {
   email: string;
 }
 
