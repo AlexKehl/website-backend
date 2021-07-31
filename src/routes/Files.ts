@@ -6,6 +6,7 @@ import {
   getImagePathsForCategoryController,
 } from '../controllers/Files';
 import { hasFilesAttached } from '../guards/HasFileAttached';
+import { hasValidAccessToken } from '../guards/HasValidAccessToken';
 import { hasValidatedData } from '../guards/HasValidatedData';
 import upload from '../utils/MulterConfig';
 import routeHandler from '../utils/RouteHandler';
@@ -17,7 +18,7 @@ export const startFilesRoutes = (app: Express) => {
     body('category').isString(),
     routeHandler({
       controller: fileSyncController,
-      guards: [hasValidatedData, hasFilesAttached],
+      guards: [hasValidatedData, hasValidAccessToken, hasFilesAttached],
     })
   );
 

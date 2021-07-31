@@ -27,7 +27,6 @@ export const startAuthRoutes = (app: Express) => {
 
   app.post(
     '/refreshtoken',
-    body('email').isEmail(),
     cookie('refreshToken').isString(),
     routeHandler({
       controller: getNewAccessTokenController,
@@ -37,6 +36,7 @@ export const startAuthRoutes = (app: Express) => {
 
   app.post(
     '/logout',
+    //TODO remove email from body
     body('email').isEmail(),
     cookie('refreshToken').isString(),
     routeHandler({

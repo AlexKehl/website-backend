@@ -1,11 +1,16 @@
 import { getNewAccessToken } from '../services/Token';
-import { ExpressObj, RefreshTokenDto } from '../types';
+import { EmailDto, ExpressObj } from '../types';
 
 const getNewAccessTokenController = async ({
   req,
   res,
-}: ExpressObj<RefreshTokenDto>) => {
-  const { headers, statusCode, data } = await getNewAccessToken(req.body);
+}: ExpressObj<EmailDto>) => {
+  const { refreshToken } = req.cookies;
+  const { headers, statusCode, data } = await getNewAccessToken(refreshToken);
+  res.cookie('accessToken', data?.accessToken, {
+    sameSite: true,
+    secure: true,
+  });
   res.set(headers).status(statusCode).send(data);
 };
 

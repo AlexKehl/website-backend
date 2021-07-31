@@ -51,6 +51,16 @@ export interface EmailWithTokens {
   refreshTokenHash: string;
 }
 
+export interface DecodedRefreshToken {
+  email: string;
+  iat: number;
+}
+
+export interface DecodedAccessToken {
+  email: string;
+  iat: number;
+}
+
 export * from './RequestObject';
 export * from './Dto';
 export * from './Files';
