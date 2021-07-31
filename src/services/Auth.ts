@@ -79,6 +79,7 @@ const createLoginSuccessResponse = ({
         name: 'refreshToken',
         val: refreshToken,
         options: {
+          httpOnly: true,
           sameSite: true,
           secure: true,
         },
