@@ -66,6 +66,7 @@ describe('createLoginSuccessResponse', () => {
           name: 'refreshToken',
           val: expect.any(String),
           options: {
+            httpOnly: true,
             sameSite: true,
             secure: true,
           },

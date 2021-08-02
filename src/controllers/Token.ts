@@ -8,7 +8,7 @@ const getNewAccessTokenController = async ({
 }: ExpressObj<EmailDto>) => {
   const { refreshToken } = req.cookies;
 
-  evaluateHttpObject(res, await getNewAccessToken(refreshToken));
+  evaluateHttpObject(res, getNewAccessToken(refreshToken));
 };
 
 export { getNewAccessTokenController };

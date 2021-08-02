@@ -12,6 +12,6 @@ describe('getNewAccessToken', () => {
     await asyncTimeout(1)();
     const res2 = getNewAccessToken(refreshToken);
 
-    expect(res1.data?.accessToken).not.toEqual(res2.data?.accessToken);
+    expect(res1.cookies?.[0].val).not.toEqual(res2.cookies?.[0].val);
   });
 });

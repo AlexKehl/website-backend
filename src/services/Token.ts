@@ -11,15 +11,18 @@ const getNewAccessToken = (refreshToken: string) => {
   const email = getEmailFromToken(refreshToken);
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
-    data: {
-      accessToken: sign(
-        { email, iat: new Date().getTime() },
-        ACCESS_TOKEN_SECRET,
-        {
+    cookies: [
+      {
+        val: sign({ email, iat: new Date().getTime() }, ACCESS_TOKEN_SECRET, {
           expiresIn: ACCESS_TOKEN_EXPIRATION_TIME,
-        }
-      ),
-    },
+        }),
+        name: 'accessToken',
+        options: {
+          sameSite: true,
+          secure: true,
+        },
+      },
+    ],
   });
 };
 
