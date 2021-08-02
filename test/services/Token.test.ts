@@ -1,59 +1,17 @@
-import { evaluateRefreshToken } from '../../src/services/Token';
-import { makeHttpError } from '../../src/utils/HttpErrors';
-import { makeHttpResponse } from '../../src/utils/HttpResponses';
-import HttpStatus from '../../src/utils/HttpStatus';
-import { RegisteredUser, UserWithRefreshToken } from '../fixtures/User';
+import { getNewAccessToken } from '../../src/services/Token';
+import { asyncTimeout } from '../../src/utils/Functions';
+import { generateRefreshTokenAndHash, RegisteredUser } from '../fixtures/User';
 
-describe('evaluateRefreshToken', () => {
-  it('returns NOT_FOUND for no refresh token hash', async () => {
-    const { email } = RegisteredUser;
+describe('getNewAccessToken', () => {
+  it('returns two different accessTokens', async () => {
+    const { refreshToken } = await generateRefreshTokenAndHash(
+      RegisteredUser.email
+    );
 
-    const res = await evaluateRefreshToken({ email, refreshToken: 'bar' });
+    const res1 = getNewAccessToken(refreshToken);
+    await asyncTimeout(1)();
+    const res2 = getNewAccessToken(refreshToken);
 
-    const expected = makeHttpError({
-      statusCode: HttpStatus.NOT_FOUND,
-      data: {
-        error: 'No refreshToken stored',
-      },
-    });
-    expect(res).toEqual(expected);
-  });
-
-  it('returns UNAUTHORIZED for invalid refreshTokenHash', async () => {
-    const { email, refreshTokenHash } = RegisteredUser;
-
-    const res = await evaluateRefreshToken({
-      email,
-      refreshToken: 'foo',
-      refreshTokenHash,
-    });
-
-    const expected = makeHttpError({
-      statusCode: HttpStatus.UNAUTHORIZED,
-      data: {
-        error: 'Invalid refreshToken',
-      },
-    });
-    expect(res).toEqual(expected);
-  });
-
-  it('returns OK on successful evaluation', async () => {
-    const { email, refreshToken } = UserWithRefreshToken;
-    const { refreshTokenHash } = RegisteredUser;
-
-    const res = await evaluateRefreshToken({
-      email,
-      refreshToken,
-      refreshTokenHash,
-    });
-
-    const expected = makeHttpResponse({
-      statusCode: HttpStatus.OK,
-      data: {
-        accessToken: expect.any(String),
-      },
-    });
-
-    expect(res).toEqual(expected);
+    expect(res1.data?.accessToken).not.toEqual(res2.data?.accessToken);
   });
 });
