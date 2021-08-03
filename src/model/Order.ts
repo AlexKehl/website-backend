@@ -5,6 +5,7 @@ export enum OrderStatus {
   ACCEPTED,
   NEED_MORE_INFO,
   REJECTED,
+  WAITING_FOR_APPROVAL,
 }
 
 export enum OrderLevel {
@@ -19,7 +20,7 @@ export interface OrderDoc {
   imageIds: string[];
   status: OrderStatus;
   statusReason?: string;
-  priceSum: number;
+  price: number;
   level: OrderLevel;
 }
 
