@@ -65,3 +65,4 @@ export * from './RequestObject';
 export * from './Dto';
 export * from './Files';
 export * from './Responses';
+export * from './ClientInterface';
