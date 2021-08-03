@@ -1,8 +1,8 @@
 import { GalleryImageDoc } from '../model/GalleryImage';
 import { GalleryImageDto } from './Dto';
+import { SerializedFileObj } from './Files';
 
-export type SerializedGalleryObj = GalleryImageDto &
-  Pick<Express.Multer.File, 'originalname' | 'buffer' | 'size' | 'mimetype'>;
+export type SerializedGalleryObj = SerializedFileObj<GalleryImageDto>;
 
 export interface GalleryImagesToSync {
   toUpload: SerializedGalleryObj[];

@@ -1,5 +1,5 @@
 import { Express } from 'express';
-import { orderImageUploadController } from '../controllers/Profile';
+import { orderImageSyncController } from '../controllers/Profile';
 import { hasFilesAttached } from '../guards/HasFileAttached';
 import { hasValidAccessToken } from '../guards/HasValidAccessToken';
 import { hasValidatedData } from '../guards/HasValidatedData';
@@ -11,7 +11,7 @@ export const startProfileRoutes = (app: Express) => {
     '/file/sync/orderimages',
     upload.array('files'),
     routeHandler({
-      controller: orderImageUploadController,
+      controller: orderImageSyncController,
       guards: [hasValidatedData, hasValidAccessToken, hasFilesAttached],
     })
   );

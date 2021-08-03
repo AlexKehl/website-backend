@@ -1,9 +1,8 @@
 import { v4 as uuid } from 'uuid';
 import { mkdir, unlink, writeFile } from 'fs/promises';
-import { differenceWith } from 'lodash';
 import { join } from 'path';
 import { BASE_URL, IMAGE_PATH } from '../../config';
-import { File, GalleryImageDoc } from '../model/GalleryImage';
+import { GalleryImage, GalleryImageDoc } from '../model/GalleryImage';
 import {
   FileWithCategoryDto,
   GalleryImageDto,
@@ -16,47 +15,22 @@ import {
 import { handleHttpErrors, tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
+import { createFilesToSyncObj, serializeFileObjects } from './Files';
 
-const serializeFileObjects = (
-  req: WithBody<GalleryImageDto>
-): SerializedGalleryObj[] => {
-  return (req.files as Express.Multer.File[]).map((file) => {
-    const { originalname, buffer, size, mimetype } = file;
-    return { ...req.body, originalname, buffer, size, mimetype };
-  });
-};
-
-const createFilesToSyncObj = (fileDocs: GalleryImageDoc[]) => async (
-  serializedFileObjects: SerializedGalleryObj[]
-): Promise<GalleryImagesToSync> => {
-  const toDelete = differenceWith(
-    fileDocs,
-    serializedFileObjects,
-    (fileDoc, obj) =>
-      fileDoc.category === obj.category && fileDoc.name === obj.originalname
-  );
-
-  const toUpload = differenceWith(
-    serializedFileObjects,
-    fileDocs,
-    (obj, fileDoc) =>
-      fileDoc.category === obj.category && fileDoc.name === obj.originalname
-  );
-
-  return { toUpload, toDelete };
-};
-
-const isFileNotExistingInDb = async ({ category, name }: FileWithCategoryDto) =>
+const isImageNotExistingInDb = async ({
+  category,
+  name,
+}: FileWithCategoryDto) =>
   tryToExecute<FileWithCategoryDto>({
-    fnToTry: async () => await File.findOne({ name, category }),
+    fnToTry: async () => await GalleryImage.findOne({ name, category }),
     httpErrorData: {
       statusCode: HttpStatus.NOT_FOUND,
-      data: { error: 'File is not existing.' },
+      data: { error: 'GalleryImage is not existing.' },
     },
     passThrough: { category, name },
   });
 
-const writeFileToDisk = async (
+const writeImageToDisk = async (
   fileObj: SerializedGalleryObj
 ): Promise<SerializedGalleryObj> => {
   const { category, originalname, buffer } = fileObj;
@@ -68,14 +42,14 @@ const writeFileToDisk = async (
     },
     httpErrorData: {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      data: { error: 'Server has problems with saving the file.' },
+      data: { error: 'Server has problems with saving the GalleryImage.' },
     },
     passThrough: fileObj,
   });
 };
 
 const saveFileMetaToDb = async (file: SerializedGalleryObj) => {
-  return File.create({
+  return GalleryImage.create({
     id: uuid(),
     description: file.description,
     price: file.price,
@@ -86,12 +60,12 @@ const saveFileMetaToDb = async (file: SerializedGalleryObj) => {
 };
 
 const uploadFile = (fileObj: SerializedGalleryObj): Promise<any> =>
-  Promise.all([writeFileToDisk(fileObj), saveFileMetaToDb(fileObj)]);
+  Promise.all([writeImageToDisk(fileObj), saveFileMetaToDb(fileObj)]);
 
 const deleteFile = ({ category, name }: GalleryImageDoc): Promise<any> =>
   Promise.all([
     unlink(join(IMAGE_PATH, category, name)),
-    File.deleteOne({ category, name }),
+    GalleryImage.deleteOne({ category, name }),
   ]);
 
 const generateImagePathHttpResponse = ({
@@ -127,7 +101,7 @@ const createImagesForConsumerHttpResponse = (
 
 const getImagesDocsForCategory = (category: string) =>
   tryToExecute<GalleryImageDoc[]>({
-    fnToTry: async () => File.find({ category }).lean(),
+    fnToTry: async () => GalleryImage.find({ category }).lean(),
     httpErrorData: {
       statusCode: HttpStatus.NOT_FOUND,
       data: { error: 'No images stored for this category' },
@@ -138,7 +112,12 @@ const getInputsForFilesToSyncObj = (category: string) => async (
   serializeFileObjects: SerializedGalleryObj[]
 ) => {
   const imagesForCategory = await getImagesDocsForCategory(category);
-  return createFilesToSyncObj(imagesForCategory)(serializeFileObjects);
+  return createFilesToSyncObj<GalleryImageDoc, SerializedGalleryObj>({
+    fileDocs: imagesForCategory,
+    serializedFileObjects: serializeFileObjects,
+    pred: (imageDoc, obj) =>
+      imageDoc.category === obj.category && imageDoc.name === obj.originalname,
+  });
 };
 
 const processFilesToSync = async ({
@@ -151,12 +130,12 @@ const processFilesToSync = async ({
 };
 
 const getImagePath = (category: string, name: string) =>
-  isFileNotExistingInDb({ category, name })
+  isImageNotExistingInDb({ category, name })
     .then(generateImagePathHttpResponse)
     .catch(handleHttpErrors);
 
 const syncFiles = (req: WithBody<GalleryImageDto>) =>
-  Promise.resolve(serializeFileObjects(req))
+  Promise.resolve(serializeFileObjects<GalleryImageDto>(req))
     .then(getInputsForFilesToSyncObj(req.body.category))
     .then(processFilesToSync)
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
@@ -169,7 +148,6 @@ const getImagePathsForCategory = async (category: string) =>
     .catch(handleHttpErrors);
 
 export {
-  createFilesToSyncObj,
   serializeFileObjects,
   uploadFile,
   deleteFile,

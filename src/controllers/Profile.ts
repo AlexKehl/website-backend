@@ -2,7 +2,7 @@ import { orderImageUpload } from '../services/Profile';
 import { ExpressObj, OrderImageDto } from '../types';
 import { evaluateHttpObject } from '../utils/HttpResponses';
 
-const orderImageUploadController = async ({
+const orderImageSyncController = async ({
   req,
   res,
 }: ExpressObj<OrderImageDto>) => {
@@ -10,4 +10,4 @@ const orderImageUploadController = async ({
   evaluateHttpObject(res, serviceResponse);
 };
 
-export { orderImageUploadController };
+export { orderImageSyncController };

@@ -1,7 +1,7 @@
 import { setupServer } from '../TestSetupUtils';
 import * as request from 'supertest';
 import HttpStatus from '../../src/utils/HttpStatus';
-import { File } from '../../src/model/GalleryImage';
+import { GalleryImage } from '../../src/model/GalleryImage';
 import { fileDocs, imagesForConsumer } from '../fixtures/GalleryImages';
 import { generateAccessToken, RegisteredUser } from '../fixtures/User';
 
@@ -53,7 +53,7 @@ describe('/file/sync/gallery', () => {
       .field('name', 'i-201.jpg')
       .field('isForSell', true);
 
-    const uploadedFile = await File.findOne({
+    const uploadedFile = await GalleryImage.findOne({
       name: 'TestImage.jpg',
       category: 'acryl',
     }).exec();
@@ -66,7 +66,7 @@ describe('/file/sync/gallery', () => {
 
 describe('/file/:category', () => {
   it('returns a list of available files', async () => {
-    await File.insertMany(fileDocs);
+    await GalleryImage.insertMany(fileDocs);
 
     const res = await request(app).get('/files/acryl');
 

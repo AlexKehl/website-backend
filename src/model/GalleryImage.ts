@@ -1,12 +1,9 @@
 import { Schema, model, SchemaTypes } from 'mongoose';
 import { Document } from 'mongoose';
-import { TranslatedText } from '../types';
+import { FileDoc } from '../types/Files';
 
-export interface GalleryImageDoc {
-  id: string;
-  name: string;
+export interface GalleryImageDoc extends FileDoc {
   category: string;
-  description?: TranslatedText;
   isForSell: boolean;
   price?: number;
 }
@@ -20,4 +17,7 @@ const GalleryImageSchema = new Schema({
   price: { type: Number },
 });
 
-export const File = model<GalleryImageDoc & Document>('GalleryImage', GalleryImageSchema);
+export const GalleryImage = model<GalleryImageDoc & Document>(
+  'GalleryImage',
+  GalleryImageSchema
+);

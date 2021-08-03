@@ -1,5 +1,8 @@
 import { OrderImageDto, WithBody } from '../types';
+import { serializeFileObjects } from './Files';
 
-const orderImageUpload = async (req: WithBody<OrderImageDto>) => {};
+const orderImageSync = async (req: WithBody<OrderImageDto>) => {
+  return Promise.resolve(serializeFileObjects<OrderImageDto>(req));
+};
 
-export { orderImageUpload };
+export { orderImageSync };

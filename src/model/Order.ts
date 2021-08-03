@@ -1,4 +1,4 @@
-import { Schema, model, SchemaTypes } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { Document } from 'mongoose';
 
 export enum OrderStatus {
@@ -15,15 +15,8 @@ export enum OrderLevel {
   VERY_HIGH,
 }
 
-export interface OrderImage {
-  id: string;
-  url: string;
-  name: string;
-  description: string;
-}
-
 export interface OrderDoc {
-  images: OrderImage[];
+  imageIds: string[];
   status: OrderStatus;
   statusReason?: string;
   priceSum: number;
@@ -31,7 +24,7 @@ export interface OrderDoc {
 }
 
 const OrderSchema = new Schema({
-  images: { type: SchemaTypes.Mixed, required: true },
+  imageIds: { type: [String], required: true },
   status: { type: Number, required: true },
   statusReason: { type: String },
   priceSum: { type: Number, required: true },
