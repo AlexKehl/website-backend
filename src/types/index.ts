@@ -63,6 +63,7 @@ export interface DecodedAccessToken {
 
 export * from './RequestObject';
 export * from './Dto';
-export * from './Files';
+export * from './Gallery';
 export * from './Responses';
 export * from './ClientInterface';
+export * from './Texts';

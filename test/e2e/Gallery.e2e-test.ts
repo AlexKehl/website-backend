@@ -1,13 +1,9 @@
 import { setupServer } from '../TestSetupUtils';
 import * as request from 'supertest';
 import HttpStatus from '../../src/utils/HttpStatus';
-import { File } from '../../src/model/File';
-import { fileDocs, imagesForConsumer } from '../fixtures/File';
-import {
-  generateAccessToken,
-  generateRefreshTokenAndHash,
-  RegisteredUser,
-} from '../fixtures/User';
+import { File } from '../../src/model/GalleryImage';
+import { fileDocs, imagesForConsumer } from '../fixtures/GalleryImages';
+import { generateAccessToken, RegisteredUser } from '../fixtures/User';
 
 const { app } = setupServer({ port: 3005 });
 
@@ -53,7 +49,9 @@ describe('/file/sync/gallery', () => {
       .post('/file/sync/gallery')
       .set('Cookie', [`accessToken=${accessToken}`])
       .attach('files', './test/fixtures/TestImage.jpg')
-      .field('category', 'acryl');
+      .field('category', 'acryl')
+      .field('name', 'i-201.jpg')
+      .field('isForSell', true);
 
     const uploadedFile = await File.findOne({
       name: 'TestImage.jpg',

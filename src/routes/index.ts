@@ -3,7 +3,7 @@ import * as express from 'express';
 import * as cookieParser from 'cookie-parser';
 import { ServerStartOptions } from '../types';
 import { startAuthRoutes } from './Auth';
-import { startFilesRoutes } from './Files';
+import { startGalleryRoutes } from './Gallery';
 import { CLIENT_URL } from '../../config';
 
 const start = ({ port, startupMessage }: ServerStartOptions) => {
@@ -22,7 +22,7 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
   );
 
   startAuthRoutes(app);
-  startFilesRoutes(app);
+  startGalleryRoutes(app);
 
   const server = app.listen(port, () => {
     if (startupMessage) {

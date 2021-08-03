@@ -3,11 +3,14 @@ import {
   getImagePath,
   getImagePathsForCategory,
   syncFiles,
-} from '../services/Files';
-import { ExpressObj, FileDto } from '../types';
+} from '../services/Gallery';
+import { ExpressObj, GalleryImageDto } from '../types';
 import { evaluateHttpObject } from '../utils/HttpResponses';
 
-const fileSyncController = async ({ req, res }: ExpressObj<FileDto>) => {
+const fileSyncController = async ({
+  req,
+  res,
+}: ExpressObj<GalleryImageDto>) => {
   evaluateHttpObject(res, await syncFiles(req));
 };
 

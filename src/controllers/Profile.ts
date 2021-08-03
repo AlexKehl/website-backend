@@ -1,0 +1,13 @@
+import { orderImageUpload } from '../services/Profile';
+import { ExpressObj, OrderImageDto } from '../types';
+import { evaluateHttpObject } from '../utils/HttpResponses';
+
+const orderImageUploadController = async ({
+  req,
+  res,
+}: ExpressObj<OrderImageDto>) => {
+  const serviceResponse = await orderImageUpload(req);
+  evaluateHttpObject(res, serviceResponse);
+};
+
+export { orderImageUploadController };
