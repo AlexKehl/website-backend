@@ -6,6 +6,7 @@ import {
   getImagePathsForCategoryController,
 } from '../controllers/Gallery';
 import { hasFilesAttached } from '../guards/HasFileAttached';
+import { hasRoleGuard } from '../guards/HasRole';
 import { hasValidAccessToken } from '../guards/HasValidAccessToken';
 import { hasValidatedData } from '../guards/HasValidatedData';
 import upload from '../utils/MulterConfig';
@@ -20,7 +21,12 @@ export const startGalleryRoutes = (app: Express) => {
     body('isForSell').isString(),
     routeHandler({
       controller: fileSyncController,
-      guards: [hasValidatedData, hasValidAccessToken, hasFilesAttached],
+      guards: [
+        hasRoleGuard('Admin'),
+        hasValidatedData,
+        hasValidAccessToken,
+        hasFilesAttached,
+      ],
     })
   );
 
