@@ -7,7 +7,7 @@ import {
 import { ExpressObj, GalleryImageDto } from '../types';
 import { evaluateHttpObject } from '../utils/HttpResponses';
 
-const fileSyncController = async ({
+const gallerySyncController = async ({
   req,
   res,
 }: ExpressObj<GalleryImageDto>) => {
@@ -32,7 +32,7 @@ const getImageByCategoryController = async ({ req, res }: ExpressObj) => {
 };
 
 export {
-  fileSyncController,
+  gallerySyncController,
   getImagePathsForCategoryController,
   getImageByCategoryController,
 };

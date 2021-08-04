@@ -19,7 +19,12 @@ describe('/refreshtoken', () => {
       refreshTokenHash,
     } = await generateRefreshTokenAndHash(email);
 
-    await User.create({ email, passwordHash, refreshTokenHash });
+    await User.create({
+      email,
+      passwordHash,
+      refreshTokenHash,
+      roles: ['RegisteredUser'],
+    });
 
     const res = await request(app)
       .post('/refreshtoken')
@@ -54,7 +59,12 @@ describe('/refreshtoken', () => {
       refreshTokenHash,
     } = await generateRefreshTokenAndHash(email);
 
-    await User.create({ email, passwordHash, refreshTokenHash });
+    await User.create({
+      email,
+      passwordHash,
+      refreshTokenHash,
+      roles: ['RegisteredUser'],
+    });
 
     const res = await request(app)
       .post('/refreshtoken')

@@ -53,6 +53,7 @@ export const RegisteredUser: UserDoc = {
   passwordHash: '$2b$10$iVjBNmC5NoJoeGVqDM/rw.IkftpSd9jq78t0K7LdJEvNlCyR8atKW',
   refreshTokenHash:
     '$2b$10$gS6mgtoUKtRBpVVyea7zCO9kPfDP5.W6j3AQPZHEqhJ2LoEopzGVq',
+  roles: ['RegisteredUser'],
 };
 
 export const userResponse: UserResponse = {

@@ -41,10 +41,6 @@ export interface ServerStartOptions {
   startupMessage?: string;
 }
 
-export interface UserResponse {
-  email: string;
-}
-
 export interface EmailWithTokens {
   email: string;
   refreshToken: string;
@@ -67,3 +63,4 @@ export * from './Gallery';
 export * from './Responses';
 export * from './ClientInterface';
 export * from './Texts';
+export * from './User';

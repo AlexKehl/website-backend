@@ -1,3 +1,4 @@
+import { Role } from '.';
 import { OrderDoc } from '../model/Order';
 import { TranslatedText } from './Texts';
 
@@ -11,4 +12,9 @@ export interface ImageForGallery {
   description?: TranslatedText;
   isForSell: boolean;
   price?: number;
+}
+
+export interface UserResponse {
+  email: string;
+  roles: Role[];
 }

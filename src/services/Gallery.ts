@@ -16,6 +16,7 @@ import { handleHttpErrors, tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
 import { createFilesToSyncObj, serializeFileObjects } from './Files';
+import { log } from '../utils/Functions';
 
 const isImageNotExistingInDb = async ({
   category,

@@ -1,7 +1,7 @@
 import { Express } from 'express';
 import { body } from 'express-validator';
 import {
-  fileSyncController,
+  gallerySyncController,
   getImageByCategoryController,
   getImagePathsForCategoryController,
 } from '../controllers/Gallery';
@@ -20,7 +20,7 @@ export const startGalleryRoutes = (app: Express) => {
     body('name').isString(),
     body('isForSell').isString(),
     routeHandler({
-      controller: fileSyncController,
+      controller: gallerySyncController,
       guards: [
         hasRoleGuard('Admin'),
         hasValidatedData,
@@ -34,7 +34,7 @@ export const startGalleryRoutes = (app: Express) => {
     '/file/sync/uploads',
     upload.array('files'),
     routeHandler({
-      controller: fileSyncController,
+      controller: gallerySyncController,
       guards: [hasValidatedData, hasValidAccessToken, hasFilesAttached],
     })
   );
