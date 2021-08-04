@@ -9,7 +9,7 @@
     "e2e": "jest --runInBand --config ./jest-e2e.json",
     "e2e:watch": "jest --watch --runInBand --config ./jest-e2e.json",
     "testrun": "npm run test && npm run e2e",
-    "start": "node server.js"
+    "start": "tsc -w & nodemon -w dist server.ts"
   },
   "module": "node",
   "author": "",
