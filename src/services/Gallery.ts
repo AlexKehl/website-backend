@@ -8,15 +8,13 @@ import {
   GalleryImageDto,
   HttpResponse,
   ImageForGallery,
-  SerializedGalleryObj,
-  WithBody,
   GalleryImagesToSync,
+  ImageWithMeta,
 } from '../types';
 import { handleHttpErrors, tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
-import { createFilesToSyncObj, serializeFileObjects } from './Files';
-import { log } from '../utils/Functions';
+import { createFilesToSyncObj } from './Files';
 
 const isImageNotExistingInDb = async ({
   category,
@@ -31,14 +29,17 @@ const isImageNotExistingInDb = async ({
     passThrough: { category, name },
   });
 
-const writeImageToDisk = async (
-  fileObj: SerializedGalleryObj
-): Promise<SerializedGalleryObj> => {
-  const { category, originalname, buffer } = fileObj;
-  return tryToExecute<SerializedGalleryObj>({
+const writeImageToDisk = (category: string) => async (
+  fileObj: ImageWithMeta
+): Promise<ImageWithMeta> => {
+  return tryToExecute<ImageWithMeta>({
     fnToTry: async () => {
       await mkdir(join(IMAGE_PATH, category), { recursive: true });
-      await writeFile(join(IMAGE_PATH, category, originalname), buffer);
+      await writeFile(
+        join(IMAGE_PATH, category, fileObj.name),
+        fileObj.image,
+        'base64'
+      );
       return true;
     },
     httpErrorData: {
@@ -49,19 +50,24 @@ const writeImageToDisk = async (
   });
 };
 
-const saveFileMetaToDb = async (file: SerializedGalleryObj) => {
+const saveFileMetaToDb = (category: string) => async (file: ImageWithMeta) => {
   return GalleryImage.create({
     id: uuid(),
     description: file.description,
     price: file.price,
-    name: file.originalname,
-    category: file.category,
+    name: file.name,
+    category: category,
     isForSell: file.isForSell,
   });
 };
 
-const uploadFile = (fileObj: SerializedGalleryObj): Promise<any> =>
-  Promise.all([writeImageToDisk(fileObj), saveFileMetaToDb(fileObj)]);
+const uploadFile = (category: string) => (
+  fileObj: ImageWithMeta
+): Promise<any> =>
+  Promise.all([
+    writeImageToDisk(category)(fileObj),
+    saveFileMetaToDb(category)(fileObj),
+  ]);
 
 const deleteFile = ({ category, name }: GalleryImageDoc): Promise<any> =>
   Promise.all([
@@ -110,22 +116,22 @@ const getImagesDocsForCategory = (category: string) =>
   });
 
 const getInputsForFilesToSyncObj = (category: string) => async (
-  serializeFileObjects: SerializedGalleryObj[]
+  imagesWithMeta: ImageWithMeta[]
 ) => {
   const imagesForCategory = await getImagesDocsForCategory(category);
-  return createFilesToSyncObj<GalleryImageDoc, SerializedGalleryObj>({
+  return createFilesToSyncObj<GalleryImageDoc, ImageWithMeta>({
     fileDocs: imagesForCategory,
-    serializedFileObjects: serializeFileObjects,
+    imagesWithMeta: imagesWithMeta,
     pred: (imageDoc, obj) =>
-      imageDoc.category === obj.category && imageDoc.name === obj.originalname,
+      imageDoc.category === category && imageDoc.name === obj.name,
   });
 };
 
-const processFilesToSync = async ({
+const processFilesToSync = (category: string) => async ({
   toDelete,
   toUpload,
 }: GalleryImagesToSync) => {
-  const uploadPromises = toUpload.map(uploadFile);
+  const uploadPromises = toUpload.map(uploadFile(category));
   const deletePromises = toDelete.map(deleteFile);
   return Promise.all([...uploadPromises, ...deletePromises]);
 };
@@ -135,10 +141,9 @@ const getImagePath = (category: string, name: string) =>
     .then(generateImagePathHttpResponse)
     .catch(handleHttpErrors);
 
-const syncFiles = (req: WithBody<GalleryImageDto>) =>
-  Promise.resolve(serializeFileObjects<GalleryImageDto>(req))
-    .then(getInputsForFilesToSyncObj(req.body.category))
-    .then(processFilesToSync)
+const syncFiles = (galleryImageDto: GalleryImageDto) =>
+  getInputsForFilesToSyncObj(galleryImageDto.category)(galleryImageDto.images)
+    .then(processFilesToSync(galleryImageDto.category))
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
     .catch(handleHttpErrors);
 
@@ -149,7 +154,6 @@ const getImagePathsForCategory = async (category: string) =>
     .catch(handleHttpErrors);
 
 export {
-  serializeFileObjects,
   uploadFile,
   deleteFile,
   imageForConsumerMap,

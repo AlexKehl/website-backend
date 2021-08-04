@@ -5,11 +5,9 @@ import { ServerStartOptions } from '../types';
 import { startAuthRoutes } from './Auth';
 import { startGalleryRoutes } from './Gallery';
 import { CLIENT_URL } from '../../config';
-
 const start = ({ port, startupMessage }: ServerStartOptions) => {
   const app = express();
 
-  app.use(express.json());
   app.use(cookieParser());
   app.use(
     cors({
@@ -20,6 +18,7 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
       preflightContinue: true,
     })
   );
+  app.use(express.json({ limit: '50mb' }));
 
   startAuthRoutes(app);
   startGalleryRoutes(app);

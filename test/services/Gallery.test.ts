@@ -1,13 +1,5 @@
-import {
-  imageForConsumerMap,
-  serializeFileObjects,
-} from '../../src/services/Gallery';
-import { SerializedGalleryObj } from '../../src/types';
-import {
-  fileDocs,
-  imagesForConsumer,
-  serializedFileObj,
-} from '../fixtures/GalleryImages';
+import { imageForConsumerMap } from '../../src/services/Gallery';
+import { fileDocs, imagesForConsumer } from '../fixtures/GalleryImages';
 
 describe('imageForConsumerMap', () => {
   it('returns imageForConsumer in right format', () => {

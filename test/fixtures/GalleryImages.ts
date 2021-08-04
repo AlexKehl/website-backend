@@ -1,15 +1,12 @@
 import { BASE_URL } from '../../config';
 import { GalleryImageDoc } from '../../src/model/GalleryImage';
-import { ImageForGallery, SerializedGalleryObj } from '../../src/types';
+import { ImageForGallery, ImageWithMeta } from '../../src/types';
 
-export const serializedFileObj: SerializedGalleryObj = {
+export const imageWithMeta: ImageWithMeta = {
   isForSell: true,
   description: { en: 'This is a description' },
-  originalname: 'i-201.jpg',
-  mimetype: 'image/jpeg',
-  buffer: Buffer.from([8, 6, 7, 5, 3, 0, 9]),
-  size: 473101,
-  category: 'acryl',
+  name: 'i-201.jpg',
+  image: 'someBase64EncodedImage',
 };
 
 export const fileDoc: GalleryImageDoc = {

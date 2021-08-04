@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { IMAGE_PATH } from '../../config';
 import {
   getImagePath,
@@ -11,7 +12,7 @@ const gallerySyncController = async ({
   req,
   res,
 }: ExpressObj<GalleryImageDto>) => {
-  evaluateHttpObject(res, await syncFiles(req));
+  evaluateHttpObject(res, await syncFiles(req.body));
 };
 
 const getImagePathsForCategoryController = async ({ req, res }: ExpressObj) => {

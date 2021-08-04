@@ -20,11 +20,17 @@ export interface EmailDto {
   email: string;
 }
 
-export interface GalleryImageDto {
-  category: string;
+export interface ImageWithMeta {
   description?: TranslatedText;
   isForSell: boolean;
   price?: number;
+  image: string;
+  name: string;
+}
+
+export interface GalleryImageDto {
+  images: ImageWithMeta[];
+  category: string;
 }
 
 export interface FileWithCategoryDto {

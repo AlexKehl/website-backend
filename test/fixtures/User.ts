@@ -58,4 +58,5 @@ export const RegisteredUser: UserDoc = {
 
 export const userResponse: UserResponse = {
   email: USER_EMAIL,
+  roles: ['RegisteredUser'],
 };

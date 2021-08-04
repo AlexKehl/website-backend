@@ -11,6 +11,6 @@ export type SerializedFileObj<T> = T &
 
 export interface CreateFilesToSyncObjInput<T, U> {
   fileDocs: T[];
-  serializedFileObjects: U[];
+  imagesWithMeta: U[];
   pred: (file: T, obj: U) => boolean;
 }

@@ -1,33 +1,6 @@
-import {
-  createFilesToSyncObj,
-  serializeFileObjects,
-} from '../../src/services/Files';
-import { GalleryImagesToSync, SerializedGalleryObj } from '../../src/types';
-import {
-  fileDoc,
-  fileDocs,
-  serializedFileObj,
-} from '../fixtures/GalleryImages';
-
-describe('serializeFileObjects', () => {
-  it('returns SerializedFileObj[]', () => {
-    const { category, ...serializedFileObjRest } = serializedFileObj;
-    const input = {
-      files: [serializedFileObjRest],
-      body: {
-        category: 'acryl',
-        isForSell: true,
-        description: { en: 'This is a description' },
-      },
-    };
-
-    const res = serializeFileObjects(input as any);
-
-    const expected: SerializedGalleryObj[] = [serializedFileObj];
-
-    expect(res).toEqual(expected);
-  });
-});
+import { createFilesToSyncObj } from '../../src/services/Files';
+import { GalleryImagesToSync } from '../../src/types';
+import { fileDoc, fileDocs, imageWithMeta } from '../fixtures/GalleryImages';
 
 describe('createFilesToSyncObj', () => {
   const pred = (file: any, obj: any) =>
@@ -36,7 +9,7 @@ describe('createFilesToSyncObj', () => {
   it('adds toDelete if serializeFileObjects is empty', () => {
     const res = createFilesToSyncObj({
       fileDocs: [fileDoc],
-      serializedFileObjects: [],
+      imagesWithMeta: [],
       pred,
     });
 
@@ -51,7 +24,7 @@ describe('createFilesToSyncObj', () => {
   it('adds toDelete if fileDocs.length > serializeFileObjects.length', async () => {
     const res = createFilesToSyncObj({
       fileDocs: [fileDoc, ...fileDocs],
-      serializedFileObjects: [serializedFileObj],
+      imagesWithMeta: [imageWithMeta],
       pred,
     });
 
@@ -66,13 +39,13 @@ describe('createFilesToSyncObj', () => {
   it('can delete and upload simultaneously', () => {
     const res = createFilesToSyncObj({
       fileDocs: [fileDocs[0]],
-      serializedFileObjects: [serializedFileObj],
+      imagesWithMeta: [imageWithMeta],
       pred,
     });
 
     const expected: GalleryImagesToSync = {
       toDelete: [fileDocs[0]],
-      toUpload: [serializedFileObj],
+      toUpload: [imageWithMeta],
     };
 
     expect(res).toEqual(expected);
@@ -81,13 +54,13 @@ describe('createFilesToSyncObj', () => {
   it('adds toUpload if fileDocs is empty', async () => {
     const res = createFilesToSyncObj({
       fileDocs: [],
-      serializedFileObjects: [serializedFileObj],
+      imagesWithMeta: [imageWithMeta],
       pred,
     });
 
     const expected: GalleryImagesToSync = {
       toDelete: [],
-      toUpload: [serializedFileObj],
+      toUpload: [imageWithMeta],
     };
 
     expect(res).toEqual(expected);
@@ -96,7 +69,7 @@ describe('createFilesToSyncObj', () => {
   it('returns empty output for empty input', async () => {
     const res = createFilesToSyncObj({
       fileDocs: [],
-      serializedFileObjects: [],
+      imagesWithMeta: [],
       pred,
     });
 

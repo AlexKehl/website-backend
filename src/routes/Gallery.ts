@@ -15,18 +15,13 @@ import routeHandler from '../utils/RouteHandler';
 export const startGalleryRoutes = (app: Express) => {
   app.post(
     '/file/sync/gallery',
-    upload.array('files'),
-    body('category').isString(),
-    body('name').isString(),
-    body('isForSell').isString(),
+    // upload.array('files'),
+    // body('category').isString(),
+    // body('name').isString(),
+    // body('isForSell').isString(),
     routeHandler({
       controller: gallerySyncController,
-      guards: [
-        hasRoleGuard('Admin'),
-        hasValidatedData,
-        hasValidAccessToken,
-        hasFilesAttached,
-      ],
+      guards: [hasRoleGuard('Admin'), hasValidatedData, hasValidAccessToken],
     })
   );
 
