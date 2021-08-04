@@ -7,6 +7,7 @@ export const imageWithMeta: ImageWithMeta = {
   description: { en: 'This is a description' },
   name: 'i-201.jpg',
   image: 'someBase64EncodedImage',
+  size: { width: 100, height: 100 },
 };
 
 export const fileDoc: GalleryImageDoc = {
@@ -16,6 +17,7 @@ export const fileDoc: GalleryImageDoc = {
   description: { en: 'This is a description' },
   category: 'acryl',
   name: 'i-201.jpg',
+  size: { width: 100, height: 100 },
 };
 
 export const fileDocs: GalleryImageDoc[] = [
@@ -26,6 +28,7 @@ export const fileDocs: GalleryImageDoc[] = [
     isForSell: true,
     price: 50,
     description: { en: 'This is a description' },
+    size: { width: 100, height: 100 },
   },
   {
     category: 'oil',
@@ -34,6 +37,7 @@ export const fileDocs: GalleryImageDoc[] = [
     isForSell: true,
     price: 50,
     description: { en: 'This is a description' },
+    size: { width: 100, height: 100 },
   },
 ];
 
@@ -46,6 +50,7 @@ export const imagesForConsumer: ImageForGallery[] = [
     id: 'id124',
     price: 50,
     description: { en: 'This is a description' },
+    size: { width: 100, height: 100 },
   },
   {
     name: 'bar.jpg',
@@ -55,5 +60,6 @@ export const imagesForConsumer: ImageForGallery[] = [
     id: 'id125',
     price: 50,
     description: { en: 'This is a description' },
+    size: { width: 100, height: 100 },
   },
 ];

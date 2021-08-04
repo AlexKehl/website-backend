@@ -3,30 +3,23 @@ import * as request from 'supertest';
 import HttpStatus from '../../src/utils/HttpStatus';
 import { GalleryImage } from '../../src/model/GalleryImage';
 import { fileDocs, imagesForConsumer } from '../fixtures/GalleryImages';
-import { generateAccessToken, RegisteredUser } from '../fixtures/User';
+import {
+  AdminUser,
+  generateAccessToken,
+  RegisteredUser,
+} from '../fixtures/User';
+import { User } from '../../src/model/User';
 
 const { app } = setupServer({ port: 3005 });
 
 describe('/file/sync/gallery', () => {
   it('returns HttpStatus.BAD_REQUEST if files are missing', async () => {
     const accessToken = await generateAccessToken(RegisteredUser.email);
+    await User.create(AdminUser);
 
     const res = await request(app)
       .post('/file/sync/gallery')
       .set('Cookie', [`accessToken=${accessToken}`])
-      .field('category', 'acryl');
-
-    expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-    expect(res.body.success).toBe(false);
-  });
-
-  it('returns HttpStatus.BAD_REQUEST if some file is corrupt', async () => {
-    const accessToken = await generateAccessToken(RegisteredUser.email);
-
-    const res = await request(app)
-      .post('/file/sync/gallery')
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .attach('files', './test/fixtures/CorruptImage.jpg')
       .field('category', 'acryl');
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -34,33 +27,15 @@ describe('/file/sync/gallery', () => {
   });
 
   it('returns HttpStatus.BAD_REQUEST if category is missing', async () => {
+    const accessToken = await generateAccessToken(RegisteredUser.email);
+    await User.create(AdminUser);
+
     const res = await request(app)
       .post('/file/sync/gallery')
-      .attach('files', './test/fixtures/TestImage.jpg');
+      .set('Cookie', [`accessToken=${accessToken}`]);
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
     expect(res.body.success).toBe(false);
-  });
-
-  it('returns HttpStatus.OK on successfull upload', async () => {
-    const accessToken = await generateAccessToken(RegisteredUser.email);
-
-    const res = await request(app)
-      .post('/file/sync/gallery')
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .attach('files', './test/fixtures/TestImage.jpg')
-      .field('category', 'acryl')
-      .field('name', 'i-201.jpg')
-      .field('isForSell', true);
-
-    const uploadedFile = await GalleryImage.findOne({
-      name: 'TestImage.jpg',
-      category: 'acryl',
-    }).exec();
-
-    expect(uploadedFile).toBeDefined();
-    expect(res.status).toEqual(HttpStatus.OK);
-    expect(res.body.success).toBe(true);
   });
 });
 

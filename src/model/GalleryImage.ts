@@ -15,6 +15,7 @@ const GalleryImageSchemaDefinition: Record<keyof GalleryImageDoc, any> = {
   description: { type: SchemaTypes.Mixed },
   isForSell: { type: Boolean, required: true },
   price: { type: Number },
+  size: { type: SchemaTypes.Mixed, required: true },
 };
 
 const GalleryImageSchema = new Schema(GalleryImageSchemaDefinition);

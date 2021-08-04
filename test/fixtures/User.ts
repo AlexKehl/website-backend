@@ -56,6 +56,14 @@ export const RegisteredUser: UserDoc = {
   roles: ['RegisteredUser'],
 };
 
+export const AdminUser: UserDoc = {
+  email: USER_EMAIL,
+  passwordHash: '$2b$10$iVjBNmC5NoJoeGVqDM/rw.IkftpSd9jq78t0K7LdJEvNlCyR8atKW',
+  refreshTokenHash:
+    '$2b$10$gS6mgtoUKtRBpVVyea7zCO9kPfDP5.W6j3AQPZHEqhJ2LoEopzGVq',
+  roles: ['Admin'],
+};
+
 export const userResponse: UserResponse = {
   email: USER_EMAIL,
   roles: ['RegisteredUser'],

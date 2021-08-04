@@ -1,4 +1,5 @@
 import { OrderLevel } from '../model/Order';
+import { ImageSize } from './ClientInterface';
 import { TranslatedText } from './Texts';
 
 export interface LoginDto {
@@ -26,6 +27,7 @@ export interface ImageWithMeta {
   price?: number;
   image: string;
   name: string;
+  size: ImageSize;
 }
 
 export interface GalleryImageDto {

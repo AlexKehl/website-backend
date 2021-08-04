@@ -58,6 +58,7 @@ const saveFileMetaToDb = (category: string) => async (file: ImageWithMeta) => {
     name: file.name,
     category: category,
     isForSell: file.isForSell,
+    size: file.size,
   });
 };
 
@@ -95,6 +96,7 @@ const imageForConsumerMap = (
     category: fileDoc.category,
     name: fileDoc.name,
     url: `${BASE_URL}/files/${fileDoc.category}/${fileDoc.name}`,
+    size: fileDoc.size,
   }));
 };
 

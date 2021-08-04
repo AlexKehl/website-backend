@@ -3,8 +3,9 @@ import { GalleryImagesToSync } from '../../src/types';
 import { fileDoc, fileDocs, imageWithMeta } from '../fixtures/GalleryImages';
 
 describe('createFilesToSyncObj', () => {
+  const category = 'acryl';
   const pred = (file: any, obj: any) =>
-    file.category === obj.category && file.name === obj.originalname;
+    file.category === category && file.name === obj.name;
 
   it('adds toDelete if serializeFileObjects is empty', () => {
     const res = createFilesToSyncObj({

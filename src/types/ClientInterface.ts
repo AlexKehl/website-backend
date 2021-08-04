@@ -4,6 +4,11 @@ import { TranslatedText } from './Texts';
 
 export interface Order extends OrderDoc {}
 
+export interface ImageSize {
+  width: number;
+  height: number;
+}
+
 export interface ImageForGallery {
   id: string;
   url: string;
@@ -12,6 +17,7 @@ export interface ImageForGallery {
   description?: TranslatedText;
   isForSell: boolean;
   price?: number;
+  size: ImageSize;
 }
 
 export interface UserResponse {
