@@ -49,7 +49,10 @@ describe('hasValidCredentials', () => {
 describe('createLoginSuccessResponse', () => {
   it('returns http res with tokens and userResponse', async () => {
     const userWithRefreshToken = await getUserWithRefreshToken();
-    const res = createLoginSuccessResponse(userWithRefreshToken);
+    const res = createLoginSuccessResponse({
+      ...userWithRefreshToken,
+      ...RegisteredUser,
+    });
 
     const expected = makeHttpResponse({
       statusCode: HttpStatus.OK,

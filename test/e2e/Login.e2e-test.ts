@@ -4,6 +4,7 @@ import HttpStatus from '../../src/utils/HttpStatus';
 import {
   generateRefreshTokenAndHash,
   RegisteredUser,
+  userResponse,
   UserWithPassword,
 } from '../fixtures/User';
 import { User } from '../../src/model/User';
@@ -32,16 +33,18 @@ describe('/login', () => {
   it('logins successfully', async () => {
     const { email, passwordHash } = RegisteredUser;
     const { password } = UserWithPassword;
-    const createdUser = new User({ email, passwordHash });
+    const createdUser = new User({
+      email,
+      passwordHash,
+      roles: ['RegisteredUser'],
+    });
     await createdUser.save();
 
     const res = await request(app).post('/login').send({ email, password });
 
     const expectedBody = {
       success: true,
-      user: {
-        email,
-      },
+      user: userResponse,
     };
 
     const hasCorrectCookieHeader = [

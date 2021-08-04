@@ -8,7 +8,7 @@ import {
   SALT_ROUNDS,
 } from '../../config';
 import { User, UserDoc } from '../model/User';
-import { LoginDto, RefreshTokenDto, RegisterDto } from '../types';
+import { LoginDto, RefreshTokenDto, RegisterDto, Role } from '../types';
 import { tryToExecute } from '../utils/HttpErrors';
 import { handleHttpErrors } from '../utils/HttpErrorHandler';
 import { makeHttpResponse } from '../utils/HttpResponses';
@@ -62,7 +62,8 @@ const hasValidCredentials = (loginDto: LoginDto) => async (user: UserDoc) =>
 const createLoginSuccessResponse = ({
   email,
   refreshToken,
-}: RefreshTokenDto) => {
+  roles,
+}: RefreshTokenDto & { roles: Role[] }) => {
   const accessToken = generateAccessToken({ email });
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
@@ -85,18 +86,19 @@ const createLoginSuccessResponse = ({
         },
       },
     ],
-    data: { user: { email } },
+    data: { user: { email, roles } },
   });
 };
 
-const updateRefreshToken = async ({
-  email,
-}: UserDoc): Promise<RefreshTokenDto> => {
+const updateRefreshToken = async (
+  userDoc: UserDoc
+): Promise<RefreshTokenDto & { roles: Role[] }> => {
+  const { email, roles } = userDoc;
   try {
     const refreshToken = generateRefreshToken({ email });
     const refreshTokenHash = await hash(refreshToken, SALT_ROUNDS);
     await User.updateOne({ email }, { refreshTokenHash });
-    return { email, refreshToken };
+    return { email, refreshToken, roles };
   } catch (e) {
     logger.log({ level: 'error', message: e.message });
     throw new WithPayloadError({
