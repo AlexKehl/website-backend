@@ -24,12 +24,14 @@ export interface OrderDoc {
   level: OrderLevel;
 }
 
-const OrderSchema = new Schema({
+const OrderSchemaDefinition: Record<keyof OrderDoc, any> = {
   imageIds: { type: [String], required: true },
   status: { type: Number, required: true },
   statusReason: { type: String },
-  priceSum: { type: Number, required: true },
+  price: { type: Number, required: true },
   level: { type: Number, required: true },
-});
+};
+
+const OrderSchema = new Schema(OrderSchemaDefinition);
 
 export const Order = model<OrderDoc & Document>('Order', OrderSchema);
