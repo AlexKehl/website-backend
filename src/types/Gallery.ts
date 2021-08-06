@@ -1,8 +1,5 @@
 import { GalleryImageDoc } from '../model/GalleryImage';
-import { GalleryImageDto, ImageWithMeta } from './Dto';
-import { SerializedFileObj } from './Files';
-
-export type SerializedGalleryObj = SerializedFileObj<GalleryImageDto>;
+import { ImageWithMeta } from './Dto';
 
 export interface GalleryImagesToSync {
   toUpload: ImageWithMeta[];

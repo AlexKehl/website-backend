@@ -1,6 +1,5 @@
 import { Role } from '.';
 import { OrderDoc } from '../model/Order';
-import { TranslatedText } from './Texts';
 
 export interface Order extends OrderDoc {}
 
@@ -14,7 +13,7 @@ export interface ImageForGallery {
   url: string;
   category: string;
   name: string;
-  description?: TranslatedText;
+  description?: string;
   isForSell: boolean;
   price?: number;
   size: ImageSize;

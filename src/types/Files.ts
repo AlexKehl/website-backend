@@ -1,15 +1,11 @@
 import { ImageSize } from './ClientInterface';
-import { TranslatedText } from './Texts';
 
 export interface FileDoc {
   id: string;
   name: string;
-  description?: TranslatedText;
+  description?: string;
   size: ImageSize;
 }
-
-export type SerializedFileObj<T> = T &
-  Pick<Express.Multer.File, 'originalname' | 'buffer' | 'size' | 'mimetype'>;
 
 export interface CreateFilesToSyncObjInput<T, U> {
   fileDocs: T[];

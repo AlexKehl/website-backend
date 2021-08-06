@@ -19,8 +19,7 @@ describe('/file/sync/gallery', () => {
 
     const res = await request(app)
       .post('/file/sync/gallery')
-      .set('Cookie', [`accessToken=${accessToken}`])
-      .field('category', 'acryl');
+      .set('Cookie', [`accessToken=${accessToken}`]);
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
     expect(res.body.success).toBe(false);

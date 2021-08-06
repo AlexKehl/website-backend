@@ -1,6 +1,5 @@
 import { OrderLevel } from '../model/Order';
 import { ImageSize } from './ClientInterface';
-import { TranslatedText } from './Texts';
 
 export interface LoginDto {
   email: string;
@@ -22,7 +21,7 @@ export interface EmailDto {
 }
 
 export interface ImageWithMeta {
-  description?: TranslatedText;
+  description?: string;
   isForSell: boolean;
   price?: number;
   image: string;

@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import { IMAGE_PATH } from '../../config';
 import {
   getImagePath,

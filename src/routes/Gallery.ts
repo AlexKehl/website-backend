@@ -1,5 +1,5 @@
 import { Express } from 'express';
-import { body } from 'express-validator';
+import { checkSchema } from 'express-validator';
 import {
   gallerySyncController,
   getImageByCategoryController,
@@ -9,13 +9,12 @@ import { hasRoleGuard } from '../guards/HasRole';
 import { hasValidAccessToken } from '../guards/HasValidAccessToken';
 import { hasValidatedData } from '../guards/HasValidatedData';
 import routeHandler from '../utils/RouteHandler';
+import FileWithMeta from '../validators/request/FileWithMeta';
 
 export const startGalleryRoutes = (app: Express) => {
   app.post(
     '/file/sync/gallery',
-    body('category').isString(),
-    // body('name').isString(),
-    // body('isForSell').isString(),
+    checkSchema(FileWithMeta),
     routeHandler({
       controller: gallerySyncController,
       guards: [hasRoleGuard('Admin'), hasValidatedData, hasValidAccessToken],
