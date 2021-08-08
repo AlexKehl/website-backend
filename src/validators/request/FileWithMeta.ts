@@ -1,4 +1,5 @@
 import { Schema } from 'express-validator';
+import { get } from 'lodash';
 
 const fileWithMetaSchema: Schema = {
   category: {
@@ -7,13 +8,25 @@ const fileWithMetaSchema: Schema = {
   },
   'images.*.description': {
     isString: true,
+    optional: { options: { nullable: true } },
   },
   'images.*.isForSell': {
     isBoolean: true,
   },
   'images.*.price': {
-    isNumeric: true,
-    optional: { options: { nullable: true } },
+    custom: {
+      options: (value, { req, path }) => {
+        const splitted = path.split('.');
+        splitted.pop();
+        const modifiedPath = splitted.join('.');
+        const currentImage = get(req.body, modifiedPath);
+        if (!currentImage.isForSell) {
+          return true;
+        }
+        return Boolean(currentImage.price);
+      },
+    },
+    errorMessage: 'Price must be provided if item is for sell.',
   },
   'images.*.image': {
     isString: true,
