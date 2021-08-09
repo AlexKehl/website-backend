@@ -8,13 +8,15 @@ import {
   SALT_ROUNDS,
 } from '../../config';
 import { User, UserDoc } from '../model/User';
-import { LoginDto, RefreshTokenDto, RegisterDto, Role } from '../types';
 import { tryToExecute } from '../utils/HttpErrors';
 import { handleHttpErrors } from '../utils/HttpErrorHandler';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
 import { logger } from '../utils/Logger';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
+import { LoginDto, RegisterDto } from '../../../common/interface/Dto';
+import { RefreshTokenData } from '../types/Auth';
+import { Role } from '../../../common/interface/Constants';
 
 const generateAccessToken = ({ email }: { email: string }) =>
   sign({ email }, ACCESS_TOKEN_SECRET, {
@@ -63,7 +65,7 @@ const createLoginSuccessResponse = ({
   email,
   refreshToken,
   roles,
-}: RefreshTokenDto & { roles: Role[] }) => {
+}: RefreshTokenData & { roles: Role[] }) => {
   const accessToken = generateAccessToken({ email });
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
@@ -92,7 +94,7 @@ const createLoginSuccessResponse = ({
 
 const updateRefreshToken = async (
   userDoc: UserDoc
-): Promise<RefreshTokenDto & { roles: Role[] }> => {
+): Promise<RefreshTokenData & { roles: Role[] }> => {
   const { email, roles } = userDoc;
   try {
     const refreshToken = generateRefreshToken({ email });

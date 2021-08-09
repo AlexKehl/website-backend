@@ -1,3 +1,7 @@
+import {
+  DeleteGalleryImageDto,
+  GalleryImageDto,
+} from '../../../common/interface/Dto';
 import { IMAGE_PATH } from '../../config';
 import {
   deleteImage,
@@ -5,12 +9,7 @@ import {
   getImagePathsForCategory,
   uploadImage,
 } from '../services/Gallery';
-import {
-  Category,
-  DeleteGalleryImageDto,
-  ExpressObj,
-  GalleryImageDto,
-} from '../types';
+import { Category, ExpressObj } from '../types';
 import { evaluateHttpObject } from '../utils/HttpResponses';
 
 const galleryUploadController = async ({

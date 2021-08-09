@@ -1,10 +1,10 @@
-import { OrderImageDto, WithBody } from '../types';
+import { WithBody } from '../types';
 
 const getImagesForUser = async (userId: string) => {
   return;
 };
 
-const orderImageSync = async (req: WithBody<OrderImageDto>) => {
+const orderImageSync = async () => {
   // return Promise.resolve(serializeFileObjects<OrderImageDto>(req));
 };
 

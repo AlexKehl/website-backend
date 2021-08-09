@@ -3,37 +3,29 @@ import { mkdir, unlink, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { BASE_URL, IMAGE_PATH } from '../../config';
 import { GalleryImage, GalleryImageDoc } from '../model/GalleryImage';
-import {
-  FileWithCategoryDto,
-  GalleryImageDto,
-  HttpResponse,
-  ImageForGallery,
-  ImageWithMeta,
-  HttpError,
-  DeleteGalleryImageDto,
-  Category,
-} from '../types';
+import { HttpResponse, Category } from '../types';
 import { handleHttpErrors, tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
+import {
+  DeleteGalleryImageDto,
+  GalleryImageDto,
+} from '../../../common/interface/Dto';
+import { ImageForGallery } from '../../../common/interface/ConsumerData';
 
-const isImageNotExistingInDb = async ({
-  category,
-  name,
-}: FileWithCategoryDto) =>
-  tryToExecute<FileWithCategoryDto>({
+const isImageNotExistingInDb = async (category: Category, name: string) =>
+  tryToExecute({
     fnToTry: async () => await GalleryImage.findOne({ name, category }),
     httpErrorData: {
       statusCode: HttpStatus.NOT_FOUND,
       data: { error: 'GalleryImage is not existing.' },
     },
-    passThrough: { category, name },
   });
 
 const writeImageToDisk =
   (category: Category) =>
-  async (fileObj: ImageWithMeta): Promise<ImageWithMeta> => {
-    return tryToExecute<ImageWithMeta>({
+  async (fileObj: GalleryImageDto): Promise<GalleryImageDto> => {
+    return tryToExecute<GalleryImageDto>({
       fnToTry: async () => {
         await mkdir(join(IMAGE_PATH, category), { recursive: true });
         await writeFile(
@@ -52,7 +44,7 @@ const writeImageToDisk =
   };
 
 const saveFileMetaToDb =
-  (category: Category) => async (file: ImageWithMeta) => {
+  (category: Category) => async (file: GalleryImageDto) => {
     return GalleryImage.create({
       id: uuid(),
       description: file.description,
@@ -66,7 +58,7 @@ const saveFileMetaToDb =
 
 const uploadFile =
   (category: Category) =>
-  (fileObj: ImageWithMeta): Promise<any> =>
+  (fileObj: GalleryImageDto): Promise<any> =>
     Promise.all([
       writeImageToDisk(category)(fileObj),
       saveFileMetaToDb(category)(fileObj),
@@ -78,10 +70,7 @@ const deleteFile = ({ category, name }: DeleteGalleryImageDto): Promise<any> =>
     GalleryImage.deleteOne({ category, name }),
   ]);
 
-const generateImagePathHttpResponse = ({
-  category,
-  name,
-}: FileWithCategoryDto) =>
+const generateImagePathHttpResponse = (category: Category, name: string) =>
   makeHttpResponse({
     statusCode: HttpStatus.OK,
     data: { imagePath: join(category, name) },
@@ -130,8 +119,8 @@ const deleteImage = (dto: DeleteGalleryImageDto) =>
     .catch(handleHttpErrors);
 
 const getImagePath = (category: Category, name: string) =>
-  isImageNotExistingInDb({ category, name })
-    .then(generateImagePathHttpResponse)
+  isImageNotExistingInDb(category, name)
+    .then(() => generateImagePathHttpResponse(category, name))
     .catch(handleHttpErrors);
 
 const getImagePathsForCategory = async (category: Category) =>

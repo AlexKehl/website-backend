@@ -1,7 +1,8 @@
 import { login, logout, register } from '../services/Auth';
-import { LoginDto, ExpressObj } from '../types';
+import { ExpressObj } from '../types';
 import { evaluateHttpObject } from '../utils/HttpResponses';
 import { getEmailFromToken } from '../utils/Tokens';
+import { LoginDto } from '../../../common/interface/Dto';
 
 const registerController = async ({ req, res }: ExpressObj<LoginDto>) => {
   evaluateHttpObject(res, await register(req.body));

@@ -32,16 +32,6 @@ export interface AdaptedRequest<T extends Request> {
   readonly body: T['body'];
 }
 
-export interface Credentials {
-  email: string;
-  password?: string;
-  refreshToken?: string;
-}
-
-export interface Login extends Request {
-  body: Credentials;
-}
-
 export interface WithBody<T> extends Request {
   body: T;
 }
