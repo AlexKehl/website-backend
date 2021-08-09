@@ -1,5 +1,5 @@
-import { ImageForGallery } from '../../../common/interface/ConsumerData';
-import { GalleryImageDto } from '../../../common/interface/Dto';
+import { ImageForGallery } from '../../common/interface/ConsumerData';
+import { GalleryImageDto } from '../../common/interface/Dto';
 import { BASE_URL } from '../../config';
 import { GalleryImageDoc } from '../../src/model/GalleryImage';
 

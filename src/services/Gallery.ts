@@ -10,8 +10,8 @@ import HttpStatus from '../utils/HttpStatus';
 import {
   DeleteGalleryImageDto,
   GalleryImageDto,
-} from '../../../common/interface/Dto';
-import { ImageForGallery } from '../../../common/interface/ConsumerData';
+} from '../../common/interface/Dto';
+import { ImageForGallery } from '../../common/interface/ConsumerData';
 
 const isImageNotExistingInDb = async (category: Category, name: string) =>
   tryToExecute({

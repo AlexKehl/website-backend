@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { Document } from 'mongoose';
-import { Role } from '../../../common/interface/Constants';
+import { Role } from '../../common/interface/Constants';
 
 export interface UserDoc {
   email: string;

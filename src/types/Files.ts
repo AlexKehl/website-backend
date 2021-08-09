@@ -1,4 +1,4 @@
-import { ImageSize } from '../../../common/interface/GalleryImages';
+import { ImageSize } from '../../common/interface/GalleryImages';
 
 export interface FileDoc {
   id: string;

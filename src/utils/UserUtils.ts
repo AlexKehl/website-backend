@@ -1,4 +1,4 @@
-import { Role } from '../../../common/interface/Constants';
+import { Role } from '../../common/interface/Constants';
 import { User } from '../model/User';
 
 const hasRole = async (email: string, role: Role) => {
