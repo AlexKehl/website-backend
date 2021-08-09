@@ -1,4 +1,4 @@
-import { Role } from '../../common/interface/Constants';
+import { Role } from '../../../common/interface/Constants';
 import { ExpressObj } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 import HttpStatus from '../utils/HttpStatus';

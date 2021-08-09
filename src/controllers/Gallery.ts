@@ -1,7 +1,7 @@
 import {
   DeleteGalleryImageDto,
   GalleryImageDto,
-} from '../../common/interface/Dto';
+} from '../../../common/interface/Dto';
 import { IMAGE_PATH } from '../../config';
 import {
   deleteImage,
