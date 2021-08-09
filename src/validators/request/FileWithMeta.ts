@@ -1,43 +1,42 @@
 import { Schema } from 'express-validator';
-import { get } from 'lodash';
 
 const fileWithMetaSchema: Schema = {
+  id: {
+    isString: true,
+    optional: { options: { nullable: true } },
+  },
   category: {
     errorMessage: 'Missing category',
     isString: true,
   },
-  'images.*.description': {
+  description: {
     isString: true,
     optional: { options: { nullable: true } },
   },
-  'images.*.isForSell': {
+  isForSell: {
     isBoolean: true,
   },
-  'images.*.price': {
+  price: {
     custom: {
-      options: (value, { req, path }) => {
-        const splitted = path.split('.');
-        splitted.pop();
-        const modifiedPath = splitted.join('.');
-        const currentImage = get(req.body, modifiedPath);
-        if (!currentImage.isForSell) {
+      options: (value, { req }) => {
+        if (!req.body.isForSell) {
           return true;
         }
-        return Boolean(currentImage.price);
+        return Boolean(req.body.price);
       },
     },
     errorMessage: 'Price must be provided if item is for sell.',
   },
-  'images.*.image': {
+  image: {
     isString: true,
   },
-  'images.*.name': {
+  name: {
     isString: true,
   },
-  'images.*.size.width': {
+  'size.width': {
     isNumeric: true,
   },
-  'images.*.size.height': {
+  'size.height': {
     isNumeric: true,
   },
 };

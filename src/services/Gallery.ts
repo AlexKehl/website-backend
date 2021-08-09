@@ -13,7 +13,7 @@ import {
 } from '../../common/interface/Dto';
 import { ImageForGallery } from '../../common/interface/ConsumerData';
 
-const isImageNotExistingInDb = async (category: Category, name: string) =>
+const isImageExistingInDb = async (category: Category, name: string) =>
   tryToExecute({
     fnToTry: async () => await GalleryImage.findOne({ name, category }),
     httpErrorData: {
@@ -64,6 +64,20 @@ const uploadFile =
       saveFileMetaToDb(category)(fileObj),
     ]);
 
+const updateFile = async (dto: GalleryImageDto): Promise<any> =>
+  tryToExecute<GalleryImageDto[]>({
+    fnToTry: async () =>
+      GalleryImage.updateOne(
+        { name: dto.name, category: dto.category },
+        { ...dto }
+      ),
+    passThrough: dto,
+    httpErrorData: {
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      data: { error: 'Internal server error' },
+    },
+  });
+
 const deleteFile = ({ category, name }: DeleteGalleryImageDto): Promise<any> =>
   Promise.all([
     unlink(join(IMAGE_PATH, category, name)),
@@ -109,7 +123,9 @@ const getImagesDocsForCategory = (category: Category) =>
   });
 
 const uploadImage = async (dto: GalleryImageDto) =>
-  uploadFile(dto.category)(dto)
+  isImageExistingInDb(dto.category, dto.name)
+    .then(() => updateFile(dto))
+    .catch(() => uploadFile(dto.category)(dto))
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
     .catch(handleHttpErrors);
 
@@ -119,7 +135,7 @@ const deleteImage = (dto: DeleteGalleryImageDto) =>
     .catch(handleHttpErrors);
 
 const getImagePath = (category: Category, name: string) =>
-  isImageNotExistingInDb(category, name)
+  isImageExistingInDb(category, name)
     .then(() => generateImagePathHttpResponse(category, name))
     .catch(handleHttpErrors);
 

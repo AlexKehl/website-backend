@@ -1,4 +1,5 @@
 import { Express } from 'express';
+import { checkSchema } from 'express-validator';
 import {
   galleryDeleteController,
   galleryUploadController,
@@ -9,13 +10,15 @@ import { hasRoleGuard } from '../guards/HasRole';
 import { hasValidAccessToken } from '../guards/HasValidAccessToken';
 import { hasValidatedData } from '../guards/HasValidatedData';
 import routeHandler from '../utils/RouteHandler';
+import FileWithMeta from '../validators/request/FileWithMeta';
 
 export const startGalleryRoutes = (app: Express) => {
   app.post(
     '/file/gallery/upload',
+    checkSchema(FileWithMeta),
     routeHandler({
       controller: galleryUploadController,
-      guards: [hasRoleGuard('Admin'), hasValidAccessToken],
+      guards: [hasRoleGuard('Admin'), hasValidAccessToken, hasValidatedData],
     })
   );
 

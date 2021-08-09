@@ -3,16 +3,17 @@ import { GalleryImageDto } from '../../common/interface/Dto';
 import { BASE_URL } from '../../config';
 import { GalleryImageDoc } from '../../src/model/GalleryImage';
 
-export const imageWithMeta: GalleryImageDto = {
+export const galleryImageDto: GalleryImageDto = {
   isForSell: true,
   description: 'This is a description',
   name: 'i-201.jpg',
   image: 'someBase64EncodedImage',
   size: { width: 100, height: 100 },
   category: 'acryl',
+  price: 150,
 };
 
-export const fileDoc: GalleryImageDoc = {
+export const galleryImageDoc: GalleryImageDoc = {
   id: 'id123',
   isForSell: true,
   price: 50,
@@ -22,7 +23,7 @@ export const fileDoc: GalleryImageDoc = {
   size: { width: 100, height: 100 },
 };
 
-export const fileDocs: GalleryImageDoc[] = [
+export const galleryImageDocs: GalleryImageDoc[] = [
   {
     category: 'acryl',
     name: 'foo.jpg',
@@ -43,7 +44,7 @@ export const fileDocs: GalleryImageDoc[] = [
   },
 ];
 
-export const imagesForConsumer: ImageForGallery[] = [
+export const imagesForGallery: ImageForGallery[] = [
   {
     name: 'foo.jpg',
     category: 'acryl',
