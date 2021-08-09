@@ -1,3 +1,4 @@
+import { Category } from '.';
 import { OrderLevel } from '../model/Order';
 import { ImageSize } from './ClientInterface';
 
@@ -30,15 +31,30 @@ export interface ImageWithMeta {
 }
 
 export interface GalleryImageDto {
+  description?: string;
+  isForSell: boolean;
+  price?: number;
+  image: string;
+  name: string;
+  size: ImageSize;
+  category: Category;
+}
+
+export interface GalleryImageUploadDto {
   images: ImageWithMeta[];
-  category: string;
+  category: Category;
 }
 
 export interface FileWithCategoryDto {
-  category: string;
+  category: Category;
   name: string;
 }
 
 export interface OrderImageDto {
   level: OrderLevel;
+}
+
+export interface DeleteGalleryImageDto {
+  category: Category;
+  name: string;
 }

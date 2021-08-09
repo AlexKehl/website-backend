@@ -8,13 +8,14 @@ import {
   GalleryImageDto,
   HttpResponse,
   ImageForGallery,
-  GalleryImagesToSync,
   ImageWithMeta,
+  HttpError,
+  DeleteGalleryImageDto,
+  Category,
 } from '../types';
 import { handleHttpErrors, tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
-import { createFilesToSyncObj } from './Files';
 
 const isImageNotExistingInDb = async ({
   category,
@@ -29,48 +30,49 @@ const isImageNotExistingInDb = async ({
     passThrough: { category, name },
   });
 
-const writeImageToDisk = (category: string) => async (
-  fileObj: ImageWithMeta
-): Promise<ImageWithMeta> => {
-  return tryToExecute<ImageWithMeta>({
-    fnToTry: async () => {
-      await mkdir(join(IMAGE_PATH, category), { recursive: true });
-      await writeFile(
-        join(IMAGE_PATH, category, fileObj.name),
-        fileObj.image,
-        'base64'
-      );
-      return true;
-    },
-    httpErrorData: {
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      data: { error: 'Server has problems with saving the GalleryImage.' },
-    },
-    passThrough: fileObj,
-  });
-};
+const writeImageToDisk =
+  (category: Category) =>
+  async (fileObj: ImageWithMeta): Promise<ImageWithMeta> => {
+    return tryToExecute<ImageWithMeta>({
+      fnToTry: async () => {
+        await mkdir(join(IMAGE_PATH, category), { recursive: true });
+        await writeFile(
+          join(IMAGE_PATH, category, fileObj.name),
+          fileObj.image,
+          'base64'
+        );
+        return true;
+      },
+      httpErrorData: {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        data: { error: 'Server has problems with saving the GalleryImage.' },
+      },
+      passThrough: fileObj,
+    });
+  };
 
-const saveFileMetaToDb = (category: string) => async (file: ImageWithMeta) => {
-  return GalleryImage.create({
-    id: uuid(),
-    description: file.description,
-    price: file.price,
-    name: file.name,
-    category: category,
-    isForSell: file.isForSell,
-    size: file.size,
-  });
-};
+const saveFileMetaToDb =
+  (category: Category) => async (file: ImageWithMeta) => {
+    return GalleryImage.create({
+      id: uuid(),
+      description: file.description,
+      price: file.price,
+      name: file.name,
+      category: category,
+      isForSell: file.isForSell,
+      size: file.size,
+    });
+  };
 
-const uploadFile = (category: string) => (
-  fileObj: ImageWithMeta
-): Promise<any> =>
-  Promise.all([
-    writeImageToDisk(category)(fileObj),
-    saveFileMetaToDb(category)(fileObj),
-  ]);
+const uploadFile =
+  (category: Category) =>
+  (fileObj: ImageWithMeta): Promise<any> =>
+    Promise.all([
+      writeImageToDisk(category)(fileObj),
+      saveFileMetaToDb(category)(fileObj),
+    ]);
 
-const deleteFile = ({ category, name }: GalleryImageDoc): Promise<any> =>
+const deleteFile = ({ category, name }: DeleteGalleryImageDto): Promise<any> =>
   Promise.all([
     unlink(join(IMAGE_PATH, category, name)),
     GalleryImage.deleteOne({ category, name }),
@@ -108,7 +110,7 @@ const createImagesForConsumerHttpResponse = (
     data: { images },
   });
 
-const getImagesDocsForCategory = (category: string) =>
+const getImagesDocsForCategory = (category: Category) =>
   tryToExecute<GalleryImageDoc[]>({
     fnToTry: async () => GalleryImage.find({ category }).lean(),
     httpErrorData: {
@@ -117,39 +119,22 @@ const getImagesDocsForCategory = (category: string) =>
     },
   });
 
-const getInputsForFilesToSyncObj = (category: string) => async (
-  imagesWithMeta: ImageWithMeta[]
-) => {
-  const imagesForCategory = await getImagesDocsForCategory(category);
-  return createFilesToSyncObj<GalleryImageDoc, ImageWithMeta>({
-    fileDocs: imagesForCategory,
-    imagesWithMeta: imagesWithMeta,
-    pred: (imageDoc, obj) =>
-      imageDoc.category === category && imageDoc.name === obj.name,
-  });
-};
+const uploadImage = async (dto: GalleryImageDto) =>
+  uploadFile(dto.category)(dto)
+    .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
+    .catch(handleHttpErrors);
 
-const processFilesToSync = (category: string) => async ({
-  toDelete,
-  toUpload,
-}: GalleryImagesToSync) => {
-  const uploadPromises = toUpload.map(uploadFile(category));
-  const deletePromises = toDelete.map(deleteFile);
-  return Promise.all([...uploadPromises, ...deletePromises]);
-};
+const deleteImage = (dto: DeleteGalleryImageDto) =>
+  deleteFile(dto)
+    .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
+    .catch(handleHttpErrors);
 
-const getImagePath = (category: string, name: string) =>
+const getImagePath = (category: Category, name: string) =>
   isImageNotExistingInDb({ category, name })
     .then(generateImagePathHttpResponse)
     .catch(handleHttpErrors);
 
-const syncFiles = (galleryImageDto: GalleryImageDto) =>
-  getInputsForFilesToSyncObj(galleryImageDto.category)(galleryImageDto.images)
-    .then(processFilesToSync(galleryImageDto.category))
-    .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
-    .catch(handleHttpErrors);
-
-const getImagePathsForCategory = async (category: string) =>
+const getImagePathsForCategory = async (category: Category) =>
   getImagesDocsForCategory(category)
     .then(imageForConsumerMap)
     .then(createImagesForConsumerHttpResponse)
@@ -158,8 +143,9 @@ const getImagePathsForCategory = async (category: string) =>
 export {
   uploadFile,
   deleteFile,
+  deleteImage,
   imageForConsumerMap,
   getImagePathsForCategory,
   getImagePath,
-  syncFiles,
+  uploadImage,
 };

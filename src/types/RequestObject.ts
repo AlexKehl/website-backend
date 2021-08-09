@@ -1,5 +1,6 @@
 import { CookieOptions, Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
+import { Category } from '.';
 
 export interface Cookie {
   name: string;
@@ -46,7 +47,7 @@ export interface WithBody<T> extends Request {
 }
 
 export interface FileMeta {
-  category: string;
+  category: Category;
   name: string;
   height: number;
   width: number;

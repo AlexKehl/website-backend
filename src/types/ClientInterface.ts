@@ -1,4 +1,4 @@
-import { Role } from '.';
+import { Category, Role } from '.';
 import { OrderDoc } from '../model/Order';
 
 export interface Order extends OrderDoc {}
@@ -11,7 +11,7 @@ export interface ImageSize {
 export interface ImageForGallery {
   id: string;
   url: string;
-  category: string;
+  category: Category;
   name: string;
   description?: string;
   isForSell: boolean;
