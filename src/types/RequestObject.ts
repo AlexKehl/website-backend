@@ -1,5 +1,6 @@
 import { CookieOptions, Request } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
+import { Category } from '.';
 
 export interface Cookie {
   name: string;
@@ -31,22 +32,12 @@ export interface AdaptedRequest<T extends Request> {
   readonly body: T['body'];
 }
 
-export interface Credentials {
-  email: string;
-  password?: string;
-  refreshToken?: string;
-}
-
-export interface Login extends Request {
-  body: Credentials;
-}
-
 export interface WithBody<T> extends Request {
   body: T;
 }
 
 export interface FileMeta {
-  category: string;
+  category: Category;
   name: string;
   height: number;
   width: number;

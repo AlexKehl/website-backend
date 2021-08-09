@@ -1,13 +1,15 @@
+import { ImageForGallery } from '../../common/interface/ConsumerData';
+import { GalleryImageDto } from '../../common/interface/Dto';
 import { BASE_URL } from '../../config';
 import { GalleryImageDoc } from '../../src/model/GalleryImage';
-import { ImageForGallery, ImageWithMeta } from '../../src/types';
 
-export const imageWithMeta: ImageWithMeta = {
+export const imageWithMeta: GalleryImageDto = {
   isForSell: true,
   description: 'This is a description',
   name: 'i-201.jpg',
   image: 'someBase64EncodedImage',
   size: { width: 100, height: 100 },
+  category: 'acryl',
 };
 
 export const fileDoc: GalleryImageDoc = {
