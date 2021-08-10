@@ -8,21 +8,22 @@ import {
   REFRESH_TOKEN_SECRET,
   SALT_ROUNDS,
 } from '../../config';
-import { User, UserDoc } from '../model/User';
+import { User as UserModel, UserDoc } from '../model/User';
 import { RefreshTokenData } from '../types/Auth';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { logger } from '../utils/Logger';
-import { getEmailFromToken } from '../utils/Tokens';
+import { getUserFromToken } from '../utils/Tokens';
+import { User } from '../../common/interface/ConsumerResponses';
 
-const generateAccessToken = ({ email }: { email: string }) =>
-  sign({ email, iat: new Date().getTime() }, ACCESS_TOKEN_SECRET, {
+const generateAccessToken = (user: User) =>
+  sign({ ...user, iat: new Date().getTime() }, ACCESS_TOKEN_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRATION_TIME,
   });
 
-const generateRefreshToken = ({ email }: { email: string }) =>
-  sign({ email }, REFRESH_TOKEN_SECRET, {
+const generateRefreshToken = (user: User) =>
+  sign(user, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRATION_TIME,
   });
 
@@ -31,9 +32,9 @@ const updateRefreshToken = async (
 ): Promise<RefreshTokenData & { roles: Role[] }> => {
   const { email, roles } = userDoc;
   try {
-    const refreshToken = generateRefreshToken({ email });
+    const refreshToken = generateRefreshToken({ email, roles });
     const refreshTokenHash = await hash(refreshToken, SALT_ROUNDS);
-    await User.updateOne({ email }, { refreshTokenHash });
+    await UserModel.updateOne({ email }, { refreshTokenHash });
     return { email, refreshToken, roles };
   } catch (e) {
     logger.log({ level: 'error', message: e.message });
@@ -45,12 +46,12 @@ const updateRefreshToken = async (
 };
 
 const getNewAccessToken = (refreshToken: string) => {
-  const email = getEmailFromToken(refreshToken);
+  const userData = getUserFromToken(refreshToken);
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
     cookies: [
       {
-        val: generateAccessToken({ email }),
+        val: generateAccessToken(userData),
         name: 'accessToken',
         options: {
           sameSite: true,

@@ -48,7 +48,7 @@ const createLoginSuccessResponse = ({
   refreshToken,
   roles,
 }: RefreshTokenData & { roles: Role[] }) => {
-  const accessToken = generateAccessToken({ email });
+  const accessToken = generateAccessToken({ email, roles });
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
     cookies: [
