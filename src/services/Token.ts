@@ -12,7 +12,7 @@ import { User, UserDoc } from '../model/User';
 import { RefreshTokenData } from '../types/Auth';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 import { makeHttpResponse } from '../utils/HttpResponses';
-import HttpStatus from '../utils/HttpStatus';
+import HttpStatus from '../../common/constants/HttpStatus';
 import { logger } from '../utils/Logger';
 import { getEmailFromToken } from '../utils/Tokens';
 

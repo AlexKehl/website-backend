@@ -3,7 +3,7 @@ import { hasRole } from '../../common/utils/User';
 import { User } from '../model/User';
 import { ExpressObj } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
-import HttpStatus from '../utils/HttpStatus';
+import HttpStatus from '../../common/constants/HttpStatus';
 import { getEmailFromToken } from '../utils/Tokens';
 
 const hasRoleGuard = (role: Role) => async (expressObj: ExpressObj) => {

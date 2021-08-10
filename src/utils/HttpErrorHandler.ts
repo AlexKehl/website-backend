@@ -1,7 +1,7 @@
+import HttpStatus from '../../common/constants/HttpStatus';
 import { ExpressResponse } from '../types';
 import WithPayloadError from './Exceptions/WithPayloadError';
 import { makeHttpError } from './HttpErrors';
-import HttpStatus from './HttpStatus';
 import { logger } from './Logger';
 
 export const HttpErrorRouteHandler = (res: ExpressResponse) => (err: Error) => {

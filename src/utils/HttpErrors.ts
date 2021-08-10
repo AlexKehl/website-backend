@@ -1,8 +1,8 @@
 import { HttpError, MakeHttpErrorData } from '../types';
 import WithPayloadError from './Exceptions/WithPayloadError';
 import { ExpressResponse } from '../types';
-import HttpStatus from './HttpStatus';
 import { logger } from './Logger';
+import HttpStatus from '../../common/constants/HttpStatus';
 
 export interface TryToExecuteInput {
   fnToTry: () => Promise<any>;

@@ -3,7 +3,7 @@ import {
   hasValidCredentials,
 } from '../../src/services/Auth';
 import { makeHttpResponse } from '../../src/utils/HttpResponses';
-import HttpStatus from '../../src/utils/HttpStatus';
+import HttpStatus from '../../common/constants/HttpStatus';
 import {
   getUserWithRefreshToken,
   RegisteredUser,

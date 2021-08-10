@@ -7,7 +7,7 @@ import { RefreshTokenData } from '../types/Auth';
 import { handleHttpErrors } from '../utils/HttpErrorHandler';
 import { tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
-import HttpStatus from '../utils/HttpStatus';
+import HttpStatus from '../../common/constants/HttpStatus';
 import { generateAccessToken, updateRefreshToken } from './Token';
 
 const isUserNotExisting = async ({ email, password }: RegisterDto) =>

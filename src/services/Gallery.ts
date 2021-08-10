@@ -6,7 +6,7 @@ import { GalleryImage, GalleryImageDoc } from '../model/GalleryImage';
 import { HttpResponse } from '../types';
 import { handleHttpErrors, tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
-import HttpStatus from '../utils/HttpStatus';
+import HttpStatus from '../../common/constants/HttpStatus';
 import {
   DeleteGalleryImageDto,
   GalleryImageDto,

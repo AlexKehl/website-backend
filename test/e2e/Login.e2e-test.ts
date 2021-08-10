@@ -1,6 +1,5 @@
 import { setupServer } from '../TestSetupUtils';
 import * as request from 'supertest';
-import HttpStatus from '../../src/utils/HttpStatus';
 import {
   generateRefreshTokenAndHash,
   RegisteredUser,
@@ -8,6 +7,7 @@ import {
   UserWithPassword,
 } from '../fixtures/User';
 import { User } from '../../src/model/User';
+import HttpStatus from '../../common/constants/HttpStatus';
 
 const { app } = setupServer({ port: 3005 });
 
@@ -115,10 +115,8 @@ describe('/logout', () => {
 
   it('returns HttpStatus.OK if logout was successful', async () => {
     const { email, passwordHash } = RegisteredUser;
-    const {
-      refreshToken,
-      refreshTokenHash,
-    } = await generateRefreshTokenAndHash(email);
+    const { refreshToken, refreshTokenHash } =
+      await generateRefreshTokenAndHash(email);
     const createdUser = new User({ email, passwordHash, refreshTokenHash });
     await createdUser.save();
 
@@ -133,10 +131,8 @@ describe('/logout', () => {
 
   it('deletes refreshTokenHash on successful logout', async () => {
     const { email, passwordHash } = RegisteredUser;
-    const {
-      refreshToken,
-      refreshTokenHash,
-    } = await generateRefreshTokenAndHash(email);
+    const { refreshToken, refreshTokenHash } =
+      await generateRefreshTokenAndHash(email);
     const createdUser = new User({ email, passwordHash, refreshTokenHash });
     await createdUser.save();
 

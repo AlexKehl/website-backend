@@ -1,6 +1,5 @@
 import { setupServer } from '../TestSetupUtils';
 import * as request from 'supertest';
-import HttpStatus from '../../src/utils/HttpStatus';
 import { GalleryImage } from '../../src/model/GalleryImage';
 import {
   galleryImageDocs,
@@ -14,6 +13,7 @@ import {
 } from '../fixtures/User';
 import { User } from '../../src/model/User';
 import { GalleryImageDto } from '../../common/interface/Dto';
+import HttpStatus from '../../common/constants/HttpStatus';
 
 const { app } = setupServer({ port: 3005 });
 

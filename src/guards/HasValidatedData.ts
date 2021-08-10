@@ -1,6 +1,6 @@
 import { ExpressObj } from '../types';
 import { validationResult } from 'express-validator';
-import HttpStatus from '../utils/HttpStatus';
+import HttpStatus from '../../common/constants/HttpStatus';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 
 const hasValidatedData = async (expressObj: ExpressObj) => {

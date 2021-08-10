@@ -1,6 +1,6 @@
 import * as request from 'supertest';
+import HttpStatus from '../../common/constants/HttpStatus';
 import { User } from '../../src/model/User';
-import HttpStatus from '../../src/utils/HttpStatus';
 import {
   generateAccessToken,
   generateRefreshTokenAndHash,
@@ -14,10 +14,8 @@ describe('/refreshtoken', () => {
   it('returns a new accessToken', async () => {
     const { email, passwordHash } = RegisteredUser;
     const accessToken = generateAccessToken(email);
-    const {
-      refreshToken,
-      refreshTokenHash,
-    } = await generateRefreshTokenAndHash(email);
+    const { refreshToken, refreshTokenHash } =
+      await generateRefreshTokenAndHash(email);
 
     await User.create({
       email,
@@ -54,10 +52,8 @@ describe('/refreshtoken', () => {
 
   it('returns UNAUTHORIZED for for wrong refreshTokenHash', async () => {
     const { email, passwordHash } = RegisteredUser;
-    const {
-      refreshToken,
-      refreshTokenHash,
-    } = await generateRefreshTokenAndHash(email);
+    const { refreshToken, refreshTokenHash } =
+      await generateRefreshTokenAndHash(email);
 
     await User.create({
       email,

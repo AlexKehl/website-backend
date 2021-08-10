@@ -1,5 +1,5 @@
 import * as request from 'supertest';
-import HttpStatus from '../../src/utils/HttpStatus';
+import HttpStatus from '../../common/constants/HttpStatus';
 import { UserWithPassword } from '../fixtures/User';
 import { setupServer } from '../TestSetupUtils';
 

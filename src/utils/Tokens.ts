@@ -1,6 +1,6 @@
 import { decode } from 'jsonwebtoken';
+import HttpStatus from '../../common/constants/HttpStatus';
 import WithPayloadError from './Exceptions/WithPayloadError';
-import HttpStatus from './HttpStatus';
 
 export const getEmailFromToken = (token: string): string => {
   const decoded = decode(token, { json: true });

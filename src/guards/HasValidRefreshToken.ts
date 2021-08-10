@@ -4,7 +4,7 @@ import { REFRESH_TOKEN_SECRET } from '../../config';
 import { User } from '../model/User';
 import { ExpressObj } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
-import HttpStatus from '../utils/HttpStatus';
+import HttpStatus from '../../common/constants/HttpStatus';
 
 const hasValidRefreshToken = async (expressObj: ExpressObj) => {
   try {
