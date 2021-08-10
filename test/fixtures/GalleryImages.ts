@@ -8,7 +8,8 @@ export const galleryImageDto: GalleryImageDto = {
   description: 'This is a description',
   name: 'i-201.jpg',
   image: 'someBase64EncodedImage',
-  size: { width: 100, height: 100 },
+  width: 100,
+  height: 100,
   category: 'acryl',
   price: 150,
 };
@@ -20,7 +21,8 @@ export const galleryImageDoc: GalleryImageDoc = {
   description: 'This is a description',
   category: 'acryl',
   name: 'i-201.jpg',
-  size: { width: 100, height: 100 },
+  width: 100,
+  height: 100,
 };
 
 export const galleryImageDocs: GalleryImageDoc[] = [
@@ -31,7 +33,8 @@ export const galleryImageDocs: GalleryImageDoc[] = [
     isForSell: true,
     price: 50,
     description: 'This is a description',
-    size: { width: 100, height: 100 },
+    width: 100,
+    height: 100,
   },
   {
     category: 'oil',
@@ -40,7 +43,8 @@ export const galleryImageDocs: GalleryImageDoc[] = [
     isForSell: true,
     price: 50,
     description: 'This is a description',
-    size: { width: 100, height: 100 },
+    width: 100,
+    height: 100,
   },
 ];
 
@@ -53,7 +57,8 @@ export const imagesForGallery: ImageForGallery[] = [
     id: 'id124',
     price: 50,
     description: 'This is a description',
-    size: { width: 100, height: 100 },
+    width: 100,
+    height: 100,
   },
   {
     name: 'bar.jpg',
@@ -63,6 +68,7 @@ export const imagesForGallery: ImageForGallery[] = [
     id: 'id125',
     price: 50,
     description: 'This is a description',
-    size: { width: 100, height: 100 },
+    width: 100,
+    height: 100,
   },
 ];

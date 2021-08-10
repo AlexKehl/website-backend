@@ -52,7 +52,8 @@ const saveFileMetaToDb =
       name: file.name,
       category: category,
       isForSell: file.isForSell,
-      size: file.size,
+      height: file.height,
+      width: file.width,
     });
   };
 
@@ -101,7 +102,8 @@ const imageForConsumerMap = (
     category: fileDoc.category,
     name: fileDoc.name,
     url: `${BASE_URL}/files/${fileDoc.category}/${fileDoc.name}`,
-    size: fileDoc.size,
+    width: fileDoc.width,
+    height: fileDoc.height,
   }));
 };
 
@@ -130,7 +132,8 @@ const uploadImage = async (dto: GalleryImageDto) =>
     .catch(handleHttpErrors);
 
 const deleteImage = (dto: DeleteGalleryImageDto) =>
-  deleteFile(dto)
+  isImageExistingInDb(dto.category, dto.name)
+    .then(() => deleteFile(dto))
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
     .catch(handleHttpErrors);
 

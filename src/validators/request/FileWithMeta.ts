@@ -33,10 +33,10 @@ const fileWithMetaSchema: Schema = {
   name: {
     isString: true,
   },
-  'size.width': {
+  width: {
     isNumeric: true,
   },
-  'size.height': {
+  height: {
     isNumeric: true,
   },
 };
