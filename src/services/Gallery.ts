@@ -3,7 +3,7 @@ import { mkdir, unlink, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { BASE_URL, IMAGE_PATH } from '../../config';
 import { GalleryImage, GalleryImageDoc } from '../model/GalleryImage';
-import { HttpResponse, Category } from '../types';
+import { HttpResponse } from '../types';
 import { handleHttpErrors, tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
@@ -12,6 +12,7 @@ import {
   GalleryImageDto,
 } from '../../common/interface/Dto';
 import { ImageForGallery } from '../../common/interface/ConsumerData';
+import { Category } from '../../common/interface/Constants';
 
 const isImageExistingInDb = async (category: Category, name: string) =>
   tryToExecute({

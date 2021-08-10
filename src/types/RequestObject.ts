@@ -1,6 +1,4 @@
 import { CookieOptions, Request } from 'express';
-import { ParamsDictionary } from 'express-serve-static-core';
-import { Category } from '.';
 
 export interface Cookie {
   name: string;
@@ -23,23 +21,6 @@ export interface MakeHttpErrorData {
   };
 }
 
-export interface AdaptedRequest<T extends Request> {
-  readonly headers: T['headers'];
-  readonly path: T['path'];
-  readonly method: T['method'];
-  readonly pathParams: ParamsDictionary;
-  readonly queryParams: Record<string, any>;
-  readonly body: T['body'];
-}
-
 export interface WithBody<T> extends Request {
   body: T;
-}
-
-export interface FileMeta {
-  category: Category;
-  name: string;
-  height: number;
-  width: number;
-  description?: string;
 }

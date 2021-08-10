@@ -8,7 +8,8 @@ const OrderImageSchemaDefinition: Record<keyof OrderImageDoc, any> = {
   id: { type: String, required: true },
   name: { type: String, required: true },
   description: { type: String },
-  size: { type: SchemaTypes.Mixed, required: true },
+  width: { type: Number, required: true },
+  height: { type: Number, required: true },
 };
 
 const OrderImageSchema = new Schema(OrderImageSchemaDefinition);

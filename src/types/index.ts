@@ -1,19 +1,18 @@
 import { Request, Response } from 'express';
 import { WithBody } from './RequestObject';
-import { HttpResponse } from './Responses';
 
 export type ExpressResponse = Response;
 export type ExpressRequest = Request;
 export type ExpressObj<T = any> = { req: WithBody<T>; res: ExpressResponse };
 
-export type BLFunction = (x: any) => Promise<HttpResponse | HttpError>;
+export type Controller<T = any> = (expressObj: ExpressObj<T>) => Promise<void>;
+export type RouteGuard<T = any> = (
+  expressObj: ExpressObj<T>
+) => Promise<ExpressObj>;
 
-export type Controller = (expressObj: ExpressObj) => Promise<void>;
-export type RouteGuard = (expressObj: ExpressObj) => Promise<ExpressObj>;
-
-export interface RouteHandlerObj {
-  controller: Controller;
-  guards?: RouteGuard[];
+export interface RouteHandlerObj<T = any> {
+  controller: Controller<T>;
+  guards?: RouteGuard<T>[];
 }
 
 export type RouteHandler = (
@@ -41,24 +40,5 @@ export interface ServerStartOptions {
   startupMessage?: string;
 }
 
-export interface EmailWithTokens {
-  email: string;
-  refreshToken: string;
-  refreshTokenHash: string;
-}
-
-export interface DecodedRefreshToken {
-  email: string;
-  iat: number;
-}
-
-export interface DecodedAccessToken {
-  email: string;
-  iat: number;
-}
-
-export type Category = 'acryl' | 'oil';
-
 export * from './RequestObject';
 export * from './Responses';
-export * from './Texts';

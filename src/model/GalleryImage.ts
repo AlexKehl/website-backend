@@ -1,6 +1,6 @@
 import { Schema, model, SchemaTypes } from 'mongoose';
 import { Document } from 'mongoose';
-import { Category } from '../types';
+import { Category } from '../../common/interface/Constants';
 import { FileDoc } from '../types/Files';
 
 export interface GalleryImageDoc extends FileDoc {

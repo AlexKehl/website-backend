@@ -1,18 +1,18 @@
 import { login, logout, register } from '../services/Auth';
-import { ExpressObj } from '../types';
+import { Controller } from '../types';
 import { evaluateHttpObject } from '../utils/HttpResponses';
 import { getEmailFromToken } from '../utils/Tokens';
 import { LoginDto } from '../../common/interface/Dto';
 
-const registerController = async ({ req, res }: ExpressObj<LoginDto>) => {
+const registerController: Controller<LoginDto> = async ({ req, res }) => {
   evaluateHttpObject(res, await register(req.body));
 };
 
-const loginController = async ({ req, res }: ExpressObj<LoginDto>) => {
+const loginController: Controller<LoginDto> = async ({ req, res }) => {
   evaluateHttpObject(res, await login(req.body));
 };
 
-const logoutController = async ({ req, res }: ExpressObj) => {
+const logoutController: Controller = async ({ req, res }) => {
   const { refreshToken } = req.cookies;
   const email = getEmailFromToken(refreshToken);
 
