@@ -1,32 +1,14 @@
 import { compare, hash } from 'bcrypt';
-import { sign } from 'jsonwebtoken';
-import {
-  ACCESS_TOKEN_EXPIRATION_TIME,
-  ACCESS_TOKEN_SECRET,
-  REFRESH_TOKEN_EXPIRATION_TIME,
-  REFRESH_TOKEN_SECRET,
-  SALT_ROUNDS,
-} from '../../config';
+import { Role } from '../../common/interface/Constants';
+import { LoginDto, RegisterDto } from '../../common/interface/Dto';
+import { SALT_ROUNDS } from '../../config';
 import { User, UserDoc } from '../model/User';
-import { tryToExecute } from '../utils/HttpErrors';
+import { RefreshTokenData } from '../types/Auth';
 import { handleHttpErrors } from '../utils/HttpErrorHandler';
+import { tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import HttpStatus from '../utils/HttpStatus';
-import { logger } from '../utils/Logger';
-import WithPayloadError from '../utils/Exceptions/WithPayloadError';
-import { LoginDto, RegisterDto } from '../../common/interface/Dto';
-import { RefreshTokenData } from '../types/Auth';
-import { Role } from '../../common/interface/Constants';
-
-const generateAccessToken = ({ email }: { email: string }) =>
-  sign({ email }, ACCESS_TOKEN_SECRET, {
-    expiresIn: ACCESS_TOKEN_EXPIRATION_TIME,
-  });
-
-const generateRefreshToken = ({ email }: { email: string }) =>
-  sign({ email }, REFRESH_TOKEN_SECRET, {
-    expiresIn: REFRESH_TOKEN_EXPIRATION_TIME,
-  });
+import { generateAccessToken, updateRefreshToken } from './Token';
 
 const isUserNotExisting = async ({ email, password }: RegisterDto) =>
   tryToExecute<RegisterDto>({
@@ -92,24 +74,6 @@ const createLoginSuccessResponse = ({
   });
 };
 
-const updateRefreshToken = async (
-  userDoc: UserDoc
-): Promise<RefreshTokenData & { roles: Role[] }> => {
-  const { email, roles } = userDoc;
-  try {
-    const refreshToken = generateRefreshToken({ email });
-    const refreshTokenHash = await hash(refreshToken, SALT_ROUNDS);
-    await User.updateOne({ email }, { refreshTokenHash });
-    return { email, refreshToken, roles };
-  } catch (e) {
-    logger.log({ level: 'error', message: e.message });
-    throw new WithPayloadError({
-      data: { error: 'Error updating Refresh token' },
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-    });
-  }
-};
-
 const deleteRefreshToken = ({ email }: UserDoc) =>
   tryToExecute({
     fnToTry: async () =>
@@ -129,13 +93,12 @@ const login = async (loginDto: LoginDto) =>
 
 const createNewUser = async ({ email, password }: RegisterDto) => {
   const passwordHash = await hash(password, SALT_ROUNDS);
-  return new User({ email, passwordHash });
+  return User.create({ email, passwordHash, roles: ['RegisteredUser'] });
 };
 
 const register = async ({ email, password }: RegisterDto) =>
   isUserNotExisting({ email, password })
     .then(createNewUser)
-    .then((user) => user.save())
     .then(() => makeHttpResponse({ statusCode: HttpStatus.CREATED }))
     .catch(handleHttpErrors);
 

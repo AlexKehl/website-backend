@@ -5,9 +5,7 @@ import {
   loginController,
   logoutController,
 } from '../controllers/Auth';
-import { getNewAccessTokenController } from '../controllers/Token';
 import { hasValidatedData } from '../guards/HasValidatedData';
-import { hasValidRefreshToken } from '../guards/HasValidRefreshToken';
 import routeHandler from '../utils/RouteHandler';
 
 export const startAuthRoutes = (app: Express) => {
@@ -23,15 +21,6 @@ export const startAuthRoutes = (app: Express) => {
     body('email').isEmail(),
     body('password').isLength({ min: 8 }),
     routeHandler({ controller: loginController, guards: [hasValidatedData] })
-  );
-
-  app.post(
-    '/refreshtoken',
-    cookie('refreshToken').isString(),
-    routeHandler({
-      controller: getNewAccessTokenController,
-      guards: [hasValidatedData, hasValidRefreshToken],
-    })
   );
 
   app.post(

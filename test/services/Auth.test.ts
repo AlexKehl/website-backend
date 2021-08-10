@@ -1,6 +1,5 @@
 import {
   createLoginSuccessResponse,
-  createNewUser,
   hasValidCredentials,
 } from '../../src/services/Auth';
 import { makeHttpResponse } from '../../src/utils/HttpResponses';
@@ -14,14 +13,6 @@ import {
 import WithPayloadError from '../../src/utils/Exceptions/WithPayloadError';
 import { verify } from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../config';
-
-describe('createNewUser', () => {
-  it('creates a new user with hashed password', async () => {
-    const { passwordHash } = await createNewUser(UserWithPassword);
-
-    expect(passwordHash).toEqual(expect.any(String));
-  });
-});
 
 describe('hasValidCredentials', () => {
   it('resolves with loginDto if credentials are valid', async () => {

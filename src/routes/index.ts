@@ -5,6 +5,7 @@ import { ServerStartOptions } from '../types';
 import { startAuthRoutes } from './Auth';
 import { startGalleryRoutes } from './Gallery';
 import { CLIENT_URL } from '../../config';
+import { startTokenRoutes } from './Token';
 const start = ({ port, startupMessage }: ServerStartOptions) => {
   const app = express();
 
@@ -22,6 +23,7 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
 
   startAuthRoutes(app);
   startGalleryRoutes(app);
+  startTokenRoutes(app);
 
   const server = app.listen(port, () => {
     if (startupMessage) {
