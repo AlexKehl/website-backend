@@ -1,5 +1,5 @@
+import { asyncTimeout } from '../../common/utils/Functions';
 import { getNewAccessToken } from '../../src/services/Token';
-import { asyncTimeout } from '../../src/utils/Functions';
 import { generateRefreshTokenAndHash, RegisteredUser } from '../fixtures/User';
 
 describe('getNewAccessToken', () => {

@@ -1,5 +1,5 @@
 import { Role } from '../../common/interface/Constants';
-import { hasRole } from '../../common/functions/User';
+import { hasRole } from '../../common/utils/User';
 import { User } from '../model/User';
 import { ExpressObj } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
