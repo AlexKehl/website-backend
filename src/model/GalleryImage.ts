@@ -1,9 +1,10 @@
 import { Schema, model, SchemaTypes } from 'mongoose';
 import { Document } from 'mongoose';
+import { Category } from '../types';
 import { FileDoc } from '../types/Files';
 
 export interface GalleryImageDoc extends FileDoc {
-  category: string;
+  category: Category;
   isForSell: boolean;
   price?: number;
 }
@@ -15,7 +16,8 @@ const GalleryImageSchemaDefinition: Record<keyof GalleryImageDoc, any> = {
   description: { type: SchemaTypes.Mixed },
   isForSell: { type: Boolean, required: true },
   price: { type: Number },
-  size: { type: SchemaTypes.Mixed, required: true },
+  width: { type: Number, required: true },
+  height: { type: Number, required: true },
 };
 
 const GalleryImageSchema = new Schema(GalleryImageSchemaDefinition);

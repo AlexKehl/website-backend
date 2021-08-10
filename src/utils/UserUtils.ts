@@ -1,5 +1,5 @@
+import { Role } from '../../common/interface/Constants';
 import { User } from '../model/User';
-import { Role } from '../types';
 
 const hasRole = async (email: string, role: Role) => {
   const user = await User.findOne({ email });

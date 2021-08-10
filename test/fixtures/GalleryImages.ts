@@ -1,34 +1,40 @@
+import { ImageForGallery } from '../../common/interface/ConsumerData';
+import { GalleryImageDto } from '../../common/interface/Dto';
 import { BASE_URL } from '../../config';
 import { GalleryImageDoc } from '../../src/model/GalleryImage';
-import { ImageForGallery, ImageWithMeta } from '../../src/types';
 
-export const imageWithMeta: ImageWithMeta = {
+export const galleryImageDto: GalleryImageDto = {
   isForSell: true,
-  description: { en: 'This is a description' },
+  description: 'This is a description',
   name: 'i-201.jpg',
   image: 'someBase64EncodedImage',
-  size: { width: 100, height: 100 },
+  width: 100,
+  height: 100,
+  category: 'acryl',
+  price: 150,
 };
 
-export const fileDoc: GalleryImageDoc = {
+export const galleryImageDoc: GalleryImageDoc = {
   id: 'id123',
   isForSell: true,
   price: 50,
-  description: { en: 'This is a description' },
+  description: 'This is a description',
   category: 'acryl',
   name: 'i-201.jpg',
-  size: { width: 100, height: 100 },
+  width: 100,
+  height: 100,
 };
 
-export const fileDocs: GalleryImageDoc[] = [
+export const galleryImageDocs: GalleryImageDoc[] = [
   {
     category: 'acryl',
     name: 'foo.jpg',
     id: 'id124',
     isForSell: true,
     price: 50,
-    description: { en: 'This is a description' },
-    size: { width: 100, height: 100 },
+    description: 'This is a description',
+    width: 100,
+    height: 100,
   },
   {
     category: 'oil',
@@ -36,12 +42,13 @@ export const fileDocs: GalleryImageDoc[] = [
     id: 'id125',
     isForSell: true,
     price: 50,
-    description: { en: 'This is a description' },
-    size: { width: 100, height: 100 },
+    description: 'This is a description',
+    width: 100,
+    height: 100,
   },
 ];
 
-export const imagesForConsumer: ImageForGallery[] = [
+export const imagesForGallery: ImageForGallery[] = [
   {
     name: 'foo.jpg',
     category: 'acryl',
@@ -49,8 +56,9 @@ export const imagesForConsumer: ImageForGallery[] = [
     isForSell: true,
     id: 'id124',
     price: 50,
-    description: { en: 'This is a description' },
-    size: { width: 100, height: 100 },
+    description: 'This is a description',
+    width: 100,
+    height: 100,
   },
   {
     name: 'bar.jpg',
@@ -59,7 +67,8 @@ export const imagesForConsumer: ImageForGallery[] = [
     isForSell: true,
     id: 'id125',
     price: 50,
-    description: { en: 'This is a description' },
-    size: { width: 100, height: 100 },
+    description: 'This is a description',
+    width: 100,
+    height: 100,
   },
 ];

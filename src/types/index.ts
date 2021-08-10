@@ -57,10 +57,8 @@ export interface DecodedAccessToken {
   iat: number;
 }
 
+export type Category = 'acryl' | 'oil';
+
 export * from './RequestObject';
-export * from './Dto';
-export * from './Gallery';
 export * from './Responses';
-export * from './ClientInterface';
 export * from './Texts';
-export * from './User';

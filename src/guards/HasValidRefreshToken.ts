@@ -2,13 +2,11 @@ import { compare } from 'bcrypt';
 import { decode, verify } from 'jsonwebtoken';
 import { REFRESH_TOKEN_SECRET } from '../../config';
 import { User } from '../model/User';
-import { ExpressObj, RefreshTokenDto } from '../types';
+import { ExpressObj } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 import HttpStatus from '../utils/HttpStatus';
 
-const hasValidRefreshToken = async (
-  expressObj: ExpressObj<RefreshTokenDto>
-) => {
+const hasValidRefreshToken = async (expressObj: ExpressObj) => {
   try {
     const refreshToken = expressObj.req.cookies.refreshToken;
     const decoded = decode(refreshToken, {

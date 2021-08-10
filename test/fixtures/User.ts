@@ -1,5 +1,7 @@
 import { hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
+import { LoginDto } from '../../common/interface/Dto';
+import { User } from '../../common/interface/ConsumerResponses';
 import {
   REFRESH_TOKEN_SECRET,
   REFRESH_TOKEN_EXPIRATION_TIME,
@@ -8,7 +10,7 @@ import {
   ACCESS_TOKEN_SECRET,
 } from '../../config';
 import { UserDoc } from '../../src/model/User';
-import { LoginDto, RefreshTokenDto, UserResponse } from '../../src/types';
+import { RefreshTokenData } from '../../src/types/Auth';
 
 const USER_EMAIL = 'test@test.com';
 
@@ -43,7 +45,7 @@ export const getUserWithRefreshToken = async () => {
   };
 };
 
-export const UserWithRefreshToken: RefreshTokenDto = {
+export const UserWithRefreshToken: RefreshTokenData = {
   email: USER_EMAIL,
   refreshToken: 'someToken',
 };
@@ -64,7 +66,7 @@ export const AdminUser: UserDoc = {
   roles: ['Admin'],
 };
 
-export const userResponse: UserResponse = {
+export const userResponse: User = {
   email: USER_EMAIL,
   roles: ['RegisteredUser'],
 };

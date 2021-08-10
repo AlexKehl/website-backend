@@ -1,11 +1,8 @@
 import { getNewAccessToken } from '../services/Token';
-import { EmailDto, ExpressObj } from '../types';
+import { ExpressObj } from '../types';
 import { evaluateHttpObject } from '../utils/HttpResponses';
 
-const getNewAccessTokenController = async ({
-  req,
-  res,
-}: ExpressObj<EmailDto>) => {
+const getNewAccessTokenController = async ({ req, res }: ExpressObj) => {
   const { refreshToken } = req.cookies;
 
   evaluateHttpObject(res, getNewAccessToken(refreshToken));
