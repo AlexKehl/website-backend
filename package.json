@@ -6,9 +6,9 @@
   "scripts": {
     "test": "jest --config ./jest-unit.json",
     "test:watch": "jest --watch --config ./jest-unit.json",
-    "e2e": "jest --runInBand --config ./jest-e2e.json",
-    "e2e:watch": "jest --watch --runInBand --config ./jest-e2e.json",
-    "testrun": "npm run test && npm run e2e",
+    "integration": "jest --runInBand --config ./jest-integration.json",
+    "integration:watch": "jest --watch --runInBand --config ./jest-integration.json",
+    "testrun": "npm run test && npm run integration",
     "start": "tsc -w & nodemon -w dist server.ts"
   },
   "module": "node",
