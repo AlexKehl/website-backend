@@ -1,5 +1,6 @@
 import { Express } from 'express';
 import { checkSchema } from 'express-validator';
+import { Endpoints } from '../../common/constants/Endpoints';
 import {
   galleryDeleteController,
   galleryUploadController,
@@ -14,7 +15,7 @@ import FileWithMeta from '../validators/request/FileWithMeta';
 
 export const startGalleryRoutes = (app: Express) => {
   app.post(
-    '/file/gallery/upload',
+    Endpoints.galleryUpload,
     checkSchema(FileWithMeta),
     routeHandler({
       controller: galleryUploadController,
@@ -23,20 +24,15 @@ export const startGalleryRoutes = (app: Express) => {
   );
 
   app.post(
-    '/file/gallery/delete',
+    Endpoints.galleryDelete,
     routeHandler({
       controller: galleryDeleteController,
       guards: [hasRoleGuard('Admin'), hasValidAccessToken],
     })
   );
 
-  app.post(
-    '/file/gallery/update'
-    //TODO
-  );
-
   app.get(
-    '/files/:category',
+    Endpoints.galleryCategoryList,
     routeHandler({
       controller: getImagePathsForCategoryController,
       guards: [hasValidatedData],
@@ -44,7 +40,7 @@ export const startGalleryRoutes = (app: Express) => {
   );
 
   app.get(
-    '/files/:category/:name',
+    Endpoints.galleryGetImage,
     routeHandler({ controller: getImageByCategoryController })
   );
 };

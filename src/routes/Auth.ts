@@ -7,24 +7,25 @@ import {
 } from '../controllers/Auth';
 import { hasValidatedData } from '../guards/HasValidatedData';
 import routeHandler from '../utils/RouteHandler';
+import { Endpoints } from '../../common/constants/Endpoints';
 
 export const startAuthRoutes = (app: Express) => {
   app.post(
-    '/register',
+    Endpoints.register,
     body('email').isEmail(),
     body('password').isLength({ min: 8 }),
     routeHandler({ controller: registerController, guards: [hasValidatedData] })
   );
 
   app.post(
-    '/login',
+    Endpoints.login,
     body('email').isEmail(),
     body('password').isLength({ min: 8 }),
     routeHandler({ controller: loginController, guards: [hasValidatedData] })
   );
 
   app.post(
-    '/logout',
+    Endpoints.logout,
     cookie('refreshToken').isString(),
     routeHandler({
       controller: logoutController,

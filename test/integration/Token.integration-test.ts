@@ -1,4 +1,5 @@
 import * as request from 'supertest';
+import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { User } from '../../src/model/User';
 import {
@@ -10,7 +11,7 @@ import { setupServer } from '../TestSetupUtils';
 
 const { app } = setupServer({ port: 3005 });
 
-describe('/refreshtoken', () => {
+describe(Endpoints.refreshAccessToken, () => {
   it('returns a new accessToken', async () => {
     const { email, passwordHash } = RegisteredUser;
     const accessToken = generateAccessToken(email);
@@ -25,7 +26,7 @@ describe('/refreshtoken', () => {
     });
 
     const res = await request(app)
-      .post('/refreshtoken')
+      .post(Endpoints.refreshAccessToken)
       .set('Cookie', [`accessToken=${accessToken}`])
       .set('Cookie', [`refreshToken=${refreshToken}`]);
 
@@ -34,7 +35,7 @@ describe('/refreshtoken', () => {
   });
 
   it('returns BAD_REQUEST if refreshToken is not passed', async () => {
-    const res = await request(app).post('/refreshtoken');
+    const res = await request(app).post(Endpoints.refreshAccessToken);
 
     expect(res.status).toBe(HttpStatus.BAD_REQUEST);
   });
@@ -44,7 +45,7 @@ describe('/refreshtoken', () => {
     const { refreshToken } = await generateRefreshTokenAndHash(email);
 
     const res = await request(app)
-      .post('/refreshtoken')
+      .post(Endpoints.refreshAccessToken)
       .set('Cookie', [`refreshToken=${refreshToken}`]);
 
     expect(res.status).toBe(HttpStatus.UNAUTHORIZED);
@@ -63,7 +64,7 @@ describe('/refreshtoken', () => {
     });
 
     const res = await request(app)
-      .post('/refreshtoken')
+      .post(Endpoints.refreshAccessToken)
       .set('Cookie', [`refreshToken=${refreshToken}123`]);
 
     expect(res.status).toBe(HttpStatus.UNAUTHORIZED);

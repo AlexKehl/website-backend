@@ -14,16 +14,20 @@ import {
 import { User } from '../../src/model/User';
 import { GalleryImageDto } from '../../common/interface/Dto';
 import HttpStatus from '../../common/constants/HttpStatus';
+import {
+  Endpoints,
+  staticEndPointPart,
+} from '../../common/constants/Endpoints';
 
 const { app } = setupServer({ port: 3005 });
 
-describe('/file/gallery/upload', () => {
+describe(Endpoints.galleryUpload, () => {
   it('returns HttpStatus.BAD_REQUEST if files are missing', async () => {
     const accessToken = await generateAccessToken(RegisteredUser.email);
     await User.create(AdminUser);
 
     const res = await request(app)
-      .post('/file/gallery/upload')
+      .post(Endpoints.galleryUpload)
       .set('Cookie', [`accessToken=${accessToken}`]);
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -35,7 +39,7 @@ describe('/file/gallery/upload', () => {
     await User.create(AdminUser);
 
     const res = await request(app)
-      .post('/file/gallery/upload')
+      .post(Endpoints.galleryUpload)
       .set('Cookie', [`accessToken=${accessToken}`]);
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -50,7 +54,7 @@ describe('/file/gallery/upload', () => {
     const body: GalleryImageDto = imageRest;
 
     const res = await request(app)
-      .post('/file/gallery/upload')
+      .post(Endpoints.galleryUpload)
       .set('Cookie', [`accessToken=${accessToken}`])
       .send(body);
 
@@ -64,7 +68,7 @@ describe('/file/gallery/upload', () => {
     await User.create(AdminUser);
 
     const res = await request(app)
-      .post('/file/gallery/upload')
+      .post(Endpoints.galleryUpload)
       .set('Cookie', [`accessToken=${accessToken}`])
       .send(galleryImageDto);
 
@@ -82,7 +86,7 @@ describe('/file/gallery/upload', () => {
     await User.create(AdminUser);
 
     await request(app)
-      .post('/file/gallery/upload')
+      .post(Endpoints.galleryUpload)
       .set('Cookie', [`accessToken=${accessToken}`])
       .send(galleryImageDto);
 
@@ -98,14 +102,14 @@ describe('/file/gallery/upload', () => {
     await User.create(AdminUser);
 
     await request(app)
-      .post('/file/gallery/upload')
+      .post(Endpoints.galleryUpload)
       .set('Cookie', [`accessToken=${accessToken}`])
       .send(galleryImageDto);
 
     const modifiedImageDto = { ...galleryImageDto, description: 'updated' };
 
     await request(app)
-      .post('/file/gallery/upload')
+      .post(Endpoints.galleryUpload)
       .set('Cookie', [`accessToken=${accessToken}`])
       .send(modifiedImageDto);
 
@@ -119,11 +123,13 @@ describe('/file/gallery/upload', () => {
   });
 });
 
-describe('/file/:category', () => {
+describe(Endpoints.galleryCategoryList, () => {
   it('returns a list of available files', async () => {
     await GalleryImage.insertMany(galleryImageDocs);
 
-    const res = await request(app).get('/files/acryl');
+    const res = await request(app).get(
+      `${staticEndPointPart('galleryCategoryList')}/acryl`
+    );
 
     const expected = [imagesForGallery[0]];
     expect(res.status).toEqual(HttpStatus.OK);

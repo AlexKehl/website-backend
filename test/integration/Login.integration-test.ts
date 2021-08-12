@@ -8,13 +8,14 @@ import {
 } from '../fixtures/User';
 import { User } from '../../src/model/User';
 import HttpStatus from '../../common/constants/HttpStatus';
+import { Endpoints } from '../../common/constants/Endpoints';
 
 const { app } = setupServer({ port: 3005 });
 
-describe('/login', () => {
+describe(Endpoints.login, () => {
   it('validates email', async () => {
     const res = await request(app)
-      .post('/login')
+      .post(Endpoints.login)
       .send({ email: 'foo', password: '12345678' });
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -23,7 +24,7 @@ describe('/login', () => {
 
   it('validates password', async () => {
     const res = await request(app)
-      .post('/login')
+      .post(Endpoints.login)
       .send({ email: RegisteredUser.email, password: '123' });
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -40,7 +41,9 @@ describe('/login', () => {
     });
     await createdUser.save();
 
-    const res = await request(app).post('/login').send({ email, password });
+    const res = await request(app)
+      .post(Endpoints.login)
+      .send({ email, password });
 
     const expectedBody = {
       success: true,
@@ -67,11 +70,11 @@ describe('/login', () => {
     const createdUser = new User({ email, passwordHash });
     await createdUser.save();
 
-    await request(app).post('/login').send({ email, password });
+    await request(app).post(Endpoints.login).send({ email, password });
 
     const userAfterFirstLogin = (await User.findOne({ email }).exec()) || {};
 
-    await request(app).post('/login').send({ email, password });
+    await request(app).post(Endpoints.login).send({ email, password });
 
     const userAfterSecondLogin = (await User.findOne({ email }).exec()) || {};
 
@@ -83,7 +86,7 @@ describe('/login', () => {
   });
 
   it('returns HttpStatus.NOT_FOUND if user is not registered', async () => {
-    const res = await request(app).post('/login').send(UserWithPassword);
+    const res = await request(app).post(Endpoints.login).send(UserWithPassword);
 
     expect(res.status).toEqual(HttpStatus.NOT_FOUND);
     expect(res.body.success).toBe(false);
@@ -95,7 +98,7 @@ describe('/login', () => {
     await createdUser.save();
 
     const res = await request(app)
-      .post('/login')
+      .post(Endpoints.login)
       .send({ email, password: 'abcdefghi' });
 
     expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
@@ -103,10 +106,10 @@ describe('/login', () => {
   });
 });
 
-describe('/logout', () => {
+describe(Endpoints.logout, () => {
   it('validates refreshToken', async () => {
     const res = await request(app)
-      .post('/logout')
+      .post(Endpoints.logout)
       .send({ email: RegisteredUser.email });
 
     expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
@@ -121,7 +124,7 @@ describe('/logout', () => {
     await createdUser.save();
 
     const res = await request(app)
-      .post('/logout')
+      .post(Endpoints.logout)
       .set('Cookie', [`refreshToken=${refreshToken}`])
       .send({ email: RegisteredUser.email });
 
@@ -137,7 +140,7 @@ describe('/logout', () => {
     await createdUser.save();
 
     await request(app)
-      .post('/logout')
+      .post(Endpoints.logout)
       .set('Cookie', [`refreshToken=${refreshToken}`])
       .send({ email: RegisteredUser.email });
 
