@@ -1,7 +1,11 @@
 import * as request from 'supertest';
 import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
+import HttpTexts from '../../common/constants/HttpTexts';
+import { USER_EMAIL } from '../../common/fixtures/User';
 import { User } from '../../src/model/User';
+import { createUser, findUser } from '../../src/services/Users';
+import { generateEmailToken } from '../fixtures/Tokens';
 import {
   generateAccessToken,
   generateRefreshTokenAndHash,
@@ -68,5 +72,34 @@ describe(Endpoints.refreshAccessToken, () => {
       .set('Cookie', [`refreshToken=${refreshToken}123`]);
 
     expect(res.status).toBe(HttpStatus.UNAUTHORIZED);
+  });
+});
+
+describe.only(Endpoints.emailConfirm, () => {
+  it('returns BAD_REQUEST if token is not passed', async () => {
+    const res = await request(app).post(Endpoints.emailConfirm);
+
+    expect(res.status).toBe(HttpStatus.BAD_REQUEST);
+  });
+
+  it('returns BAD_REQUEST if email is not in db', async () => {
+    const token = generateEmailToken(USER_EMAIL);
+
+    const res = await request(app).post(Endpoints.emailConfirm).send({ token });
+
+    expect(res.status).toBe(HttpStatus.BAD_REQUEST);
+    expect(res.body.error).toBe(HttpTexts.userNotExisting);
+  });
+
+  it('returns OK and confirms token', async () => {
+    const { email } = RegisteredUser;
+    const token = generateEmailToken(email);
+    await createUser(RegisteredUser);
+
+    const res = await request(app).post(Endpoints.emailConfirm).send({ token });
+
+    const { isEmailConfirmed } = (await findUser(email)) || {};
+    expect(res.status).toBe(HttpStatus.OK);
+    expect(isEmailConfirmed).toBe(true);
   });
 });

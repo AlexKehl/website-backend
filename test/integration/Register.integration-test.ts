@@ -1,7 +1,7 @@
 import * as request from 'supertest';
 import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
-import { UserWithPassword } from '../fixtures/User';
+import { UserWithPassword } from '../../common/fixtures/User';
 import { setupServer } from '../TestSetupUtils';
 
 const { app } = setupServer({ port: 3005 });

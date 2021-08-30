@@ -1,14 +1,10 @@
 import { setupServer } from '../TestSetupUtils';
 import * as request from 'supertest';
-import {
-  generateRefreshTokenAndHash,
-  RegisteredUser,
-  userResponse,
-  UserWithPassword,
-} from '../fixtures/User';
+import { generateRefreshTokenAndHash, RegisteredUser } from '../fixtures/User';
 import { User } from '../../src/model/User';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { Endpoints } from '../../common/constants/Endpoints';
+import { UserWithPassword, userResponse } from '../../common/fixtures/User';
 
 const { app } = setupServer({ port: 3005 });
 

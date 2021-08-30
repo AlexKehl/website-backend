@@ -7,6 +7,7 @@ export interface UserDoc {
   roles: Role[];
   refreshTokenHash?: string;
   passwordHash: string;
+  isEmailConfirmed?: boolean;
 }
 
 const UserSchemaDefinition: Record<keyof UserDoc, any> = {
@@ -14,6 +15,7 @@ const UserSchemaDefinition: Record<keyof UserDoc, any> = {
   refreshTokenHash: { type: String },
   passwordHash: { type: String },
   roles: { type: [String], required: true },
+  isEmailConfirmed: { type: Boolean, default: false },
 };
 
 const UserSchema: Schema = new Schema(UserSchemaDefinition);

@@ -32,11 +32,6 @@ export const generateRefreshTokenAndHash = async (email: string) => {
   };
 };
 
-export const UserWithPassword: LoginDto = {
-  email: USER_EMAIL,
-  password: '12345678',
-};
-
 export const getUserWithRefreshToken = async () => {
   const { refreshToken } = await generateRefreshTokenAndHash(USER_EMAIL);
   return {
@@ -64,9 +59,4 @@ export const AdminUser: UserDoc = {
   refreshTokenHash:
     '$2b$10$gS6mgtoUKtRBpVVyea7zCO9kPfDP5.W6j3AQPZHEqhJ2LoEopzGVq',
   roles: ['Admin'],
-};
-
-export const userResponse: User = {
-  email: USER_EMAIL,
-  roles: ['RegisteredUser'],
 };

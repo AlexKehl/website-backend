@@ -4,15 +4,11 @@ import {
 } from '../../src/services/Auth';
 import { makeHttpResponse } from '../../src/utils/HttpResponses';
 import HttpStatus from '../../common/constants/HttpStatus';
-import {
-  getUserWithRefreshToken,
-  RegisteredUser,
-  userResponse,
-  UserWithPassword,
-} from '../fixtures/User';
+import { getUserWithRefreshToken, RegisteredUser } from '../fixtures/User';
 import WithPayloadError from '../../src/utils/Exceptions/WithPayloadError';
 import { verify } from 'jsonwebtoken';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../config';
+import { userResponse, UserWithPassword } from '../../common/fixtures/User';
 
 describe('hasValidCredentials', () => {
   it('resolves with loginDto if credentials are valid', async () => {
