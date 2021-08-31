@@ -15,7 +15,9 @@ const main = async () => {
       startupMessage: `Server listening at http://localhost:${3002}`,
     });
   } catch (e) {
-    logger.log({ level: 'error', message: e.message });
+    if (e instanceof Error) {
+      logger.log({ level: 'error', message: e.message });
+    }
   }
 };
 

@@ -11,7 +11,7 @@ const routeHandler: RouteHandler =
         await guard(expressObj);
       }
       return await controller(expressObj);
-    } catch (e) {
+    } catch (e: any) {
       HttpErrorRouteHandler(res)(e);
     }
   };

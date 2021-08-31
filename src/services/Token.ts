@@ -37,7 +37,9 @@ const updateRefreshToken = async (
     await UserModel.updateOne({ email }, { refreshTokenHash });
     return { email, refreshToken, roles };
   } catch (e) {
-    logger.log({ level: 'error', message: e.message });
+    if (e instanceof Error) {
+      logger.log({ level: 'error', message: e.message });
+    }
     throw new WithPayloadError({
       data: { error: 'Error updating Refresh token' },
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

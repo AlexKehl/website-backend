@@ -37,7 +37,7 @@ const decodeConfirmationToken = (token: string): string => {
     }
 
     return payload.email;
-  } catch (e) {
+  } catch (e: any) {
     if (e?.name === 'TokenExpiredError') {
       throw new WithPayloadError({
         statusCode: HttpStatus.BAD_REQUEST,
