@@ -1,4 +1,5 @@
 import { compare, hash } from 'bcrypt';
+import HttpStatus from '../../common/constants/HttpStatus';
 import { Role } from '../../common/interface/Constants';
 import { LoginDto, RegisterDto } from '../../common/interface/Dto';
 import { SALT_ROUNDS } from '../../config';
@@ -7,7 +8,7 @@ import { RefreshTokenData } from '../types/Auth';
 import { handleHttpErrors } from '../utils/HttpErrorHandler';
 import { tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
-import HttpStatus from '../../common/constants/HttpStatus';
+import { sendVerificationLink } from './Email';
 import { generateAccessToken, updateRefreshToken } from './Token';
 
 const isUserNotExisting = async ({ email, password }: RegisterDto) =>
@@ -99,6 +100,7 @@ const createNewUser = async ({ email, password }: RegisterDto) => {
 const register = async ({ email, password }: RegisterDto) =>
   isUserNotExisting({ email, password })
     .then(createNewUser)
+    .then(() => sendVerificationLink(email))
     .then(() => makeHttpResponse({ statusCode: HttpStatus.CREATED }))
     .catch(handleHttpErrors);
 

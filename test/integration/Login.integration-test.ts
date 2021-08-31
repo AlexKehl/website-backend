@@ -5,6 +5,7 @@ import { User } from '../../src/model/User';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { Endpoints } from '../../common/constants/Endpoints';
 import { UserWithPassword, userResponse } from '../../common/fixtures/User';
+import { createUser } from '../../src/services/Users';
 
 const { app } = setupServer({ port: 3005 });
 
@@ -28,14 +29,10 @@ describe(Endpoints.login, () => {
   });
 
   it('logins successfully', async () => {
-    const { email, passwordHash } = RegisteredUser;
+    const { email } = RegisteredUser;
     const { password } = UserWithPassword;
-    const createdUser = new User({
-      email,
-      passwordHash,
-      roles: ['RegisteredUser'],
-    });
-    await createdUser.save();
+
+    await createUser(RegisteredUser);
 
     const res = await request(app)
       .post(Endpoints.login)

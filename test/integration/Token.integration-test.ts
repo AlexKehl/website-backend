@@ -75,7 +75,7 @@ describe(Endpoints.refreshAccessToken, () => {
   });
 });
 
-describe.only(Endpoints.emailConfirm, () => {
+describe(Endpoints.emailConfirm, () => {
   it('returns BAD_REQUEST if token is not passed', async () => {
     const res = await request(app).post(Endpoints.emailConfirm);
 
@@ -89,6 +89,18 @@ describe.only(Endpoints.emailConfirm, () => {
 
     expect(res.status).toBe(HttpStatus.BAD_REQUEST);
     expect(res.body.error).toBe(HttpTexts.userNotExisting);
+  });
+
+  it('returns OK and confirms token', async () => {
+    const { email } = RegisteredUser;
+    const token = generateEmailToken(email);
+    await createUser(RegisteredUser);
+
+    const res = await request(app).post(Endpoints.emailConfirm).send({ token });
+
+    const { isEmailConfirmed } = (await findUser(email)) || {};
+    expect(res.status).toBe(HttpStatus.OK);
+    expect(isEmailConfirmed).toBe(true);
   });
 
   it('returns OK and confirms token', async () => {

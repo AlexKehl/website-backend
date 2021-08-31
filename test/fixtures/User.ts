@@ -12,7 +12,7 @@ import {
 import { UserDoc } from '../../src/model/User';
 import { RefreshTokenData } from '../../src/types/Auth';
 
-const USER_EMAIL = 'test@test.com';
+const USER_EMAIL = 'user@test.com';
 
 export const generateAccessToken = async (email: string) => {
   const accessToken = sign({ email }, ACCESS_TOKEN_SECRET, {

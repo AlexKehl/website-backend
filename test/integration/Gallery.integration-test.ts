@@ -14,10 +14,7 @@ import {
 import { User } from '../../src/model/User';
 import { GalleryImageDto } from '../../common/interface/Dto';
 import HttpStatus from '../../common/constants/HttpStatus';
-import {
-  Endpoints,
-  staticEndPointPart,
-} from '../../common/constants/Endpoints';
+import { Endpoints } from '../../common/constants/Endpoints';
 
 const { app } = setupServer({ port: 3005 });
 
@@ -128,7 +125,7 @@ describe(Endpoints.galleryCategoryList, () => {
     await GalleryImage.insertMany(galleryImageDocs);
 
     const res = await request(app).get(
-      `${staticEndPointPart('galleryCategoryList')}/acryl`
+      Endpoints.galleryCategoryList.replace(':category', 'acryl')
     );
 
     const expected = [imagesForGallery[0]];

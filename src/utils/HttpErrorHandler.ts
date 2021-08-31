@@ -19,5 +19,6 @@ export const handleHttpErrors = (err: Error) => {
   if (err instanceof WithPayloadError) {
     return err.getPayload();
   }
+  console.log(err.message);
   return makeInternalHttpError();
 };

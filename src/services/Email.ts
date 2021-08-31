@@ -1,12 +1,27 @@
-import { verify } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
+import { createTransport } from 'nodemailer';
 import HttpStatus from '../../common/constants/HttpStatus';
 import HttpTexts from '../../common/constants/HttpTexts';
 import { ConfirmEmailDto } from '../../common/interface/Dto';
-import { EMAIL_VERIFICATION_SECRET } from '../../config';
+import {
+  EMAIL_CONFIRMATION_URL,
+  EMAIL_PASSWORD,
+  EMAIL_TOKEN_EXPRATION_TIME,
+  EMAIL_USER,
+  EMAIL_VERIFICATION_SECRET,
+} from '../../config';
 import { HttpError, HttpResponse } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import { findUser, markEmailAsConfirmed } from './Users';
+
+const nodemailerTransport = createTransport({
+  service: 'gmail',
+  auth: {
+    user: EMAIL_USER,
+    pass: EMAIL_PASSWORD,
+  },
+});
 
 const decodeConfirmationToken = (token: string): string => {
   try {
@@ -40,6 +55,22 @@ const decodeConfirmationToken = (token: string): string => {
   }
 };
 
+const sendVerificationLink = (email: string) => {
+  const payload = { email };
+
+  const token = sign(payload, EMAIL_VERIFICATION_SECRET, {
+    expiresIn: EMAIL_TOKEN_EXPRATION_TIME,
+  });
+  const url = `${EMAIL_CONFIRMATION_URL}?token=${token}`;
+  const text = `${HttpTexts.emailConfirmText}${url}`;
+
+  return nodemailerTransport.sendMail({
+    to: email,
+    subject: HttpTexts.emailSubject,
+    text,
+  });
+};
+
 const confirmEmail = async ({
   token,
 }: ConfirmEmailDto): Promise<HttpResponse | HttpError> => {
@@ -66,4 +97,4 @@ const confirmEmail = async ({
   return makeHttpResponse({ statusCode: HttpStatus.OK });
 };
 
-export { decodeConfirmationToken, confirmEmail };
+export { decodeConfirmationToken, confirmEmail, sendVerificationLink };
