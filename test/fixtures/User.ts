@@ -1,7 +1,5 @@
 import { hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
-import { LoginDto } from '../../common/interface/Dto';
-import { User } from '../../common/interface/ConsumerResponses';
 import {
   REFRESH_TOKEN_SECRET,
   REFRESH_TOKEN_EXPIRATION_TIME,
