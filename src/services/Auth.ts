@@ -58,7 +58,6 @@ const createLoginSuccessResponse = ({
         val: accessToken,
         options: {
           sameSite: true,
-          secure: true,
         },
       },
       {
@@ -67,7 +66,6 @@ const createLoginSuccessResponse = ({
         options: {
           httpOnly: true,
           sameSite: true,
-          secure: true,
         },
       },
     ],
