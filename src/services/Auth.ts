@@ -56,16 +56,12 @@ const createLoginSuccessResponse = ({
       {
         name: 'accessToken',
         val: accessToken,
-        options: {
-          sameSite: true,
-        },
       },
       {
         name: 'refreshToken',
         val: refreshToken,
         options: {
           httpOnly: true,
-          sameSite: true,
         },
       },
     ],
