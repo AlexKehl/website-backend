@@ -1,4 +1,4 @@
-import { start } from './src/Routes';
+import { start } from './src/routes';
 import { connect } from 'mongoose';
 import { DB_URL } from './config';
 import { logger } from './src/utils/Logger';

@@ -1,6 +1,6 @@
 import { connect, connection } from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { start } from '../src/Routes';
+import { start } from '../src/routes';
 import { ServerStartOptions } from '../src/types';
 
 let mongod: MongoMemoryServer;
