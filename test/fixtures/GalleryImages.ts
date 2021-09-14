@@ -52,7 +52,7 @@ export const imagesForGallery: ImageForGallery[] = [
   {
     name: 'foo.jpg',
     category: 'acryl',
-    url: `${BASE_URL}/files/acryl/foo.jpg`,
+    url: `/files/acryl/foo.jpg`,
     isForSell: true,
     id: 'id124',
     price: 50,
@@ -63,7 +63,7 @@ export const imagesForGallery: ImageForGallery[] = [
   {
     name: 'bar.jpg',
     category: 'oil',
-    url: `${BASE_URL}/files/oil/bar.jpg`,
+    url: `/files/oil/bar.jpg`,
     isForSell: true,
     id: 'id125',
     price: 50,

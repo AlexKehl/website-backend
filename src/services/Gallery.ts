@@ -102,7 +102,7 @@ const imageForConsumerMap = (
     price: fileDoc.price,
     category: fileDoc.category,
     name: fileDoc.name,
-    url: `${BASE_URL}/files/${fileDoc.category}/${fileDoc.name}`,
+    url: `/files/${fileDoc.category}/${fileDoc.name}`,
     width: fileDoc.width,
     height: fileDoc.height,
   }));
