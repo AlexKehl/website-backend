@@ -3,7 +3,6 @@ import { Schema } from 'express-validator';
 const fileWithMetaSchema: Schema = {
   id: {
     isString: true,
-    optional: { options: { nullable: true } },
   },
   category: {
     errorMessage: 'Missing category',

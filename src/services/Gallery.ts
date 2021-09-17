@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import { mkdir, unlink, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { IMAGE_PATH } from '../../config';
@@ -13,10 +12,11 @@ import {
 } from '../../common/interface/Dto';
 import { ImageForGallery } from '../../common/interface/ConsumerData';
 import { Category } from '../../common/interface/Constants';
+import { GalleryImageMeta } from '../../common/interface/GalleryImages';
 
-const isImageExistingInDb = async (category: Category, name: string) =>
-  tryToExecute({
-    fnToTry: async () => await GalleryImage.findOne({ name, category }),
+const isImageExistingInDb = async (category: Category, id: string) =>
+  tryToExecute<GalleryImageDoc>({
+    fnToTry: async () => await GalleryImage.findOne({ id, category }),
     httpErrorData: {
       statusCode: HttpStatus.NOT_FOUND,
       data: { error: 'GalleryImage is not existing.' },
@@ -30,7 +30,7 @@ const writeImageToDisk =
       fnToTry: async () => {
         await mkdir(join(IMAGE_PATH, category), { recursive: true });
         await writeFile(
-          join(IMAGE_PATH, category, fileObj.name),
+          join(IMAGE_PATH, category, fileObj.id),
           fileObj.image,
           'base64'
         );
@@ -46,16 +46,7 @@ const writeImageToDisk =
 
 const saveFileMetaToDb =
   (category: Category) => async (file: GalleryImageDto) => {
-    return GalleryImage.create({
-      id: uuid(),
-      description: file.description,
-      price: file.price,
-      name: file.name,
-      category: category,
-      isForSell: file.isForSell,
-      height: file.height,
-      width: file.width,
-    });
+    return GalleryImage.create({ ...file, category: category });
   };
 
 const uploadFile =
@@ -70,7 +61,7 @@ const updateFile = async (dto: GalleryImageDto): Promise<any> =>
   tryToExecute<GalleryImageDto[]>({
     fnToTry: async () =>
       GalleryImage.updateOne(
-        { name: dto.name, category: dto.category },
+        { id: dto.id, category: dto.category },
         { ...dto }
       ),
     passThrough: dto,
@@ -80,29 +71,32 @@ const updateFile = async (dto: GalleryImageDto): Promise<any> =>
     },
   });
 
-const deleteFile = ({ category, name }: DeleteGalleryImageDto): Promise<any> =>
+const deleteFile = ({ category, id }: DeleteGalleryImageDto): Promise<any> =>
   Promise.all([
-    unlink(join(IMAGE_PATH, category, name)),
-    GalleryImage.deleteOne({ category, name }),
+    unlink(join(IMAGE_PATH, category, id)),
+    GalleryImage.deleteOne({ category, id }),
   ]);
 
-const generateImagePathHttpResponse = (category: Category, name: string) =>
+const generateImagePathHttpResponse = (
+  category: Category,
+  id: GalleryImageMeta['id']
+) =>
   makeHttpResponse({
     statusCode: HttpStatus.OK,
-    data: { imagePath: join(category, name) },
+    data: { imagePath: join(category, id) },
   });
 
 const imageForConsumerMap = (
   fileDocs: GalleryImageDoc[]
 ): ImageForGallery[] => {
   return fileDocs.map((fileDoc) => ({
+    url: `/files/${fileDoc.category}/${fileDoc.id}`,
     id: fileDoc.id,
     isForSell: fileDoc.isForSell,
     description: fileDoc.description,
     price: fileDoc.price,
     category: fileDoc.category,
     name: fileDoc.name,
-    url: `/files/${fileDoc.category}/${fileDoc.name}`,
     width: fileDoc.width,
     height: fileDoc.height,
   }));
@@ -126,21 +120,21 @@ const getImagesDocsForCategory = (category: Category) =>
   });
 
 const uploadImage = async (dto: GalleryImageDto) =>
-  isImageExistingInDb(dto.category, dto.name)
+  isImageExistingInDb(dto.category, dto.id)
     .then(() => updateFile(dto))
     .catch(() => uploadFile(dto.category)(dto))
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
     .catch(handleHttpErrors);
 
 const deleteImage = (dto: DeleteGalleryImageDto) =>
-  isImageExistingInDb(dto.category, dto.name)
+  isImageExistingInDb(dto.category, dto.id)
     .then(() => deleteFile(dto))
     .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
     .catch(handleHttpErrors);
 
-const getImagePath = (category: Category, name: string) =>
-  isImageExistingInDb(category, name)
-    .then(() => generateImagePathHttpResponse(category, name))
+const getImagePath = (category: Category, id: GalleryImageMeta['id']) =>
+  isImageExistingInDb(category, id)
+    .then(() => generateImagePathHttpResponse(category, id))
     .catch(handleHttpErrors);
 
 const getImagePathsForCategory = async (category: Category) =>

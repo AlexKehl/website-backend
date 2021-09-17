@@ -4,6 +4,7 @@ import { BASE_URL } from '../../config';
 import { GalleryImageDoc } from '../../src/model/GalleryImage';
 
 export const galleryImageDto: GalleryImageDto = {
+  id: 'someId',
   isForSell: true,
   description: 'This is a description',
   name: 'i-201.jpg',
@@ -52,7 +53,7 @@ export const imagesForGallery: ImageForGallery[] = [
   {
     name: 'foo.jpg',
     category: 'acryl',
-    url: `/files/acryl/foo.jpg`,
+    url: `/files/acryl/id124`,
     isForSell: true,
     id: 'id124',
     price: 50,
@@ -63,7 +64,7 @@ export const imagesForGallery: ImageForGallery[] = [
   {
     name: 'bar.jpg',
     category: 'oil',
-    url: `/files/oil/bar.jpg`,
+    url: `/files/oil/id125`,
     isForSell: true,
     id: 'id125',
     price: 50,
