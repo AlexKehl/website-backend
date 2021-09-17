@@ -9,7 +9,7 @@ describe('getNewAccessToken', () => {
     );
 
     const res1 = getNewAccessToken(refreshToken);
-    await asyncTimeout(1)();
+    await asyncTimeout(1)(undefined);
     const res2 = getNewAccessToken(refreshToken);
 
     expect(res1.cookies?.[0].val).not.toEqual(res2.cookies?.[0].val);
