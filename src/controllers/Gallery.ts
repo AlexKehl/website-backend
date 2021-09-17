@@ -41,10 +41,11 @@ const getImageByCategoryController: Controller = async ({ req, res }) => {
   );
   if (!data?.success) {
     res.set(headers).status(statusCode).send(data);
+  } else {
+    res.sendFile(data?.imagePath, {
+      root: `${IMAGE_PATH}/`,
+    });
   }
-  res.sendFile(data?.imagePath, {
-    root: `${IMAGE_PATH}/`,
-  });
 };
 
 export {
