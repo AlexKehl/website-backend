@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { mkdir, unlink, writeFile } from 'fs/promises';
 import { join } from 'path';
-import { BASE_URL, IMAGE_PATH } from '../../config';
+import { IMAGE_PATH } from '../../config';
 import { GalleryImage, GalleryImageDoc } from '../model/GalleryImage';
 import { HttpResponse } from '../types';
 import { handleHttpErrors, tryToExecute } from '../utils/HttpErrors';
