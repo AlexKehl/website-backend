@@ -1,9 +1,9 @@
-import { body } from 'express-validator';
 import { Express } from 'express';
-import { hasValidatedData } from '../guards/HasValidatedData';
-import routeHandler from '../utils/RouteHandler';
+import { body } from 'express-validator';
 import { Endpoints } from '../../common/constants/Endpoints';
 import { emailConfirmController } from '../controllers/Email';
+import { hasValidatedData } from '../guards/HasValidatedData';
+import routeHandler from '../utils/RouteHandler';
 
 export const startEmailRoutes = (app: Express) => {
   app.post(

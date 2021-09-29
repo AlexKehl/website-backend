@@ -8,6 +8,7 @@ import { CLIENT_URL, LOG_REQUESTS } from '../../config';
 import { startTokenRoutes } from './Token';
 import * as morgan from 'morgan';
 import { startEmailRoutes } from './Email';
+import { startPaymentRoutes } from './Payments';
 const start = ({ port, startupMessage }: ServerStartOptions) => {
   const app = express();
 
@@ -30,6 +31,7 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
   startGalleryRoutes(app);
   startTokenRoutes(app);
   startEmailRoutes(app);
+  startPaymentRoutes(app);
 
   const server = app.listen(port, () => {
     if (startupMessage) {
