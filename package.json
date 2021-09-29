@@ -9,7 +9,7 @@
     "integration": "jest --runInBand --config ./jest-integration.json",
     "integration:watch": "jest --watch --runInBand --config ./jest-integration.json",
     "testrun": "npm run test && npm run integration",
-    "build": "tsc && cp -r pictures dist/",
+    "build": "tsc",
     "start": "node dist/server.js"
   },
   "module": "node",

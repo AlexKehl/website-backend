@@ -16,8 +16,6 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
   app.use(
     cors({
       origin: CLIENT_URL,
-      allowedHeaders: 'content-type',
-      exposedHeaders: '*',
       credentials: true,
       preflightContinue: true,
     })
@@ -26,6 +24,7 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
     app.use(morgan('combined'));
   }
   app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({limit: '50mb', extended: true}));
 
   startAuthRoutes(app);
   startGalleryRoutes(app);
