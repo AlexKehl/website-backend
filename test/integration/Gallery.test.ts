@@ -1,11 +1,7 @@
-import { setupServer } from '../TestSetupUtils';
-import * as request from 'supertest';
+import { getUniqPort, setupServer } from '../TestSetupUtils';
+import request from 'supertest';
 import { GalleryImage } from '../../src/model/GalleryImage';
-import {
-  galleryImageDocs,
-  imagesForGallery,
-  galleryImageDto,
-} from '../fixtures/GalleryImages';
+import { galleryImageDocs } from '../fixtures/GalleryImages';
 import {
   AdminUser,
   generateAccessToken,
@@ -15,8 +11,12 @@ import { User } from '../../src/model/User';
 import { GalleryImageDto } from '../../common/interface/Dto';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { Endpoints } from '../../common/constants/Endpoints';
+import {
+  galleryImageDto,
+  imagesForGallery,
+} from '../../common/fixtures/GalleryImages';
 
-const { app } = setupServer({ port: 3005 });
+const { app } = setupServer({ port: getUniqPort() });
 
 describe(Endpoints.galleryUpload, () => {
   it('returns HttpStatus.BAD_REQUEST if files are missing', async () => {

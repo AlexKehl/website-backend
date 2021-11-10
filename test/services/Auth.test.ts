@@ -48,7 +48,7 @@ describe('createLoginSuccessResponse', () => {
           name: 'accessToken',
           val: expect.any(String),
           options: {
-            sameSite: true,
+            sameSite: 'none',
             secure: true,
           },
         },
@@ -57,7 +57,7 @@ describe('createLoginSuccessResponse', () => {
           val: expect.any(String),
           options: {
             httpOnly: true,
-            sameSite: true,
+            sameSite: 'none',
             secure: true,
           },
         },

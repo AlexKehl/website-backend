@@ -26,10 +26,8 @@ export const startAuthRoutes = (app: Express) => {
 
   app.post(
     Endpoints.logout,
-    cookie('refreshToken').isString(),
     routeHandler({
       controller: logoutController,
-      guards: [hasValidatedData],
     })
   );
 };

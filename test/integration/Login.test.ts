@@ -1,5 +1,5 @@
-import { setupServer } from '../TestSetupUtils';
-import * as request from 'supertest';
+import { getUniqPort, setupServer } from '../TestSetupUtils';
+import request from 'supertest';
 import { generateRefreshTokenAndHash, RegisteredUser } from '../fixtures/User';
 import { User } from '../../src/model/User';
 import HttpStatus from '../../common/constants/HttpStatus';
@@ -7,7 +7,7 @@ import { Endpoints } from '../../common/constants/Endpoints';
 import { UserWithPassword, userResponse } from '../../common/fixtures/User';
 import { createUser } from '../../src/services/Users';
 
-const { app } = setupServer({ port: 3005 });
+const { app } = setupServer({ port: getUniqPort() });
 
 describe(Endpoints.login, () => {
   it('validates email', async () => {
@@ -100,15 +100,6 @@ describe(Endpoints.login, () => {
 });
 
 describe(Endpoints.logout, () => {
-  it('validates refreshToken', async () => {
-    const res = await request(app)
-      .post(Endpoints.logout)
-      .send({ email: RegisteredUser.email });
-
-    expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
-    expect(res.body.success).toBe(false);
-  });
-
   it('returns HttpStatus.OK if logout was successful', async () => {
     const { email, passwordHash } = RegisteredUser;
     const { refreshToken, refreshTokenHash } =

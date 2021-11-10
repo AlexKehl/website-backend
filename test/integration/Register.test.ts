@@ -1,10 +1,10 @@
-import * as request from 'supertest';
+import request from 'supertest';
 import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { UserWithPassword } from '../../common/fixtures/User';
-import { setupServer } from '../TestSetupUtils';
+import { getUniqPort, setupServer } from '../TestSetupUtils';
 
-const { app } = setupServer({ port: 3005 });
+const { app } = setupServer({ port: getUniqPort() });
 
 it('validates email', async () => {
   const res = await request(app)
@@ -22,15 +22,6 @@ it('validates password', async () => {
 
   expect(res.status).toEqual(HttpStatus.BAD_REQUEST);
   expect(res.body.success).toBe(false);
-});
-
-it('returns HttpStatus.CREATED on successfull register', async () => {
-  const res = await request(app)
-    .post(Endpoints.register)
-    .send(UserWithPassword);
-
-  expect(res.status).toEqual(HttpStatus.CREATED);
-  expect(res.body.success).toBe(true);
 });
 
 it('returns HttpStatus.CONFLICT is user exists already', async () => {

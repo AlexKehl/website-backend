@@ -38,6 +38,10 @@ export const setupDb = () => {
   afterAll(async () => await closeDatabase());
 };
 
+export const getUniqPort = () => {
+  return Math.floor(Math.random() * (65535 - 1024)) + 1024;
+};
+
 export const setupServer = (options: ServerStartOptions) => {
   const { app, server } = start(options);
   beforeAll(async () => {

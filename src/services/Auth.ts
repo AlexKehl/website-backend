@@ -13,7 +13,7 @@ import { generateAccessToken, updateRefreshToken } from './Token';
 
 const isUserNotExisting = async ({ email, password }: RegisterDto) =>
   tryToExecute<RegisterDto>({
-    fnToTry: async () => !(await User.findOne({ email }).exec()),
+    fnToTry: async () => await User.findOne({ email }).exec(),
     httpErrorData: {
       statusCode: HttpStatus.CONFLICT,
       data: {

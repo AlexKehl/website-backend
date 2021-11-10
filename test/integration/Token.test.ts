@@ -1,4 +1,4 @@
-import * as request from 'supertest';
+import request from 'supertest';
 import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
 import HttpTexts from '../../common/constants/HttpTexts';
@@ -11,9 +11,9 @@ import {
   generateRefreshTokenAndHash,
   RegisteredUser,
 } from '../fixtures/User';
-import { setupServer } from '../TestSetupUtils';
+import { getUniqPort, setupServer } from '../TestSetupUtils';
 
-const { app } = setupServer({ port: 3005 });
+const { app } = setupServer({ port: getUniqPort() });
 
 describe(Endpoints.refreshAccessToken, () => {
   it('returns a new accessToken', async () => {
