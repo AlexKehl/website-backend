@@ -4,6 +4,7 @@
     "removeComments": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "lib": ["ES2020"],
     "target": "es2017",
     "outDir": "./dist",
