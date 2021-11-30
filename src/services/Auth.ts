@@ -71,7 +71,7 @@ const createLoginSuccessResponse = ({
         },
       },
     ],
-    data: { user: { email, roles } },
+    data: { user: { email, roles, accessToken } },
   });
 };
 
