@@ -10,6 +10,7 @@ import { startEmailRoutes } from './Email';
 import { startPaymentRoutes } from './Payments';
 import express from 'express';
 import { startUserInfoRoutes } from './UserInfo';
+import { startProfileRoutes } from './Profile';
 const start = ({ port, startupMessage }: ServerStartOptions) => {
   const app = express();
 
@@ -31,6 +32,7 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
   startEmailRoutes(app);
   startPaymentRoutes(app);
   startUserInfoRoutes(app);
+  startProfileRoutes(app);
 
   const server = app.listen(port, () => {
     if (startupMessage) {

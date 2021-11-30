@@ -1,9 +1,10 @@
-import { orderImageSync } from '../services/Profile';
+import { getUserInfo } from '../services/Profile';
+import { Controller } from '../types';
 import { evaluateHttpObject } from '../utils/HttpResponses';
 
-const orderImageSyncController = async () => {
-  // const serviceResponse = await orderImageSync(req);
-  // evaluateHttpObject(res, serviceResponse);
+export const getContactInformationController: Controller = async ({
+  req,
+  res,
+}) => {
+  evaluateHttpObject(res, await getUserInfo(req.query.email as string));
 };
-
-export { orderImageSyncController };
