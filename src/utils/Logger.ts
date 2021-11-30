@@ -1,6 +1,6 @@
 import { createLogger, transports, format } from 'winston';
 
-const logger = createLogger({
+export const logger = createLogger({
   level: 'info',
   format: format.json(),
   transports: [
@@ -24,5 +24,3 @@ if (process.env.NODE_ENV !== 'production') {
     })
   );
 }
-
-export { logger };

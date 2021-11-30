@@ -8,6 +8,10 @@ export interface UserDoc {
   refreshTokenHash?: string;
   passwordHash: string;
   isEmailConfirmed?: boolean;
+  lastName?: string;
+  firstName?: string;
+  countryCode?: string;
+  phone?: string;
 }
 
 const UserSchemaDefinition: Record<keyof UserDoc, any> = {
@@ -16,6 +20,10 @@ const UserSchemaDefinition: Record<keyof UserDoc, any> = {
   passwordHash: { type: String },
   roles: { type: [String], required: true },
   isEmailConfirmed: { type: Boolean, default: false },
+  phone: { type: String },
+  countryCode: { type: String },
+  firstName: { type: String },
+  lastName: { type: String },
 };
 
 const UserSchema: Schema = new Schema(UserSchemaDefinition);

@@ -1,12 +1,12 @@
 import Stripe from 'stripe';
-import HttpStatus from '../../common/constants/HttpStatus';
-import { BuyImageDto } from '../../common/interface/Dto';
-import { withParallel } from '../../common/utils/Functions';
-import { CLIENT_URL, STRIPE_API_KEY } from '../../config';
-import { GalleryImage, GalleryImageDoc } from '../model/GalleryImage';
-import { tryToExecute } from '../utils/HttpErrors';
-import { makeHttpResponse } from '../utils/HttpResponses';
 import * as R from 'remeda';
+import HttpStatus from '../../../common/constants/HttpStatus';
+import { BuyImageDto } from '../../../common/interface/Dto';
+import { withParallel } from '../../../common/utils/Functions';
+import { STRIPE_API_KEY, CLIENT_URL } from '../../../config';
+import { GalleryImageDoc, GalleryImage } from '../../model/GalleryImage';
+import { tryToExecute } from '../../utils/HttpErrors';
+import { makeHttpResponse } from '../../utils/HttpResponses';
 
 const stripe = new Stripe(STRIPE_API_KEY, { apiVersion: '2020-08-27' });
 
@@ -18,7 +18,6 @@ const createStripeSession = async ({ ids }: BuyImageDto) => {
       data: { error: 'GalleryImage is not existing.' },
     },
   });
-  console.log(imageDocs);
 
   const products = await withParallel({ threads: imageDocs.length })(
     (imageDoc) => {

@@ -9,10 +9,7 @@ export const connectToDb = async () => {
   mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
 
-  await connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  await connect(uri);
 };
 
 export const closeDatabase = async () => {

@@ -1,4 +1,4 @@
-import { Express } from 'express';
+import express, { Express } from 'express';
 import { checkSchema } from 'express-validator';
 import { Endpoints } from '../../common/constants/Endpoints';
 import {
@@ -16,6 +16,8 @@ import FileWithMeta from '../validators/request/FileWithMeta';
 export const startGalleryRoutes = (app: Express) => {
   app.post(
     Endpoints.galleryUpload,
+    express.json({ limit: '50mb' }),
+    express.urlencoded({ limit: '50mb', extended: true }),
     checkSchema(FileWithMeta),
     routeHandler({
       controller: galleryUploadController,
@@ -25,6 +27,7 @@ export const startGalleryRoutes = (app: Express) => {
 
   app.post(
     Endpoints.galleryDelete,
+    express.json(),
     routeHandler({
       controller: galleryDeleteController,
       guards: [hasRoleGuard('Admin'), hasValidAccessToken],

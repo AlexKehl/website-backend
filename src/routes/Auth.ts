@@ -1,5 +1,5 @@
-import { body, cookie } from 'express-validator';
-import { Express } from 'express';
+import { body } from 'express-validator';
+import express, { Express } from 'express';
 import {
   registerController,
   loginController,
@@ -12,6 +12,7 @@ import { Endpoints } from '../../common/constants/Endpoints';
 export const startAuthRoutes = (app: Express) => {
   app.post(
     Endpoints.register,
+    express.json(),
     body('email').isEmail(),
     body('password').isLength({ min: 8 }),
     routeHandler({ controller: registerController, guards: [hasValidatedData] })
@@ -19,6 +20,7 @@ export const startAuthRoutes = (app: Express) => {
 
   app.post(
     Endpoints.login,
+    express.json(),
     body('email').isEmail(),
     body('password').isLength({ min: 8 }),
     routeHandler({ controller: loginController, guards: [hasValidatedData] })
@@ -26,6 +28,7 @@ export const startAuthRoutes = (app: Express) => {
 
   app.post(
     Endpoints.logout,
+    express.json(),
     routeHandler({
       controller: logoutController,
     })

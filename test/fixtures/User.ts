@@ -1,5 +1,7 @@
 import { hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
+import faker from 'faker';
+import { ContactInformationDto } from '../../common/interface/Dto';
 import {
   REFRESH_TOKEN_SECRET,
   REFRESH_TOKEN_EXPIRATION_TIME,
@@ -57,4 +59,12 @@ export const AdminUser: UserDoc = {
   refreshTokenHash:
     '$2b$10$gS6mgtoUKtRBpVVyea7zCO9kPfDP5.W6j3AQPZHEqhJ2LoEopzGVq',
   roles: ['Admin'],
+};
+
+export const contactDto: ContactInformationDto = {
+  email: RegisteredUser.email,
+  phone: faker.phone.phoneNumberFormat(),
+  lastName: faker.name.lastName(),
+  firstName: faker.name.firstName(),
+  countryCode: faker.address.countryCode(),
 };

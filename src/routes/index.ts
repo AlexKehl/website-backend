@@ -9,6 +9,7 @@ import morgan from 'morgan';
 import { startEmailRoutes } from './Email';
 import { startPaymentRoutes } from './Payments';
 import express from 'express';
+import { startUserInfoRoutes } from './UserInfo';
 const start = ({ port, startupMessage }: ServerStartOptions) => {
   const app = express();
 
@@ -23,14 +24,13 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
   if (LOG_REQUESTS) {
     app.use(morgan('combined'));
   }
-  app.use(express.json({ limit: '50mb' }));
-  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   startAuthRoutes(app);
   startGalleryRoutes(app);
   startTokenRoutes(app);
   startEmailRoutes(app);
   startPaymentRoutes(app);
+  startUserInfoRoutes(app);
 
   const server = app.listen(port, () => {
     if (startupMessage) {

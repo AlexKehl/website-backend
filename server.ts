@@ -4,11 +4,7 @@ import { DB_URL } from './config';
 import { logger } from './src/utils/Logger';
 
 const main = async () => {
-  await connect(`mongodb://${DB_URL}`, {
-    dbName: 'main',
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
+  await connect(`mongodb://${DB_URL}`, { dbName: 'main' });
   try {
     start({
       port: 3002,
