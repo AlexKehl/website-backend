@@ -8,7 +8,7 @@ import { setupServer, getUniqPort, getLoggedInCookie } from '../TestSetupUtils';
 
 const { app } = setupServer({ port: getUniqPort() });
 
-describe(Endpoints.contactInformation, () => {
+describe(`POST: ${Endpoints.contactInformation}`, () => {
   it('stores given user data in db', async () => {
     await User.create({
       email: RegisteredUser.email,
@@ -26,14 +26,14 @@ describe(Endpoints.contactInformation, () => {
     expect(user).toEqual(expect.objectContaining(contactDto));
   });
 
-  it('returns proper error message if operation fails', async () => {
+  it('returns HttpStatus.NOT_FOUND if email is not registered', async () => {
     const res = await supertest(app)
       .post(Endpoints.contactInformation)
       .set(...(await getLoggedInCookie(app)))
       .send({ ...contactDto, email: 'foo@bar.com' });
 
-    expect(res.status).toEqual(HttpStatus.INTERNAL_SERVER_ERROR);
-    expect(res.body.error).toEqual('Could not write user data to db');
+    expect(res.status).toEqual(HttpStatus.NOT_FOUND);
+    expect(res.body.error).toEqual('User is not registered');
   });
 
   it('guards against unauthorized posts', async () => {

@@ -17,7 +17,7 @@ const fileWithMetaSchema: Schema = {
   },
   price: {
     custom: {
-      options: (value, { req }) => {
+      options: (_value, { req }) => {
         if (!req.body.isForSell) {
           return true;
         }

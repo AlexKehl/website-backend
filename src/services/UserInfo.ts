@@ -7,7 +7,13 @@ import { makeHttpResponse } from '../utils/HttpResponses';
 export const updateContactInformation = async (dto: ContactInformationDto) => {
   const { email, ...userData } = dto;
   try {
-    await User.updateOne({ email }, { ...userData }).orFail();
+    const updateRes = await User.updateOne({ email }, { ...userData });
+    if (updateRes.matchedCount === 0) {
+      return makeHttpError({
+        statusCode: HttpStatus.NOT_FOUND,
+        data: { error: 'User is not registered' },
+      });
+    }
     return makeHttpResponse({ statusCode: HttpStatus.OK });
   } catch (e) {
     return makeHttpError({
