@@ -85,7 +85,7 @@ const confirmEmail = async ({
       },
     });
   }
-  if (user?.isEmailConfirmed) {
+  if (user?._isEmailConfirmed) {
     throw new WithPayloadError({
       statusCode: HttpStatus.BAD_REQUEST,
       data: {

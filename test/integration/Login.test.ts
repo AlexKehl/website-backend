@@ -5,7 +5,7 @@ import { User } from '../../src/model/User';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { Endpoints } from '../../common/constants/Endpoints';
 import { UserWithPassword, userResponse } from '../../common/fixtures/User';
-import { createUser } from '../../src/services/Users';
+import { createUser, findUser } from '../../src/services/Users';
 
 const { app } = setupServer({ port: getUniqPort() });
 
@@ -41,6 +41,7 @@ describe(Endpoints.login, () => {
     const expectedBody = {
       success: true,
       user: userResponse,
+      accessToken: expect.any(String),
     };
 
     const hasCorrectCookieHeader = [
@@ -58,9 +59,9 @@ describe(Endpoints.login, () => {
   });
 
   it('updates refreshTokenHash on successful login', async () => {
-    const { email, passwordHash } = RegisteredUser;
+    const { email, _passwordHash } = RegisteredUser;
     const { password } = UserWithPassword;
-    const createdUser = new User({ email, passwordHash });
+    const createdUser = new User({ email, _passwordHash });
     await createdUser.save();
 
     await request(app).post(Endpoints.login).send({ email, password });
@@ -71,10 +72,10 @@ describe(Endpoints.login, () => {
 
     const userAfterSecondLogin = (await User.findOne({ email }).exec()) || {};
 
-    expect((userAfterFirstLogin as any).refreshTokenHash).toBeDefined();
-    expect((userAfterSecondLogin as any).refreshTokenHash).toBeDefined();
-    expect((userAfterFirstLogin as any).refreshTokenHash).not.toEqual(
-      (userAfterSecondLogin as any).refreshTokenHash
+    expect((userAfterFirstLogin as any)._refreshTokenHash).toBeDefined();
+    expect((userAfterSecondLogin as any)._refreshTokenHash).toBeDefined();
+    expect((userAfterFirstLogin as any)._refreshTokenHash).not.toEqual(
+      (userAfterSecondLogin as any)._refreshTokenHash
     );
   });
 
@@ -86,8 +87,8 @@ describe(Endpoints.login, () => {
   });
 
   it('returns HttpStatus.UNAUTHORIZED for invalid credentials', async () => {
-    const { email, passwordHash } = RegisteredUser;
-    const createdUser = new User({ email, passwordHash });
+    const { email, _passwordHash } = RegisteredUser;
+    const createdUser = new User({ email, _passwordHash });
     await createdUser.save();
 
     const res = await request(app)
@@ -101,10 +102,10 @@ describe(Endpoints.login, () => {
 
 describe(Endpoints.logout, () => {
   it('returns HttpStatus.OK if logout was successful', async () => {
-    const { email, passwordHash } = RegisteredUser;
-    const { refreshToken, refreshTokenHash } =
+    const { email, _passwordHash } = RegisteredUser;
+    const { refreshToken, _refreshTokenHash } =
       await generateRefreshTokenAndHash(email);
-    const createdUser = new User({ email, passwordHash, refreshTokenHash });
+    const createdUser = new User({ email, _passwordHash, _refreshTokenHash });
     await createdUser.save();
 
     const res = await request(app)
@@ -117,10 +118,10 @@ describe(Endpoints.logout, () => {
   });
 
   it('deletes refreshTokenHash on successful logout', async () => {
-    const { email, passwordHash } = RegisteredUser;
-    const { refreshToken, refreshTokenHash } =
+    const { email, _passwordHash } = RegisteredUser;
+    const { refreshToken, _refreshTokenHash } =
       await generateRefreshTokenAndHash(email);
-    const createdUser = new User({ email, passwordHash, refreshTokenHash });
+    const createdUser = new User({ email, _passwordHash, _refreshTokenHash });
     await createdUser.save();
 
     await request(app)
@@ -128,8 +129,8 @@ describe(Endpoints.logout, () => {
       .set('Cookie', [`refreshToken=${refreshToken}`])
       .send({ email: RegisteredUser.email });
 
-    const loggedOutUserDoc = await User.findOne({ email }).exec();
+    const loggedOutUserDoc = await findUser(email);
 
-    expect(loggedOutUserDoc?.refreshTokenHash).not.toBeDefined();
+    expect(loggedOutUserDoc?._refreshTokenHash).not.toBeDefined();
   });
 });

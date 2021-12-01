@@ -64,6 +64,7 @@ describe('createLoginSuccessResponse', () => {
       ],
       data: {
         user: userResponse,
+        accessToken: expect.any(String),
       },
     });
 

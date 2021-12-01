@@ -1,19 +1,20 @@
 import { compare, hash } from 'bcrypt';
 import HttpStatus from '../../common/constants/HttpStatus';
-import { Role } from '../../common/interface/Constants';
 import { LoginDto, RegisterDto } from '../../common/interface/Dto';
 import { SALT_ROUNDS } from '../../config';
 import { User, UserDoc } from '../model/User';
 import { RefreshTokenData } from '../types/Auth';
+import { omitPrivateFields } from '../utils/Functions';
 import { handleHttpErrors } from '../utils/HttpErrorHandler';
 import { tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import { sendVerificationLink } from './Email';
 import { generateAccessToken, updateRefreshToken } from './Token';
+import { findUser } from './Users';
 
 const isUserNotExisting = async ({ email, password }: RegisterDto) =>
   tryToExecute<RegisterDto>({
-    fnToTry: async () => await User.findOne({ email }).exec(),
+    fnToTry: () => findUser(email),
     httpErrorData: {
       statusCode: HttpStatus.CONFLICT,
       data: {
@@ -25,7 +26,7 @@ const isUserNotExisting = async ({ email, password }: RegisterDto) =>
 
 const getUserByMail = async (email: string): Promise<UserDoc> =>
   tryToExecute<UserDoc>({
-    fnToTry: () => User.findOne({ email }).exec(),
+    fnToTry: () => findUser(email),
     httpErrorData: {
       statusCode: HttpStatus.NOT_FOUND,
       data: {
@@ -36,7 +37,7 @@ const getUserByMail = async (email: string): Promise<UserDoc> =>
 
 const hasValidCredentials = (loginDto: LoginDto) => async (user: UserDoc) =>
   tryToExecute<UserDoc>({
-    fnToTry: () => compare(loginDto.password, user.passwordHash),
+    fnToTry: () => compare(loginDto.password, user._passwordHash),
     passThrough: user,
     httpErrorData: {
       statusCode: HttpStatus.UNAUTHORIZED,
@@ -45,10 +46,10 @@ const hasValidCredentials = (loginDto: LoginDto) => async (user: UserDoc) =>
   });
 
 const createLoginSuccessResponse = ({
-  email,
   refreshToken,
-  roles,
-}: RefreshTokenData & { roles: Role[] }) => {
+  ...user
+}: RefreshTokenData & UserDoc) => {
+  const { email, roles } = user;
   const accessToken = generateAccessToken({ email, roles });
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
@@ -71,14 +72,17 @@ const createLoginSuccessResponse = ({
         },
       },
     ],
-    data: { user: { email, roles, accessToken } },
+    data: {
+      accessToken,
+      user: omitPrivateFields(user),
+    },
   });
 };
 
 const deleteRefreshToken = ({ email }: UserDoc) =>
   tryToExecute({
     fnToTry: async () =>
-      await User.updateOne({ email }, { $unset: { refreshTokenHash: '' } }),
+      await User.updateOne({ email }, { $unset: { _refreshTokenHash: '' } }),
     httpErrorData: {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       data: { error: 'Error when deleting refresh token' },

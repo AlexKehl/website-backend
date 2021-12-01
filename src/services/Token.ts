@@ -1,6 +1,5 @@
 import { hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
-import { Role } from '../../common/interface/Constants';
 import {
   ACCESS_TOKEN_EXPIRATION_TIME,
   ACCESS_TOKEN_SECRET,
@@ -29,13 +28,13 @@ const generateRefreshToken = (user: Pick<User, 'email' | 'roles'>) =>
 
 const updateRefreshToken = async (
   userDoc: UserDoc
-): Promise<RefreshTokenData & { roles: Role[] }> => {
+): Promise<RefreshTokenData & UserDoc> => {
   const { email, roles } = userDoc;
   try {
     const refreshToken = generateRefreshToken({ email, roles });
-    const refreshTokenHash = await hash(refreshToken, SALT_ROUNDS);
-    await UserModel.updateOne({ email }, { refreshTokenHash });
-    return { email, refreshToken, roles };
+    const _refreshTokenHash = await hash(refreshToken, SALT_ROUNDS);
+    await UserModel.updateOne({ email }, { _refreshTokenHash });
+    return { ...userDoc, refreshToken };
   } catch (e) {
     if (e instanceof Error) {
       logger.log({ level: 'error', message: e.message });

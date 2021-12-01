@@ -70,5 +70,5 @@ export const getLoggedInCookie = async (
     .post(Endpoints.login)
     .send(UserWithPassword);
 
-  return ['Cookie', [`accessToken=${loginRes.body.user.accessToken}`]];
+  return ['Cookie', [`accessToken=${loginRes.body.accessToken}`]];
 };

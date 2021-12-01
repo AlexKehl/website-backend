@@ -17,15 +17,15 @@ const { app } = setupServer({ port: getUniqPort() });
 
 describe(Endpoints.refreshAccessToken, () => {
   it('returns a new accessToken', async () => {
-    const { email, passwordHash } = RegisteredUser;
+    const { email, _passwordHash } = RegisteredUser;
     const accessToken = generateAccessToken(email);
-    const { refreshToken, refreshTokenHash } =
+    const { refreshToken, _refreshTokenHash } =
       await generateRefreshTokenAndHash(email);
 
     await User.create({
       email,
-      passwordHash,
-      refreshTokenHash,
+      _passwordHash,
+      _refreshTokenHash,
       roles: ['RegisteredUser'],
     });
 
@@ -56,14 +56,14 @@ describe(Endpoints.refreshAccessToken, () => {
   });
 
   it('returns UNAUTHORIZED for for wrong refreshTokenHash', async () => {
-    const { email, passwordHash } = RegisteredUser;
-    const { refreshToken, refreshTokenHash } =
+    const { email, _passwordHash } = RegisteredUser;
+    const { refreshToken, _refreshTokenHash } =
       await generateRefreshTokenAndHash(email);
 
     await User.create({
       email,
-      passwordHash,
-      refreshTokenHash,
+      _passwordHash,
+      _refreshTokenHash,
       roles: ['RegisteredUser'],
     });
 
@@ -94,24 +94,12 @@ describe(Endpoints.emailConfirm, () => {
   it('returns OK and confirms token', async () => {
     const { email } = RegisteredUser;
     const token = generateEmailToken(email);
-    await createUser(RegisteredUser);
+    await createUser({ ...RegisteredUser, _isEmailConfirmed: false });
 
     const res = await request(app).post(Endpoints.emailConfirm).send({ token });
 
-    const { isEmailConfirmed } = (await findUser(email)) || {};
+    const { _isEmailConfirmed } = (await findUser(email)) || {};
     expect(res.status).toBe(HttpStatus.OK);
-    expect(isEmailConfirmed).toBe(true);
-  });
-
-  it('returns OK and confirms token', async () => {
-    const { email } = RegisteredUser;
-    const token = generateEmailToken(email);
-    await createUser(RegisteredUser);
-
-    const res = await request(app).post(Endpoints.emailConfirm).send({ token });
-
-    const { isEmailConfirmed } = (await findUser(email)) || {};
-    expect(res.status).toBe(HttpStatus.OK);
-    expect(isEmailConfirmed).toBe(true);
+    expect(_isEmailConfirmed).toBe(true);
   });
 });

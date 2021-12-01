@@ -3,18 +3,19 @@ import { Document } from 'mongoose';
 import { User as UserType } from '../../common/interface/ConsumerResponses';
 
 export interface UserDoc extends UserType {
-  isEmailConfirmed?: boolean;
-  refreshTokenHash?: string;
-  passwordHash: string;
+  _isEmailConfirmed?: boolean;
+  _refreshTokenHash?: string;
+  _passwordHash: string;
 }
 
 const UserSchemaDefinition: Record<keyof UserDoc, any> = {
   email: { type: String, required: true },
-  refreshTokenHash: { type: String },
-  passwordHash: { type: String },
+  _refreshTokenHash: { type: String },
+  _passwordHash: { type: String },
   roles: { type: [String], required: true },
-  isEmailConfirmed: { type: Boolean, default: false },
+  _isEmailConfirmed: { type: Boolean, default: false },
   contact: {
+    email: { type: String },
     phone: { type: String },
     countryCode: { type: String },
     firstName: { type: String },

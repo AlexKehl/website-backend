@@ -1,11 +1,11 @@
 import { User, UserDoc } from '../model/User';
 
-const findUser = (email: string) => {
-  return User.findOne({ email }).exec();
+const findUser = async (email: string): Promise<UserDoc> => {
+  return User.findOne({ email }).lean()!;
 };
 
 const markEmailAsConfirmed = (email: string) => {
-  return User.updateOne({ email }, { isEmailConfirmed: true });
+  return User.updateOne({ email }, { _isEmailConfirmed: true });
 };
 
 const createUser = (user: UserDoc) => {

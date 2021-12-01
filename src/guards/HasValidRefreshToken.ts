@@ -18,7 +18,7 @@ const hasValidRefreshToken = async (expressObj: ExpressObj) => {
     verify(refreshToken || '', REFRESH_TOKEN_SECRET);
 
     const user = await User.findOne({ email: decoded.email }).exec();
-    const isValid = await compare(refreshToken, user?.refreshTokenHash || '');
+    const isValid = await compare(refreshToken, user?._refreshTokenHash || '');
 
     if (!isValid) {
       throw new Error();

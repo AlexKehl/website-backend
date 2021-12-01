@@ -1,4 +1,3 @@
-import { omit } from 'remeda';
 import supertest from 'supertest';
 import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
@@ -14,7 +13,7 @@ describe(`POST: ${Endpoints.contactInformation}`, () => {
   it('stores given user data in db', async () => {
     await User.create({
       email: RegisteredUser.email,
-      passwordHash: RegisteredUser.passwordHash,
+      _passwordHash: RegisteredUser._passwordHash,
     });
 
     const res = await supertest(app)
@@ -25,7 +24,7 @@ describe(`POST: ${Endpoints.contactInformation}`, () => {
     const user = await findUser(contactDto.email);
 
     expect(res.status).toEqual(HttpStatus.OK);
-    expect(user!.contact).toEqual(omit(contactDto, ['email']));
+    expect(user!.contact).toEqual(contactDto);
   });
 
   it('returns HttpStatus.NOT_FOUND if email is not registered', async () => {
