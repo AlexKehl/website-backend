@@ -1,9 +1,11 @@
+import { omit } from 'remeda';
 import supertest from 'supertest';
 import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
+import { contactDto } from '../../common/fixtures/Dto';
 import { User } from '../../src/model/User';
 import { findUser } from '../../src/services/Users';
-import { contactDto, RegisteredUser } from '../fixtures/User';
+import { RegisteredUser } from '../fixtures/User';
 import { setupServer, getUniqPort, getLoggedInCookie } from '../TestSetupUtils';
 
 const { app } = setupServer({ port: getUniqPort() });
@@ -23,7 +25,7 @@ describe(`POST: ${Endpoints.contactInformation}`, () => {
     const user = await findUser(contactDto.email);
 
     expect(res.status).toEqual(HttpStatus.OK);
-    expect(user).toEqual(expect.objectContaining(contactDto));
+    expect(user!.contact).toEqual(omit(contactDto, ['email']));
   });
 
   it('returns HttpStatus.NOT_FOUND if email is not registered', async () => {

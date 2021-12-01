@@ -1,17 +1,11 @@
 import { Schema, model } from 'mongoose';
 import { Document } from 'mongoose';
-import { Role } from '../../common/interface/Constants';
+import { User as UserType } from '../../common/interface/ConsumerResponses';
 
-export interface UserDoc {
-  email: string;
-  roles: Role[];
+export interface UserDoc extends UserType {
+  isEmailConfirmed?: boolean;
   refreshTokenHash?: string;
   passwordHash: string;
-  isEmailConfirmed?: boolean;
-  lastName?: string;
-  firstName?: string;
-  countryCode?: string;
-  phone?: string;
 }
 
 const UserSchemaDefinition: Record<keyof UserDoc, any> = {
@@ -20,10 +14,22 @@ const UserSchemaDefinition: Record<keyof UserDoc, any> = {
   passwordHash: { type: String },
   roles: { type: [String], required: true },
   isEmailConfirmed: { type: Boolean, default: false },
-  phone: { type: String },
-  countryCode: { type: String },
-  firstName: { type: String },
-  lastName: { type: String },
+  contact: {
+    phone: { type: String },
+    countryCode: { type: String },
+    firstName: { type: String },
+    lastName: { type: String },
+  },
+  address: {
+    fullName: { type: String },
+    street: { type: String },
+    streetNumber: { type: String },
+    city: { type: String },
+    stateCode: { type: String },
+    zip: { type: String },
+    countryCode: { type: String },
+    commentary: { type: String },
+  },
 };
 
 const UserSchema: Schema = new Schema(UserSchemaDefinition);

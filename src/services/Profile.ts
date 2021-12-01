@@ -1,4 +1,5 @@
 import HttpStatus from '../../common/constants/HttpStatus';
+import { User as UserType } from '../../common/interface/ConsumerResponses';
 import { User } from '../model/User';
 import { makeHttpError } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
@@ -17,6 +18,6 @@ export const getUserInfo = async (email: string) => {
   }
   return makeHttpResponse({
     statusCode: HttpStatus.OK,
-    data: res,
+    data: res as UserType,
   });
 };

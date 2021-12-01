@@ -3,7 +3,9 @@ import HttpStatus from '../../common/constants/HttpStatus';
 import { User } from '../../common/interface/ConsumerResponses';
 import WithPayloadError from './Exceptions/WithPayloadError';
 
-export const getUserFromToken = (token: string): User => {
+export const getUserFromToken = (
+  token: string
+): Pick<User, 'email' | 'roles'> => {
   const { email, roles } = decode(token, { json: true }) || {};
   if (!email) {
     throw new WithPayloadError({

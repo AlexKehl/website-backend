@@ -17,12 +17,12 @@ import { logger } from '../utils/Logger';
 import { getUserFromToken } from '../utils/Tokens';
 import { User } from '../../common/interface/ConsumerResponses';
 
-const generateAccessToken = (user: User) =>
+const generateAccessToken = (user: Pick<User, 'email' | 'roles'>) =>
   sign({ ...user, iat: new Date().getTime() }, ACCESS_TOKEN_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRATION_TIME,
   });
 
-const generateRefreshToken = (user: User) =>
+const generateRefreshToken = (user: Pick<User, 'email' | 'roles'>) =>
   sign(user, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRATION_TIME,
   });

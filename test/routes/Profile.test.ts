@@ -2,20 +2,24 @@ import supertest from 'supertest';
 import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { User } from '../../src/model/User';
-import { contactDto, RegisteredUser } from '../fixtures/User';
+import { RegisteredUser } from '../fixtures/User';
 import { getLoggedInCookie, getUniqPort, setupServer } from '../TestSetupUtils';
+import { addressDto, contactDto } from '../../common/fixtures/Dto';
 
 const { app } = setupServer({ port: getUniqPort() });
 
 describe(`GET: ${Endpoints.user}`, () => {
-  it('returns contactInformation dto', async () => {
+  it('returns User dto', async () => {
     await User.create(RegisteredUser);
     const res = await supertest(app)
       .get(`${Endpoints.user}?email=${RegisteredUser.email}`)
       .set(...(await getLoggedInCookie(app)));
 
     expect(res.status).toEqual(HttpStatus.OK);
-    expect(res.body).toEqual(expect.objectContaining(contactDto));
+    expect(contactDto).toEqual(expect.objectContaining(res.body.contact));
+    expect(res.body.address).toEqual(addressDto);
+    expect(res.body.email).toEqual(RegisteredUser.email);
+    expect(res.body.roles).toEqual(RegisteredUser.roles);
   });
 
   it('returns HttpStatus.NOT_FOUND', async () => {
