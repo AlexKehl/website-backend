@@ -5,6 +5,7 @@ import { User } from '../../src/model/User';
 import { RegisteredUser } from '../fixtures/User';
 import { getLoggedInCookie, getUniqPort, setupServer } from '../TestSetupUtils';
 import { addressDto, contactDto } from '../../common/fixtures/Dto';
+import { omitPrivateFields } from '../../src/utils/Functions';
 
 const { app } = setupServer({ port: getUniqPort() });
 
@@ -20,6 +21,19 @@ describe(`GET: ${Endpoints.user}`, () => {
     expect(res.body.address).toEqual(addressDto);
     expect(res.body.email).toEqual(RegisteredUser.email);
     expect(res.body.roles).toEqual(RegisteredUser.roles);
+  });
+
+  it('omits private fields', async () => {
+    await User.create(RegisteredUser);
+    const res = await supertest(app)
+      .get(`${Endpoints.user}?email=${RegisteredUser.email}`)
+      .set(...(await getLoggedInCookie(app)));
+
+    const expected = {
+      success: true,
+      ...omitPrivateFields(RegisteredUser),
+    };
+    expect(res.body).toEqual(expected);
   });
 
   it('returns HttpStatus.NOT_FOUND', async () => {
