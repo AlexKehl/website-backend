@@ -1,7 +1,6 @@
-import { login, logout, register } from '../services/Auth';
+import { login, register } from '../services/Auth';
 import { Controller } from '../types';
 import { evaluateHttpObject } from '../utils/HttpResponses';
-import { getUserFromToken } from '../utils/Tokens';
 import { LoginDto } from '../../common/interface/Dto';
 
 const registerController: Controller<LoginDto> = async ({ req, res }) => {
@@ -12,11 +11,4 @@ const loginController: Controller<LoginDto> = async ({ req, res }) => {
   evaluateHttpObject(res, await login(req.body));
 };
 
-const logoutController: Controller = async ({ req, res }) => {
-  const { refreshToken } = req.cookies;
-  const { email } = getUserFromToken(refreshToken);
-
-  evaluateHttpObject(res, await logout(email));
-};
-
-export { registerController, loginController, logoutController };
+export { registerController, loginController };

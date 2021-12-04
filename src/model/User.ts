@@ -4,13 +4,11 @@ import { User as UserType } from '../../common/interface/ConsumerResponses';
 
 export interface UserDoc extends UserType {
   _isEmailConfirmed?: boolean;
-  _refreshTokenHash?: string;
   _passwordHash: string;
 }
 
 const UserSchemaDefinition: Record<keyof UserDoc, any> = {
   email: { type: String, required: true },
-  _refreshTokenHash: { type: String },
   _passwordHash: { type: String },
   roles: { type: [String], required: true },
   _isEmailConfirmed: { type: Boolean, default: false },

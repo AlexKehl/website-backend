@@ -6,9 +6,7 @@ import { makeHttpError } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 
 export const getUserInfo = async (email: string) => {
-  const res = await User.findOne({ email })
-    .select('-__v -_id -passwordHash -refreshTokenHash')
-    .lean();
+  const res = await User.findOne({ email }).lean();
   if (!res) {
     return makeHttpError({
       statusCode: HttpStatus.NOT_FOUND,

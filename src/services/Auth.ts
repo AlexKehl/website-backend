@@ -3,13 +3,12 @@ import HttpStatus from '../../common/constants/HttpStatus';
 import { LoginDto, RegisterDto } from '../../common/interface/Dto';
 import { SALT_ROUNDS } from '../../config';
 import { User, UserDoc } from '../model/User';
-import { RefreshTokenData } from '../types/Auth';
 import { omitPrivateFields } from '../utils/Functions';
 import { handleHttpErrors } from '../utils/HttpErrorHandler';
 import { tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import { sendVerificationLink } from './Email';
-import { generateAccessToken, updateRefreshToken } from './Token';
+import { generateAccessToken } from './Token';
 import { findUser } from './Users';
 
 const isUserNotExisting = async ({ email, password }: RegisterDto) =>
@@ -45,10 +44,7 @@ const hasValidCredentials = (loginDto: LoginDto) => async (user: UserDoc) =>
     },
   });
 
-const createLoginSuccessResponse = ({
-  refreshToken,
-  ...user
-}: RefreshTokenData & UserDoc) => {
+const createLoginSuccessResponse = (user: UserDoc) => {
   const { email, roles } = user;
   const accessToken = generateAccessToken({ email, roles });
   return makeHttpResponse({
@@ -62,15 +58,6 @@ const createLoginSuccessResponse = ({
           secure: true,
         },
       },
-      {
-        name: 'refreshToken',
-        val: refreshToken,
-        options: {
-          httpOnly: true,
-          sameSite: 'none',
-          secure: true,
-        },
-      },
     ],
     data: {
       accessToken,
@@ -79,20 +66,9 @@ const createLoginSuccessResponse = ({
   });
 };
 
-const deleteRefreshToken = ({ email }: UserDoc) =>
-  tryToExecute({
-    fnToTry: async () =>
-      await User.updateOne({ email }, { $unset: { _refreshTokenHash: '' } }),
-    httpErrorData: {
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      data: { error: 'Error when deleting refresh token' },
-    },
-  });
-
 const login = async (loginDto: LoginDto) =>
   getUserByMail(loginDto.email)
     .then(hasValidCredentials(loginDto))
-    .then(updateRefreshToken)
     .then(createLoginSuccessResponse)
     .catch(handleHttpErrors);
 
@@ -108,18 +84,10 @@ const register = async ({ email, password }: RegisterDto) =>
     .then(() => makeHttpResponse({ statusCode: HttpStatus.CREATED }))
     .catch(handleHttpErrors);
 
-const logout = async (email: string) => {
-  return getUserByMail(email)
-    .then(deleteRefreshToken)
-    .then(() => makeHttpResponse({ statusCode: HttpStatus.OK }))
-    .catch(handleHttpErrors);
-};
-
 export {
   hasValidCredentials,
   login,
   register,
   createLoginSuccessResponse,
   createNewUser,
-  logout,
 };

@@ -4,7 +4,6 @@ import { ServerStartOptions } from '../types';
 import { startAuthRoutes } from './Auth';
 import { startGalleryRoutes } from './Gallery';
 import { CLIENT_URL, LOG_REQUESTS } from '../../config';
-import { startTokenRoutes } from './Token';
 import morgan from 'morgan';
 import { startEmailRoutes } from './Email';
 import { startPaymentRoutes } from './Payments';
@@ -28,7 +27,6 @@ const start = ({ port, startupMessage }: ServerStartOptions) => {
 
   startAuthRoutes(app);
   startGalleryRoutes(app);
-  startTokenRoutes(app);
   startEmailRoutes(app);
   startPaymentRoutes(app);
   startUserInfoRoutes(app);

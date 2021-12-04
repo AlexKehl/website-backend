@@ -4,10 +4,10 @@ import {
 } from '../../src/services/Auth';
 import { makeHttpResponse } from '../../src/utils/HttpResponses';
 import HttpStatus from '../../common/constants/HttpStatus';
-import { getUserWithRefreshToken, RegisteredUser } from '../fixtures/User';
+import { RegisteredUser } from '../fixtures/User';
 import WithPayloadError from '../../src/utils/Exceptions/WithPayloadError';
 import { verify } from 'jsonwebtoken';
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../../config';
+import { ACCESS_TOKEN_SECRET } from '../../config';
 import { userResponse, UserWithPassword } from '../../common/fixtures/User';
 
 describe('hasValidCredentials', () => {
@@ -35,11 +35,7 @@ describe('hasValidCredentials', () => {
 
 describe('createLoginSuccessResponse', () => {
   it('returns http res with tokens and userResponse', async () => {
-    const userWithRefreshToken = await getUserWithRefreshToken();
-    const res = createLoginSuccessResponse({
-      ...userWithRefreshToken,
-      ...RegisteredUser,
-    });
+    const res = createLoginSuccessResponse(RegisteredUser);
 
     const expected = makeHttpResponse({
       statusCode: HttpStatus.OK,
@@ -48,15 +44,6 @@ describe('createLoginSuccessResponse', () => {
           name: 'accessToken',
           val: expect.any(String),
           options: {
-            sameSite: 'none',
-            secure: true,
-          },
-        },
-        {
-          name: 'refreshToken',
-          val: expect.any(String),
-          options: {
-            httpOnly: true,
             sameSite: 'none',
             secure: true,
           },
@@ -70,6 +57,5 @@ describe('createLoginSuccessResponse', () => {
 
     expect(res).toEqual(expected);
     expect(verify(res.cookies[0].val, ACCESS_TOKEN_SECRET)).toBeDefined();
-    expect(verify(res.cookies[1].val, REFRESH_TOKEN_SECRET)).toBeDefined();
   });
 });
