@@ -1,20 +1,22 @@
-import { Schema, model, SchemaTypes } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { Document } from 'mongoose';
-import { FileDoc } from '../types/Files';
+import Stripe from 'stripe';
 
-export interface OrderImageDoc extends FileDoc {}
+export interface OrderImageDoc {
+  id: string;
+  itemIds: string[];
+  stripeEvents: Stripe.Event[];
+}
 
 const OrderImageSchemaDefinition: Record<keyof OrderImageDoc, any> = {
   id: { type: String, required: true },
-  name: { type: String, required: true },
-  description: { type: String },
-  width: { type: Number, required: true },
-  height: { type: Number, required: true },
+  itemIds: { type: [String], required: true },
+  stripeEvents: { type: [Object] },
 };
 
 const OrderImageSchema = new Schema(OrderImageSchemaDefinition);
 
-export const File = model<OrderImageDoc & Document>(
+export const OrderImage = model<OrderImageDoc & Document>(
   'OrderImage',
   OrderImageSchema
 );

@@ -11,6 +11,17 @@ export const galleryImageDoc: GalleryImageDoc = {
   height: 100,
 };
 
+export const galleryImageDocNotForSell: GalleryImageDoc = {
+  id: 'id123',
+  isForSell: false,
+  price: 50,
+  description: 'This is a description',
+  category: 'acryl',
+  name: 'i-201.jpg',
+  width: 100,
+  height: 100,
+};
+
 export const galleryImageDocs: GalleryImageDoc[] = [
   {
     category: 'acryl',

@@ -9,5 +9,6 @@
   "testRegex": "\\.test.ts$",
   "transform": {
     "^.+\\.(t|j)s$": ["@swc/jest"]
-  }
+  },
+  "setupFiles": ["./src/setupTests.ts"]
 }

@@ -16,9 +16,9 @@ export const HttpErrorRouteHandler = (res: ExpressResponse) => (err: Error) => {
 };
 
 export const handleHttpErrors = (err: Error) => {
+  logger.log({ message: JSON.stringify(err, null, 2), level: 'error' });
   if (err instanceof WithPayloadError) {
     return err.getPayload();
   }
-  console.log(err.message);
   return makeInternalHttpError();
 };

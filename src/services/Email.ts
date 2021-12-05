@@ -10,6 +10,7 @@ import {
   EMAIL_USER,
   EMAIL_VERIFICATION_SECRET,
 } from '../../config';
+import { PaymentSuccess } from '../templates/mail/PaymentSuccess';
 import { HttpError, HttpResponse } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 import { makeHttpResponse } from '../utils/HttpResponses';
@@ -68,6 +69,14 @@ const sendVerificationLink = (email: string) => {
     to: email,
     subject: HttpTexts.emailSubject,
     text,
+  });
+};
+
+export const sendSuccessfullPaymentEmail = (email: string) => {
+  return nodemailerTransport.sendMail({
+    to: email,
+    subject: HttpTexts.paymentSubject,
+    html: PaymentSuccess,
   });
 };
 

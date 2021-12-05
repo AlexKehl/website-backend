@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
-import { contactDto } from '../../common/fixtures/Dto';
+import { addressDto, contactDto } from '../../common/fixtures/Dto';
 import { User } from '../../src/model/User';
 import { findUser } from '../../src/services/Users';
 import { RegisteredUser } from '../fixtures/User';
@@ -41,6 +41,33 @@ describe(`POST: ${Endpoints.contactInformation}`, () => {
     const res = await supertest(app)
       .post(Endpoints.contactInformation)
       .send(contactDto);
+
+    expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+  });
+});
+
+describe(`POST: ${Endpoints.addressInformation}`, () => {
+  it('stores given user data in db', async () => {
+    await User.create({
+      email: RegisteredUser.email,
+      _passwordHash: RegisteredUser._passwordHash,
+    });
+
+    const res = await supertest(app)
+      .post(Endpoints.addressInformation)
+      .set(...(await getLoggedInCookie(app)))
+      .send(addressDto);
+
+    const user = await findUser(RegisteredUser.email);
+
+    expect(res.status).toEqual(HttpStatus.OK);
+    expect(user!.address).toEqual(addressDto);
+  });
+
+  it('guards against unauthorized posts', async () => {
+    const res = await supertest(app)
+      .post(Endpoints.addressInformation)
+      .send(addressDto);
 
     expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
   });
