@@ -2,18 +2,17 @@ import { compare, hash } from 'bcrypt';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { LoginDto, RegisterDto } from '../../common/interface/Dto';
 import { SALT_ROUNDS } from '../../config';
-import { User, UserDoc } from '../model/User';
+import { findUser, User, UserDoc } from '../model/User';
 import { omitPrivateFields } from '../utils/Functions';
 import { handleHttpErrors } from '../utils/HttpErrorHandler';
 import { tryToExecute } from '../utils/HttpErrors';
 import { makeHttpResponse } from '../utils/HttpResponses';
 import { sendVerificationLink } from './Email';
 import { generateAccessToken } from './Token';
-import { findUser } from './Users';
 
 const isUserNotExisting = async ({ email, password }: RegisterDto) =>
   tryToExecute<RegisterDto>({
-    fnToTry: async () => !Boolean(await findUser(email)),
+    fnToTry: async () => !Boolean(await User.findOne({ email }).lean()),
     httpErrorData: {
       statusCode: HttpStatus.CONFLICT,
       data: {
@@ -21,17 +20,6 @@ const isUserNotExisting = async ({ email, password }: RegisterDto) =>
       },
     },
     passThrough: { email, password },
-  });
-
-const getUserByMail = async (email: string): Promise<UserDoc> =>
-  tryToExecute<UserDoc>({
-    fnToTry: () => findUser(email),
-    httpErrorData: {
-      statusCode: HttpStatus.NOT_FOUND,
-      data: {
-        error: 'User not found',
-      },
-    },
   });
 
 const hasValidCredentials = (loginDto: LoginDto) => async (user: UserDoc) =>
@@ -67,7 +55,7 @@ const createLoginSuccessResponse = (user: UserDoc) => {
 };
 
 const login = async (loginDto: LoginDto) =>
-  getUserByMail(loginDto.email)
+  findUser(loginDto.email)
     .then(hasValidCredentials(loginDto))
     .then(createLoginSuccessResponse)
     .catch(handleHttpErrors);

@@ -1,6 +1,9 @@
 import { Schema, model } from 'mongoose';
 import { Document } from 'mongoose';
+import HttpStatus from '../../common/constants/HttpStatus';
+import HttpTexts from '../../common/constants/HttpTexts';
 import { User as UserType } from '../../common/interface/ConsumerResponses';
+import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 
 export interface UserDoc extends UserType {
   _isEmailConfirmed?: boolean;
@@ -34,3 +37,15 @@ const UserSchemaDefinition: Record<keyof UserDoc, any> = {
 const UserSchema: Schema = new Schema(UserSchemaDefinition);
 
 export const User = model<UserDoc & Document>('User', UserSchema);
+
+export const findUser = async (email: string): Promise<UserDoc> => {
+  const user = await User.findOne({ email }).lean()!;
+  if (!user) {
+    throw new WithPayloadError({
+      statusCode: HttpStatus.NOT_FOUND,
+      data: { error: HttpTexts.userNotExisting },
+    });
+  }
+
+  return user;
+};

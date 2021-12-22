@@ -10,11 +10,12 @@ import {
   EMAIL_USER,
   EMAIL_VERIFICATION_SECRET,
 } from '../../config';
+import { findUser } from '../model/User';
 import { PaymentSuccess } from '../templates/mail/PaymentSuccess';
 import { HttpError, HttpResponse } from '../types';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 import { makeHttpResponse } from '../utils/HttpResponses';
-import { findUser, markEmailAsConfirmed } from './Users';
+import { markEmailAsConfirmed } from './Users';
 
 const nodemailerTransport = createTransport({
   service: 'gmail',
@@ -86,15 +87,8 @@ export const confirmEmail = async ({
   const email = decodeConfirmationToken(token);
 
   const user = await findUser(email);
-  if (!user) {
-    throw new WithPayloadError({
-      statusCode: HttpStatus.BAD_REQUEST,
-      data: {
-        error: HttpTexts.userNotExisting,
-      },
-    });
-  }
-  if (user?._isEmailConfirmed) {
+
+  if (user._isEmailConfirmed) {
     throw new WithPayloadError({
       statusCode: HttpStatus.BAD_REQUEST,
       data: {

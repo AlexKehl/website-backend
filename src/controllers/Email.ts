@@ -7,7 +7,7 @@ const emailConfirmController: Controller<ConfirmEmailDto> = async ({
   req,
   res,
 }) => {
-  evaluateHttpObject(res, await confirmEmail(req.body));
+  return evaluateHttpObject(res, await confirmEmail(req.body));
 };
 
 export { emailConfirmController };

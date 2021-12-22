@@ -2,8 +2,7 @@ import supertest from 'supertest';
 import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { addressDto, contactDto } from '../../common/fixtures/Dto';
-import { User } from '../../src/model/User';
-import { findUser } from '../../src/services/Users';
+import { findUser, User } from '../../src/model/User';
 import { RegisteredUser } from '../fixtures/User';
 import { setupServer, getUniqPort, getLoggedInCookie } from '../TestSetupUtils';
 

@@ -3,7 +3,8 @@ import { Endpoints } from '../../common/constants/Endpoints';
 import HttpStatus from '../../common/constants/HttpStatus';
 import HttpTexts from '../../common/constants/HttpTexts';
 import { USER_EMAIL } from '../../common/fixtures/User';
-import { createUser, findUser } from '../../src/services/Users';
+import { findUser } from '../../src/model/User';
+import { createUser } from '../../src/services/Users';
 import { generateEmailToken } from '../fixtures/Tokens';
 import { RegisteredUser } from '../fixtures/User';
 import { getUniqPort, setupServer } from '../TestSetupUtils';
@@ -17,12 +18,12 @@ describe(Endpoints.emailConfirm, () => {
     expect(res.status).toBe(HttpStatus.BAD_REQUEST);
   });
 
-  it('returns BAD_REQUEST if email is not in db', async () => {
+  it('returns NOT_FOUND if email is not in db', async () => {
     const token = generateEmailToken(USER_EMAIL);
 
     const res = await request(app).post(Endpoints.emailConfirm).send({ token });
 
-    expect(res.status).toBe(HttpStatus.BAD_REQUEST);
+    expect(res.status).toBe(HttpStatus.NOT_FOUND);
     expect(res.body.error).toBe(HttpTexts.userNotExisting);
   });
 
