@@ -8,6 +8,8 @@ import { OrderImageMock } from '../../fixtures/OrderImages';
 import { checkoutSessionCompleted } from '../../fixtures/StripeEvents';
 import { getUniqPort, setupServer } from '../../TestSetupUtils';
 
+jest.mock('../../../src/services/Email');
+
 setupServer({ port: getUniqPort() });
 
 describe('matchEventType', () => {

@@ -13,7 +13,7 @@ import { findUser } from './Users';
 
 const isUserNotExisting = async ({ email, password }: RegisterDto) =>
   tryToExecute<RegisterDto>({
-    fnToTry: () => findUser(email),
+    fnToTry: async () => !Boolean(await findUser(email)),
     httpErrorData: {
       statusCode: HttpStatus.CONFLICT,
       data: {

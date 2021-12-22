@@ -24,7 +24,7 @@ const nodemailerTransport = createTransport({
   },
 });
 
-const decodeConfirmationToken = (token: string): string => {
+export const decodeConfirmationToken = (token: string): string => {
   try {
     const payload = verify(token || '', EMAIL_VERIFICATION_SECRET) as any;
 
@@ -56,7 +56,7 @@ const decodeConfirmationToken = (token: string): string => {
   }
 };
 
-const sendVerificationLink = (email: string) => {
+export const sendVerificationLink = (email: string) => {
   const payload = { email };
 
   const token = sign(payload, EMAIL_VERIFICATION_SECRET, {
@@ -80,7 +80,7 @@ export const sendSuccessfullPaymentEmail = (email: string) => {
   });
 };
 
-const confirmEmail = async ({
+export const confirmEmail = async ({
   token,
 }: ConfirmEmailDto): Promise<HttpResponse | HttpError> => {
   const email = decodeConfirmationToken(token);
@@ -105,5 +105,3 @@ const confirmEmail = async ({
   await markEmailAsConfirmed(email);
   return makeHttpResponse({ statusCode: HttpStatus.OK });
 };
-
-export { decodeConfirmationToken, confirmEmail, sendVerificationLink };
