@@ -13,8 +13,6 @@ export const startPaymentRoutes = (app: Express) => {
   app.post(
     Endpoints.webhook,
     express.raw({ type: 'application/json' }),
-    routeHandler({
-      controller: webHookController,
-    })
+    routeHandler({ controller: webHookController })
   );
 };

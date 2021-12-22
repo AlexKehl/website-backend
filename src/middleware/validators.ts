@@ -1,6 +1,5 @@
 import { NextFunction } from 'express';
 import { ValidationChain, validationResult } from 'express-validator';
-import { ResultWithContext } from 'express-validator/src/chain';
 import HttpStatus from '../../common/constants/HttpStatus';
 import { ExpressRequest, ExpressResponse } from '../types';
 import { makeHttpError } from '../utils/HttpErrors';

@@ -7,8 +7,7 @@ import {
   getImageByCategoryController,
   getImagePathsForCategoryController,
 } from '../controllers/Gallery';
-import { hasRoleGuard } from '../guards/HasRole';
-import { hasValidAccessToken } from '../guards/HasValidAccessToken';
+import { hasRoleGuard, hasValidAccessTokenGuard } from '../middleware/guards';
 import { validator } from '../middleware/validators';
 import routeHandler from '../utils/RouteHandler';
 import FileWithMeta from '../validators/request/FileWithMeta';
@@ -19,19 +18,17 @@ export const startGalleryRoutes = (app: Express) => {
     express.json({ limit: '50mb' }),
     express.urlencoded({ limit: '50mb', extended: true }),
     validator(checkSchema(FileWithMeta)),
-    routeHandler({
-      controller: galleryUploadController,
-      guards: [hasRoleGuard('Admin'), hasValidAccessToken],
-    })
+    hasValidAccessTokenGuard,
+    hasRoleGuard('Admin'),
+    routeHandler({ controller: galleryUploadController })
   );
 
   app.post(
     Endpoints.galleryDelete,
     express.json(),
-    routeHandler({
-      controller: galleryDeleteController,
-      guards: [hasRoleGuard('Admin'), hasValidAccessToken],
-    })
+    hasValidAccessTokenGuard,
+    hasRoleGuard('Admin'),
+    routeHandler({ controller: galleryDeleteController })
   );
 
   app.get(

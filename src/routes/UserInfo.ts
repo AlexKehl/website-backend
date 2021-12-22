@@ -4,25 +4,25 @@ import {
   postAddressInformationController,
   postContactInformationController,
 } from '../controllers/UserInfo';
-import { hasValidAccessToken } from '../guards/HasValidAccessToken';
+import { hasValidAccessTokenGuard } from '../middleware/guards';
 import routeHandler from '../utils/RouteHandler';
 
 export const startUserInfoRoutes = (app: Express) => {
   app.post(
     Endpoints.contactInformation,
     express.json(),
+    hasValidAccessTokenGuard,
     routeHandler({
       controller: postContactInformationController,
-      guards: [hasValidAccessToken],
     })
   );
 
   app.post(
     Endpoints.addressInformation,
     express.json(),
+    hasValidAccessTokenGuard,
     routeHandler({
       controller: postAddressInformationController,
-      guards: [hasValidAccessToken],
     })
   );
 };

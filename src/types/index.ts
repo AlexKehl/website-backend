@@ -12,7 +12,6 @@ export type RouteGuard<T = any> = (
 
 export interface RouteHandlerObj<T = any> {
   controller: Controller<T>;
-  guards?: RouteGuard<T>[];
 }
 
 export type RouteHandler = (

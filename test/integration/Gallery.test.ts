@@ -20,7 +20,7 @@ const { app } = setupServer({ port: getUniqPort() });
 
 describe(Endpoints.galleryUpload, () => {
   it('returns HttpStatus.BAD_REQUEST if files are missing', async () => {
-    const accessToken = await generateAccessToken(RegisteredUser.email);
+    const accessToken = await generateAccessToken(AdminUser.email);
     await User.create(AdminUser);
 
     const res = await request(app)
@@ -32,7 +32,7 @@ describe(Endpoints.galleryUpload, () => {
   });
 
   it('returns HttpStatus.BAD_REQUEST if category is missing', async () => {
-    const accessToken = await generateAccessToken(RegisteredUser.email);
+    const accessToken = await generateAccessToken(AdminUser.email);
     await User.create(AdminUser);
 
     const res = await request(app)
@@ -44,7 +44,7 @@ describe(Endpoints.galleryUpload, () => {
   });
 
   it('returns HttpStatus.BAD_REQUEST if isForSell && !price', async () => {
-    const accessToken = await generateAccessToken(RegisteredUser.email);
+    const accessToken = await generateAccessToken(AdminUser.email);
     await User.create(AdminUser);
 
     const { price, ...imageRest } = galleryImageDto;
@@ -61,7 +61,7 @@ describe(Endpoints.galleryUpload, () => {
   });
 
   it('successfully uploads', async () => {
-    const accessToken = await generateAccessToken(RegisteredUser.email);
+    const accessToken = await generateAccessToken(AdminUser.email);
     await User.create(AdminUser);
 
     const res = await request(app)
@@ -95,7 +95,7 @@ describe(Endpoints.galleryUpload, () => {
   });
 
   it('updates already existing images', async () => {
-    const accessToken = await generateAccessToken(RegisteredUser.email);
+    const accessToken = await generateAccessToken(AdminUser.email);
     await User.create(AdminUser);
 
     await request(app)
@@ -117,6 +117,20 @@ describe(Endpoints.galleryUpload, () => {
 
     expect(newDocs.length).toBe(1);
     expect(newDocs[0].description).toEqual('updated');
+  });
+});
+
+describe(Endpoints.galleryDelete, () => {
+  it('returns HttpStatus.UNAUTHORIZED if not admin', async () => {
+    const accessToken = await generateAccessToken(RegisteredUser.email);
+    await User.create(RegisteredUser);
+
+    const res = await request(app)
+      .post(Endpoints.galleryDelete)
+      .set('Cookie', [`accessToken=${accessToken}`]);
+
+    expect(res.status).toEqual(HttpStatus.UNAUTHORIZED);
+    expect(res.body.success).toBe(false);
   });
 });
 
