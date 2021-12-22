@@ -8,9 +8,9 @@ export const checkoutController: Controller<BuyImageDto> = async ({
   req,
   res,
 }) => {
-  evaluateHttpObject(res, await createStripeSession(req.body));
+  return evaluateHttpObject(res, await createStripeSession(req.body));
 };
 
 export const webHookController: Controller<any> = async ({ req, res }) => {
-  evaluateHttpObject(res, await handleWebHook(req.headers, req.body));
+  return evaluateHttpObject(res, await handleWebHook(req.headers, req.body));
 };

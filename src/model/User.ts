@@ -4,6 +4,7 @@ import HttpStatus from '../../common/constants/HttpStatus';
 import HttpTexts from '../../common/constants/HttpTexts';
 import { User as UserType } from '../../common/interface/ConsumerResponses';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
+import { makeHttpError } from '../utils/HttpErrors';
 
 export interface UserDoc extends UserType {
   _isEmailConfirmed?: boolean;
@@ -48,4 +49,16 @@ export const findUser = async (email: string): Promise<UserDoc> => {
   }
 
   return user;
+};
+
+export const updateUser = async (email: string, data: Partial<UserDoc>) => {
+  const updateRes = await User.updateOne({ email }, data);
+  if (updateRes.matchedCount === 0) {
+    throw new WithPayloadError({
+      statusCode: HttpStatus.NOT_FOUND,
+      data: { error: HttpTexts.userNotExisting },
+    });
+  }
+
+  return updateRes;
 };

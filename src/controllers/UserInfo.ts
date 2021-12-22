@@ -12,11 +12,18 @@ import { getUserFromToken } from '../utils/Tokens';
 
 export const postContactInformationController: Controller<ContactInformationDto> =
   async ({ req, res }) => {
-    evaluateHttpObject(res, await updateContactInformation(req.body));
+    const { email } = getUserFromToken(req.cookies.accessToken);
+    return evaluateHttpObject(
+      res,
+      await updateContactInformation(req.body, email)
+    );
   };
 
 export const postAddressInformationController: Controller<AddressInformationDto> =
   async ({ req, res }) => {
     const { email } = getUserFromToken(req.cookies.accessToken);
-    evaluateHttpObject(res, await updateAddressInformation(req.body, email));
+    return evaluateHttpObject(
+      res,
+      await updateAddressInformation(req.body, email)
+    );
   };

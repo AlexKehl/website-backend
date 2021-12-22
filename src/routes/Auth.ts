@@ -18,7 +18,7 @@ export const startAuthRoutes = (app: Express) => {
     Endpoints.login,
     express.json(),
     validator(body('email').isEmail()),
-    validator(body('password').isLength({ min: 8 })),
+    validator(body('password').isString().isLength({ min: 8 })),
     routeHandler({ controller: loginController })
   );
 };

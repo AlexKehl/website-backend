@@ -3,7 +3,7 @@ import HttpStatus from '../../../common/constants/HttpStatus';
 import { withParallel } from '../../../common/utils/Functions';
 import { STRIPE_API_KEY, STRIPE_SECRET } from '../../../config';
 import { GalleryImage } from '../../model/GalleryImage';
-import { OrderImage } from '../../model/OrderImage';
+import { findOrderImage, OrderImage } from '../../model/OrderImage';
 import WithPayloadError from '../../utils/Exceptions/WithPayloadError';
 import { handleHttpErrors } from '../../utils/HttpErrors';
 import { makeHttpResponse } from '../../utils/HttpResponses';
@@ -30,13 +30,7 @@ const verifyStripeSecret = (signature: string, body: any) => {
 };
 
 const markItemsAsPayed = async (event: Stripe.Event) => {
-  const order = await OrderImage.findOne({ id: (event.data.object as any).id });
-  if (!order) {
-    throw new WithPayloadError({
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      data: { error: 'Order is missing!' },
-    });
-  }
+  const order = await findOrderImage((event.data.object as any).id);
   await OrderImage.updateOne(
     { id: (event.data.object as any).id },
     { stripeEvents: [...order.stripeEvents, event] }

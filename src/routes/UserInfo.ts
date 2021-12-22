@@ -12,17 +12,13 @@ export const startUserInfoRoutes = (app: Express) => {
     Endpoints.contactInformation,
     express.json(),
     hasValidAccessTokenGuard,
-    routeHandler({
-      controller: postContactInformationController,
-    })
+    routeHandler({ controller: postContactInformationController })
   );
 
   app.post(
     Endpoints.addressInformation,
     express.json(),
     hasValidAccessTokenGuard,
-    routeHandler({
-      controller: postAddressInformationController,
-    })
+    routeHandler({ controller: postAddressInformationController })
   );
 };

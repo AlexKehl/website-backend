@@ -17,23 +17,13 @@ describe(`POST: ${Endpoints.contactInformation}`, () => {
 
     const res = await supertest(app)
       .post(Endpoints.contactInformation)
-      .set(...(await getLoggedInCookie(app)))
+      .set(...(await getLoggedInCookie(app)(RegisteredUser)))
       .send(contactDto);
 
-    const user = await findUser(contactDto.email);
+    const user = await findUser(RegisteredUser.email);
 
     expect(res.status).toEqual(HttpStatus.OK);
     expect(user!.contact).toEqual(contactDto);
-  });
-
-  it('returns HttpStatus.NOT_FOUND if email is not registered', async () => {
-    const res = await supertest(app)
-      .post(Endpoints.contactInformation)
-      .set(...(await getLoggedInCookie(app)))
-      .send({ ...contactDto, email: 'foo@bar.com' });
-
-    expect(res.status).toEqual(HttpStatus.NOT_FOUND);
-    expect(res.body.error).toEqual('User is not registered');
   });
 
   it('guards against unauthorized posts', async () => {
@@ -54,7 +44,7 @@ describe(`POST: ${Endpoints.addressInformation}`, () => {
 
     const res = await supertest(app)
       .post(Endpoints.addressInformation)
-      .set(...(await getLoggedInCookie(app)))
+      .set(...(await getLoggedInCookie(app)(RegisteredUser)))
       .send(addressDto);
 
     const user = await findUser(RegisteredUser.email);

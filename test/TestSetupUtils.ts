@@ -4,10 +4,9 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { start } from '../src/routes';
 import { ServerStartOptions } from '../src/types';
 import { createUser } from '../src/services/Users';
-import { RegisteredUser } from './fixtures/User';
 import { Endpoints } from '../common/constants/Endpoints';
 import supertest from 'supertest';
-import { UserWithPassword } from '../common/fixtures/User';
+import { UserDoc } from '../src/model/User';
 
 let mongod: MongoMemoryServer;
 
@@ -62,13 +61,13 @@ export const setupServer = (options: ServerStartOptions) => {
   return { app, server };
 };
 
-export const getLoggedInCookie = async (
-  app: Express
-): Promise<['Cookie', string[]]> => {
-  await createUser(RegisteredUser);
-  const loginRes = await supertest(app)
-    .post(Endpoints.login)
-    .send(UserWithPassword);
+export const getLoggedInCookie =
+  (app: Express) =>
+  async (user: UserDoc): Promise<['Cookie', string[]]> => {
+    await createUser(user);
+    const loginRes = await supertest(app)
+      .post(Endpoints.login)
+      .send({ email: user.email, password: '12345678' });
 
-  return ['Cookie', [`accessToken=${loginRes.body.accessToken}`]];
-};
+    return ['Cookie', [`accessToken=${loginRes.body.accessToken}`]];
+  };
