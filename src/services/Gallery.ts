@@ -77,7 +77,7 @@ const deleteFile = ({ category, id }: DeleteGalleryImageDto): Promise<any> =>
     GalleryImage.deleteOne({ category, id }),
   ]);
 
-const generateImagePathHttpResponse = (
+export const generateImagePathHttpResponse = (
   category: Category,
   id: GalleryImageMeta['id']
 ) =>

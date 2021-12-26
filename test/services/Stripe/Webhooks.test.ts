@@ -1,11 +1,17 @@
 import { GalleryImage } from '../../../src/model/GalleryImage';
 import { OrderImage } from '../../../src/model/OrderImage';
+import { User } from '../../../src/model/User';
 import { sendSuccessfullPaymentEmail } from '../../../src/services/Email';
 import { matchEventType } from '../../../src/services/Stripe/Webhooks';
-import { sendMessage } from '../../../src/services/Telegram';
+import { sendImageBuyedMessage } from '../../../src/services/telegram';
 import { galleryImageDoc } from '../../fixtures/GalleryImages';
 import { OrderImageMock } from '../../fixtures/OrderImages';
-import { checkoutSessionCompleted } from '../../fixtures/StripeEvents';
+import {
+  paymentIntentCanceled,
+  paymentIntentSucceeded,
+  session,
+} from '../../fixtures/StripeEvents';
+import { RegisteredUser } from '../../fixtures/User';
 import { getUniqPort, setupServer } from '../../TestSetupUtils';
 
 jest.mock('../../../src/services/Email');
@@ -14,19 +20,37 @@ setupServer({ port: getUniqPort() });
 
 describe('matchEventType', () => {
   it('updates according db data and sends notifications', async () => {
-    await OrderImage.create(OrderImageMock);
-    await GalleryImage.create(galleryImageDoc);
+    await Promise.all([
+      OrderImage.create(OrderImageMock),
+      GalleryImage.create(galleryImageDoc),
+      User.create(RegisteredUser),
+    ]);
 
-    await matchEventType(checkoutSessionCompleted);
+    await matchEventType(paymentIntentSucceeded);
 
-    const OrderImageDoc = await OrderImage.findOne({ id: OrderImageMock.id });
+    const OrderImageDoc = await OrderImage.findOne({
+      'session.id': session.id,
+    });
     const GalleryImageDoc = await GalleryImage.findOne({
       id: galleryImageDoc.id,
     });
 
-    expect(OrderImageDoc?.stripeEvents[0]).toEqual(checkoutSessionCompleted);
+    expect(OrderImageDoc?.stripeEvents[0]).toEqual(paymentIntentSucceeded);
+    expect(OrderImageDoc?.contact).toEqual(RegisteredUser.contact);
+    expect(OrderImageDoc?.address).toEqual(RegisteredUser.address);
     expect(GalleryImageDoc?.isForSell).toBe(false);
     expect(sendSuccessfullPaymentEmail).toHaveBeenCalledTimes(1);
-    expect(sendMessage).toHaveBeenCalledTimes(1);
+    expect(sendImageBuyedMessage).toHaveBeenCalledTimes(1);
+  });
+
+  it('deletes cancelled session', async () => {
+    await OrderImage.create(OrderImageMock);
+
+    await matchEventType(paymentIntentCanceled);
+
+    const OrderImageDocAfterCancel = await OrderImage.findOne({
+      'session.id': OrderImageMock.session.id,
+    });
+    expect(OrderImageDocAfterCancel).toBe(null);
   });
 });

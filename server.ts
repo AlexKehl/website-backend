@@ -2,7 +2,7 @@ import { start } from './src/routes';
 import { connect } from 'mongoose';
 import { DB_URL } from './config';
 import { logger } from './src/utils/Logger';
-import { sendMessage, startTelegramBot } from './src/services/Telegram';
+import { startTelegramBot } from './src/services/telegram';
 
 const main = async () => {
   await connect(`mongodb://${DB_URL}`, { dbName: 'main' });

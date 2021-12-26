@@ -4,7 +4,6 @@ import HttpStatus from '../../common/constants/HttpStatus';
 import HttpTexts from '../../common/constants/HttpTexts';
 import { User as UserType } from '../../common/interface/ConsumerResponses';
 import WithPayloadError from '../utils/Exceptions/WithPayloadError';
-import { makeHttpError } from '../utils/HttpErrors';
 
 export interface UserDoc extends UserType {
   _isEmailConfirmed?: boolean;

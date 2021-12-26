@@ -14,7 +14,7 @@ describe(`GET: ${Endpoints.user}`, () => {
     await User.create(RegisteredUser);
     const res = await supertest(app)
       .get(`${Endpoints.user}?email=${RegisteredUser.email}`)
-      .set(...(await getLoggedInCookie(app)));
+      .set(...(await getLoggedInCookie(app)(RegisteredUser)));
 
     expect(res.status).toEqual(HttpStatus.OK);
     expect(contactDto).toEqual(expect.objectContaining(res.body.contact));
@@ -27,7 +27,7 @@ describe(`GET: ${Endpoints.user}`, () => {
     await User.create(RegisteredUser);
     const res = await supertest(app)
       .get(`${Endpoints.user}?email=${RegisteredUser.email}`)
-      .set(...(await getLoggedInCookie(app)));
+      .set(...(await getLoggedInCookie(app)(RegisteredUser)));
 
     const expected = {
       success: true,
@@ -39,7 +39,7 @@ describe(`GET: ${Endpoints.user}`, () => {
   it('returns HttpStatus.NOT_FOUND', async () => {
     const res = await supertest(app)
       .get(`${Endpoints.user}?email=foo@bar.com`)
-      .set(...(await getLoggedInCookie(app)));
+      .set(...(await getLoggedInCookie(app)(RegisteredUser)));
 
     const expectedBody = { error: 'User not found', success: false };
     expect(res.status).toEqual(HttpStatus.NOT_FOUND);

@@ -1,7 +1,10 @@
 import { Schema, model, SchemaTypes } from 'mongoose';
 import { Document } from 'mongoose';
+import HttpStatus from '../../common/constants/HttpStatus';
+import HttpTexts from '../../common/constants/HttpTexts';
 import { Category } from '../../common/interface/Constants';
 import { FileDoc } from '../types/Files';
+import WithPayloadError from '../utils/Exceptions/WithPayloadError';
 
 export interface GalleryImageDoc extends FileDoc {
   category: Category;
@@ -26,3 +29,17 @@ export const GalleryImage = model<GalleryImageDoc & Document>(
   'GalleryImage',
   GalleryImageSchema
 );
+
+export const findGalleryImage = async (
+  id: string
+): Promise<GalleryImageDoc> => {
+  const image = await GalleryImage.findOne({ id }).lean();
+  if (!image) {
+    throw new WithPayloadError({
+      statusCode: HttpStatus.NOT_FOUND,
+      data: { error: HttpTexts.imageIsMissing },
+    });
+  }
+
+  return image;
+};

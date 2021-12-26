@@ -19,6 +19,6 @@
     "rootDir": ".",
     "useUnknownInCatchVariables": false
   },
-  "exclude": ["node_modules", "dist"],
-  "include": ["src"]
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
 }

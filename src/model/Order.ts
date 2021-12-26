@@ -35,3 +35,4 @@ const OrderSchemaDefinition: Record<keyof OrderDoc, any> = {
 const OrderSchema = new Schema(OrderSchemaDefinition);
 
 export const Order = model<OrderDoc & Document>('Order', OrderSchema);
+

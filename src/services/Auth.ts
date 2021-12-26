@@ -61,8 +61,8 @@ const login = async (loginDto: LoginDto) =>
     .catch(handleHttpErrors);
 
 const createNewUser = async ({ email, password }: RegisterDto) => {
-  const passwordHash = await hash(password, SALT_ROUNDS);
-  return User.create({ email, passwordHash, roles: ['RegisteredUser'] });
+  const _passwordHash = await hash(password, SALT_ROUNDS);
+  return User.create({ email, _passwordHash, roles: ['RegisteredUser'] });
 };
 
 const register = async ({ email, password }: RegisterDto) =>

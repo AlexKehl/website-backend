@@ -3,6 +3,7 @@ import { createStripeSession } from '../services/Stripe/Checkout';
 import { handleWebHook } from '../services/Stripe/Webhooks';
 import { Controller } from '../types';
 import { evaluateHttpObject } from '../utils/HttpResponses';
+import { getUserFromToken } from '../utils/Tokens';
 
 export const checkoutController: Controller<BuyImageDto> = async ({
   req,

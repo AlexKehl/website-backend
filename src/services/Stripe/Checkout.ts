@@ -16,7 +16,7 @@ const saveSessionInDb = (
   dto: BuyImageDto,
   session: Stripe.Response<Stripe.Checkout.Session>
 ) => {
-  return OrderImage.create({ id: session.id, itemIds: dto.ids });
+  return OrderImage.create({ email: dto.email, itemIds: dto.ids, session });
 };
 
 const getImageDocs = (dto: BuyImageDto) => {
